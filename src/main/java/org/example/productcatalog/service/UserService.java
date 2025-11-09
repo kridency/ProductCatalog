@@ -3,7 +3,6 @@ package org.example.productcatalog.service;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.repository.UserRepository;
-import org.example.service.CrudService;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -20,9 +19,7 @@ public class UserService implements CrudService<User> {
     }
 
     public static UserService getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new UserService();
-        }
+        if(INSTANCE == null) INSTANCE = new UserService();
         return INSTANCE;
     }
 
@@ -33,14 +30,15 @@ public class UserService implements CrudService<User> {
 
     @Override
     public User update(User user) {
-        return Optional.ofNullable(user).map(value -> userRepository.save(user)).orElse(null);
+        return userRepository.getByEmail(user.getEmail()).map(value -> userRepository.save(user)).orElse(null);
     }
 
     @Override
     public User remove(User user) {
-        return Optional.ofNullable(user).map(userRepository::delete).orElse(null);
+        return userRepository.getByEmail(user.getEmail()).map(userRepository::delete).orElse(null);
     }
 
+    @Override
     public Collection<User> findAll() { return userRepository.getAll(); }
 
     public User findByEmail(String email) {

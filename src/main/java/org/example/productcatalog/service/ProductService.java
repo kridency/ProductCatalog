@@ -3,7 +3,6 @@ package org.example.productcatalog.service;
 import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.repository.ProductRepository;
-import org.example.service.CrudService;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -19,9 +18,7 @@ public class ProductService implements CrudService<Product> {
     }
 
     public static ProductService getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new ProductService();
-        }
+        if(INSTANCE == null) INSTANCE = new ProductService();
         return INSTANCE;
     }
     @Override
@@ -31,12 +28,12 @@ public class ProductService implements CrudService<Product> {
 
     @Override
     public Product update(Product product) {
-        return Optional.ofNullable(product).map(value -> productRepository.save(product)).orElse(null);
+        return productRepository.getByItem(product.getItem()).map(value -> productRepository.save(product)).orElse(null);
     }
 
     @Override
     public Product remove(Product product) {
-        return Optional.ofNullable(product).map(productRepository::delete).orElse(null);
+        return productRepository.getByItem(product.getItem()).map(productRepository::delete).orElse(null);
     }
 
     public Product findByItem(String item) {
@@ -44,5 +41,6 @@ public class ProductService implements CrudService<Product> {
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND))).orElse(null);
     }
 
+    @Override
     public Collection<Product> findAll() { return productRepository.getAll(); }
 }

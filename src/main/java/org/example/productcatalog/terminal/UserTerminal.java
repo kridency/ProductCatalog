@@ -1,31 +1,35 @@
 package org.example.productcatalog.terminal;
 
+import org.example.productcatalog.audit.AuditProxyFactory;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.service.CrudService;
+import org.example.productcatalog.service.UserService;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.RETURN;
 
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserTerminal extends AbstractTerminal<User> {
     private static UserTerminal INSTANCE;
 
     private UserTerminal() {
+        service = AuditProxyFactory.<CrudService<User>>createAuditedProxy(
+                UserService.getInstance(),
+                CrudService.class,
+                auditor);
         commandMenu = System.lineSeparator() + "\t\u001B[92mupdate\u001B[0m (Редактирование профиля пользователя)"
                 + System.lineSeparator() + "\t\u001B[92mdelete\u001B[0m (Удаление пользователя)"
                 + System.lineSeparator() + "\t\u001B[92mreturn\u001B[0m (Возврат в главное меню)";
         commands = new ConcurrentHashMap<>() {{
-            put("update", userService::update);
-            put("delete", userService::remove);
+            put("update", service::update);
+            put("delete", service::remove);
             put("return", user -> {});
         }};
     }
 
     public static UserTerminal getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new UserTerminal();
-        }
+        if(INSTANCE == null) INSTANCE = new UserTerminal();
         return INSTANCE;
     }
 
@@ -51,12 +55,9 @@ public class UserTerminal extends AbstractTerminal<User> {
 
     @Override
     public void print(User ignore) {
-        Collection<User> list = userService.findAll();
-
-        System.out.println();
-        System.out.println("\t\t\tИдентификатор\t\t\t|\t\tЭлектронная почта\t|\t\tПароль");
+        System.out.println("\n\t\t\tИдентификатор\t\t\t|\t\tЭлектронная почта\t|\t\tПароль");
         System.out.println("-".repeat(50));
-        list.forEach(value ->
+        service.findAll().forEach(value ->
                 System.out.println(value.getId() + "\t\t|\t\t" + value.getEmail() + "\t\t|\t\t" + value.getPassword())
         );
     }

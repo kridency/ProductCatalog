@@ -57,7 +57,7 @@ public class Product {
         return category;
     }
 
-    public void setCategory(String description) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
