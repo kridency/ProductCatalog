@@ -1,13 +1,11 @@
 package org.example.productcatalog.service;
 
 import org.example.productcatalog.entity.Product;
-import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.repository.ProductRepository;
+import org.example.productcatalog.util.specification.Specification;
 
 import java.util.Collection;
-import java.util.Optional;
-
-import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_FOUND;
+import java.util.Map;
 
 public class ProductService implements CrudService<Product> {
     private static ProductService INSTANCE;
@@ -36,9 +34,8 @@ public class ProductService implements CrudService<Product> {
         return productRepository.getByItem(product.getItem()).map(productRepository::delete).orElse(null);
     }
 
-    public Product findByItem(String item) {
-        return Optional.ofNullable(item).map(value -> productRepository.getByItem(item)
-                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND))).orElse(null);
+    public Collection<Product> findFiltered(Map<String, ? extends Comparable<?>> criteria) {
+        return new Specification<Product>(criteria).apply(productRepository.getAll());
     }
 
     @Override
