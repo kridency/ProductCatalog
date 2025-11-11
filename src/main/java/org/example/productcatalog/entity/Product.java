@@ -8,13 +8,13 @@ public class Product {
     private String brand;
     private String title;
     private String category;
-    private double price;
+    private Double price;
 
     public Product(String item,
                    String brand,
                    String title,
                    String category,
-                   double price) {
+                   Double price) {
 
         this.id = UUID.randomUUID();
         this.item = item;
@@ -65,7 +65,7 @@ public class Product {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 }

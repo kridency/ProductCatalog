@@ -7,4 +7,5 @@ public interface CrudService<T> {
     T update(T entity);
     T remove(T entity);
     Collection<T> findAll();
+    Collection<T> findFiltered(T entity);
 }

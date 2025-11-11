@@ -5,8 +5,9 @@ import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.Specification;
 
-import java.util.Collection;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProductService implements CrudService<Product> {
     private static ProductService INSTANCE;
@@ -53,7 +54,19 @@ public class ProductService implements CrudService<Product> {
                 });
     }
 
-    public Collection<Product> findFiltered(Map<String, ? extends Comparable<?>> criteria) {
+    @Override
+    public Collection<Product> findFiltered(Product product) {
+        Map<String, Optional<?>> criteria =
+                Arrays.stream(product.getClass().getDeclaredFields()).filter(field -> !field.getName().equals("id"))
+                        .collect(Collectors.toMap(Field::getName, field -> {
+                            try {
+                                field.setAccessible(true);
+                                return Optional.ofNullable(field.get(product));
+                            } catch (IllegalAccessException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }));
+
         return new Specification<Product>(criteria).apply(productRepository.getAll());
     }
 

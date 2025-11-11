@@ -50,4 +50,7 @@ public class UserService implements CrudService<User> {
         return Optional.ofNullable(id).map(value -> userRepository.getById(id)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))).orElse(null);
     }
+
+    @Override
+    public Collection<User> findFiltered(User user) { return null; }
 }
