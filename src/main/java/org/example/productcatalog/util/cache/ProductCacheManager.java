@@ -2,16 +2,14 @@ package org.example.productcatalog.util.cache;
 
 import org.example.productcatalog.entity.Product;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
 
-public class ProductCacheManager {
+public class ProductCacheManager extends AbstractCacheManager<String, Product> {
     private static ProductCacheManager INSTANCE;
-    private final Map<String, Product> cache;
 
-    private ProductCacheManager() { cache = Collections.synchronizedMap(new HashMap<>()); }
+
+    private ProductCacheManager() {}
 
     public static ProductCacheManager getInstance() {
         if (INSTANCE == null) {
@@ -24,16 +22,19 @@ public class ProductCacheManager {
         return INSTANCE;
     }
 
-    public void put(String cacheKey, Product value) {
-        cache.put(cacheKey, value);
+    @Override
+    public void put(Product value) {
+        cache.put(new AbstractMap.SimpleEntry<>(Instant.now(), value::getItem), value);
     }
 
-    public Optional<Product> get(String cacheKey) {
-        return cache.entrySet().stream().filter(entry -> entry.getKey().equals(cacheKey))
+    @Override
+    public Optional<Product> get(String item) {
+        return cache.entrySet().stream().filter(entry -> entry.getKey().getValue().get().equals(item))
                 .map(Map.Entry::getValue).findFirst();
     }
 
-    public void clear(String cacheKey) { cache.put(cacheKey, null); }
-
-    public void clear() { cache.clear(); }
+    @Override
+    public Optional<Product> clear(String item) {
+        return cache.keySet().stream().filter(key -> key.getValue().get().equals(item)).findFirst().map(cache::remove);
+    }
 }

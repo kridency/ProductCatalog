@@ -1,11 +1,14 @@
 package org.example.productcatalog.service;
 
 import org.example.productcatalog.entity.Product;
+import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.Specification;
 
 import java.util.*;
+
+import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_FOUND;
 
 public class ProductService implements CrudService<Product> {
     private static ProductService INSTANCE;
@@ -24,32 +27,29 @@ public class ProductService implements CrudService<Product> {
 
     @Override
     public Product create(Product product) {
-        return productCacheManager.get(product.getItem())
-                .orElseGet(() -> {
-                    var value =  productRepository.getByItem(product.getItem()).orElseGet(() -> productRepository.save(product));
-                    productCacheManager.put(product.getItem(), value);
-                    return value;
-                });
+        var obj = productRepository.getByItem(product.getItem()).orElse(product);
+        productCacheManager.get(product.getItem()).ifPresentOrElse(x -> {}, () -> productCacheManager.put(obj));
+        return productRepository.save(obj);
     }
 
     @Override
     public Product update(Product product) {
-        return productCacheManager.get(product.getItem())
-                .orElseGet(() -> {
-                    var value = productRepository.getByItem(product.getItem()).map(productRepository::save).orElse(null);
-                    productCacheManager.put(product.getItem(), value);
-                    return value;
-                });
+        var obj = productCacheManager.get(product.getItem())
+                .orElseGet(() -> productRepository.getByItem(product.getItem()).orElseThrow(() ->
+                        new ApplicationException(PRODUCT_NOT_FOUND)));
+
+        obj.setBrand(product.getBrand());
+        obj.setTitle(product.getTitle());
+        obj.setCategory(product.getCategory());
+        obj.setPrice(product.getPrice());
+        return productRepository.save(obj);
     }
 
     @Override
     public Product remove(Product product) {
-        return productCacheManager.get(product.getItem())
-                .orElseGet(() -> {
-                    var value = productRepository.getByItem(product.getItem()).map(productRepository::delete).orElse(null);
-                    productCacheManager.clear(product.getItem());
-                    return value;
-                });
+        return productRepository.delete(productCacheManager.clear(product.getItem()).orElseGet(() ->
+                productRepository.getByItem(product.getItem()).orElseThrow(() ->
+                        new ApplicationException(PRODUCT_NOT_FOUND))));
     }
 
     @Override
