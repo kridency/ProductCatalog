@@ -12,7 +12,7 @@ public abstract class AbstractCacheManager<K, V> {
             new TreeMap<>(Map.Entry.<Instant, Supplier<K>>comparingByKey(Instant::compareTo).reversed())
     );
 
-    public abstract void put(V value);
+    public abstract V put(V value);
     public abstract Optional<V> get(K objKey);
     public abstract Optional<V> clear(K objKey);
 }

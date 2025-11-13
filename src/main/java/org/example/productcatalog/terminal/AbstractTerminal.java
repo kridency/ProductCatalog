@@ -19,7 +19,7 @@ public abstract class AbstractTerminal<T> {
     protected static User principal;
     protected String commandMenu;
     protected Map<String, Consumer<T>> commands;
-    protected CrudService<T> service;
+    protected CrudService<T, String> service;
 
     protected abstract T processCommand(String command);
 

@@ -1,8 +1,6 @@
 package org.example.productcatalog.repository;
 
 import org.example.productcatalog.entity.Product;
-import org.example.productcatalog.entity.User;
-
 import java.util.*;
 
 public class ProductRepository implements CrudRepository<Product> {
@@ -22,14 +20,7 @@ public class ProductRepository implements CrudRepository<Product> {
 
     @Override
     public Product save(Product product) {
-        return products.merge(product.getId(), product, (a, b) -> {
-            a.setItem(b.getItem());
-            a.setBrand(b.getBrand());
-            a.setTitle(b.getTitle());
-            a.setCategory(b.getCategory());
-            a.setPrice(b.getPrice());
-            return a;
-        });
+        return products.merge(product.getId(), product, (a, b) -> b);
     }
 
     @Override

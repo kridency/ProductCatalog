@@ -6,11 +6,10 @@ import org.example.productcatalog.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.USER_NOT_FOUND;
 
-public class UserService implements CrudService<User> {
+public class UserService implements CrudService<User, String> {
     private static UserService INSTANCE;
     private final UserRepository userRepository;
 
@@ -46,8 +45,9 @@ public class UserService implements CrudService<User> {
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))).orElse(null);
     }
 
-    public User findById(UUID id) {
-        return Optional.ofNullable(id).map(value -> userRepository.getById(id)
+    @Override
+    public User find(String email) {
+        return Optional.ofNullable(email).map(value -> userRepository.getByEmail(email)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))).orElse(null);
     }
 

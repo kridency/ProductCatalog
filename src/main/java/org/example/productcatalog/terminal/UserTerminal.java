@@ -3,7 +3,6 @@ package org.example.productcatalog.terminal;
 import org.example.productcatalog.audit.AuditProxyFactory;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
-import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.RETURN;
@@ -14,10 +13,7 @@ public class UserTerminal extends AbstractTerminal<User> {
     private static UserTerminal INSTANCE;
 
     private UserTerminal() {
-        service = AuditProxyFactory.<CrudService<User>>createAuditedProxy(
-                UserService.getInstance(),
-                CrudService.class,
-                auditor);
+        service = AuditProxyFactory.createAuditedProxy(UserService.getInstance(), UserService.class, auditor);
         commandMenu = System.lineSeparator() + "\t\u001B[92mupdate\u001B[0m (Редактирование профиля пользователя)"
                 + System.lineSeparator() + "\t\u001B[92mdelete\u001B[0m (Удаление пользователя)"
                 + System.lineSeparator() + "\t\u001B[92mreturn\u001B[0m (Возврат в главное меню)";

@@ -10,7 +10,7 @@ import java.util.*;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_FOUND;
 
-public class ProductService implements CrudService<Product> {
+public class ProductService implements CrudService<Product, String> {
     private static ProductService INSTANCE;
     private final ProductRepository productRepository;
     private final ProductCacheManager productCacheManager;
@@ -27,15 +27,13 @@ public class ProductService implements CrudService<Product> {
 
     @Override
     public Product create(Product product) {
-        var obj = productRepository.getByItem(product.getItem()).orElse(product);
-        productCacheManager.get(product.getItem()).ifPresentOrElse(x -> {}, () -> productCacheManager.put(obj));
-        return productRepository.save(obj);
+        return productCacheManager.put(productRepository.getByItem(product.getItem())
+                .orElse(productRepository.save(product)));
     }
 
     @Override
     public Product update(Product product) {
-        var obj = productCacheManager.get(product.getItem())
-                .orElseGet(() -> productRepository.getByItem(product.getItem()).orElseThrow(() ->
+        var obj = productCacheManager.put(productRepository.getByItem(product.getItem()).orElseThrow(() ->
                         new ApplicationException(PRODUCT_NOT_FOUND)));
 
         obj.setBrand(product.getBrand());
@@ -59,4 +57,10 @@ public class ProductService implements CrudService<Product> {
 
     @Override
     public Collection<Product> findAll() { return productRepository.getAll(); }
+
+    @Override
+    public Product find(String item) {
+        return productCacheManager.get(item).orElse(productRepository.getByItem(item).orElseThrow(() ->
+                new ApplicationException(PRODUCT_NOT_FOUND)));
+    }
 }

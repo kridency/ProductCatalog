@@ -23,8 +23,10 @@ public class ProductCacheManager extends AbstractCacheManager<String, Product> {
     }
 
     @Override
-    public void put(Product value) {
+    public Product put(Product value) {
+        get(value.getItem()).ifPresent(x -> clear(x.getItem()));
         cache.put(new AbstractMap.SimpleEntry<>(Instant.now(), value::getItem), value);
+        return value;
     }
 
     @Override
