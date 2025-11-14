@@ -6,8 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public record Specification<T>(T entity)
-        implements Function<Collection<T>, Collection<T>> {
+public record Specification<T>(T entity) implements Function<Collection<T>, Collection<T>> {
     private static final BiFunction<String, Object, Object> getPath = new BiFunction<>() {
         @Override
         public Object apply(String path, Object obj) {
@@ -38,8 +37,7 @@ public record Specification<T>(T entity)
     @Override
     public Collection<T> apply(Collection<T> target) {
         var criteria = getCriteria();
-        return target.stream().filter(value ->
-            criteria.size() == criteria.entrySet().stream()
+        return target.stream().filter(value -> criteria.size() == criteria.entrySet().stream()
                     .filter(entry -> entry.getValue().isEmpty()
                             || Objects.equals(getPath.apply(entry.getKey(), value), entry.getValue().get()))
                     .count()

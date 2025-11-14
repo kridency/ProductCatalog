@@ -6,19 +6,12 @@ import java.time.Instant;
 import java.util.*;
 
 public class ProductCacheManager extends AbstractCacheManager<String, Product> {
-    private static ProductCacheManager INSTANCE;
+    private static final ProductCacheManager INSTANCE = new ProductCacheManager();
 
 
     private ProductCacheManager() {}
 
     public static ProductCacheManager getInstance() {
-        if (INSTANCE == null) {
-            synchronized (ProductCacheManager.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new ProductCacheManager();
-                }
-            }
-        }
         return INSTANCE;
     }
 
