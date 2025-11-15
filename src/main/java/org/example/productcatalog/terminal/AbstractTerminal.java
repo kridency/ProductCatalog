@@ -26,39 +26,30 @@ public abstract class AbstractTerminal<T> {
     protected abstract void print(T data);
 
     public void runCommands() {
-        var goBack = false;
-        while(!goBack) {
+        do {
             System.out.println(commandMenu);
             System.out.print(COMMAND_PROMPT);
             var command = scanner.nextLine();
             try {
-                User principal;
                 Optional.ofNullable(commands.get(command))
                         .ifPresentOrElse(consumer -> consumer.accept(processCommand(command)),
                                 () -> { throw new ApplicationException(INPUT_ERROR); });
-                principal = getPrincipal();
-                goBack = command.equals("login") && principal != null;
-                if (principal != null) {
-                    try {
-                        UserService.getInstance().findByEmail(principal.getEmail());
-                    } catch (ApplicationException e) {
-                        if (e.getMessage().equals(USER_NOT_FOUND)) {
-                            setPrincipal(null);
-                            goBack = true;
-                        }
-                    }
-                }
+                setPrincipal(getPrincipal());
             } catch (ApplicationException e) {
-                if(e.getMessage().equals(RETURN) || e.getMessage().equals(UNAUTHORIZED))
-                    goBack = true;
-                else
-                    System.out.println(e.getMessage());
+                if(e.getMessage().equals(RETURN) || e.getMessage().equals(UNAUTHORIZED)) break;
+                System.out.println(e.getMessage());
             }
-        }
+        } while (getPrincipal() != null);
     }
 
     public static void setPrincipal(User user) {
-        principal = user;
+        try {
+            principal = UserService.getInstance().findByEmail(Optional.ofNullable(user)
+                    .map(User::getEmail).orElse(null));
+        } catch (ApplicationException e) {
+            System.out.println(e.getMessage());
+            principal = null;
+        }
     }
 
     public static User getPrincipal() {

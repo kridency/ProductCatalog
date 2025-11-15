@@ -2,6 +2,7 @@ package org.example.productcatalog;
 
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.exception.ExitException;
 import org.example.productcatalog.terminal.*;
 
 import java.time.Instant;
@@ -34,7 +35,7 @@ public class ProductCatalogApplication {
 
     public static void main(String[] args) {
         try {
-            while(true) {
+            while (true) {
                 Optional.ofNullable(AbstractTerminal.getPrincipal()).ifPresentOrElse(user -> {
                     var isAdmin = user.getRole().equals(RoleType.ROLE_ADMIN);
 
@@ -58,13 +59,13 @@ public class ProductCatalogApplication {
                                                 throw new ApplicationException(INPUT_ERROR);
                                             }
                                         });
-                    } catch(ApplicationException e) {
+                    } catch (ApplicationException e) {
                         if(!e.getMessage().equals("return"))
                             System.out.println(e.getMessage());
                     }
                 }, () -> terminals.get("authentication").runCommands());
             }
-        } catch (RuntimeException e) {
+        } catch (ExitException e) {
             LOGGER.log(Level.INFO, e.getMessage());
             System.exit(0);
         }

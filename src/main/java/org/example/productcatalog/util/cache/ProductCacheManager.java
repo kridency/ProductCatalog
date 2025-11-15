@@ -4,15 +4,14 @@ import org.example.productcatalog.entity.Product;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Supplier;
 
-public class ProductCacheManager extends AbstractCacheManager<String, Product> {
-    private static final ProductCacheManager INSTANCE = new ProductCacheManager();
+public class ProductCacheManager implements CacheManager<String, Product> {
+    private final Map<Map.Entry<Instant, Supplier<String>>, Product> cache;
 
-
-    private ProductCacheManager() {}
-
-    public static ProductCacheManager getInstance() {
-        return INSTANCE;
+    public ProductCacheManager() {
+        cache = Collections.synchronizedMap(
+                new TreeMap<>(Map.Entry.<Instant, Supplier<String>>comparingByKey(Instant::compareTo).reversed()));
     }
 
     @Override

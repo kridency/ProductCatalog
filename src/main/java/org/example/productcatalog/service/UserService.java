@@ -10,7 +10,7 @@ import java.util.Optional;
 import static org.example.productcatalog.preset.ProductCatalogInit.USER_NOT_FOUND;
 
 public class UserService implements CrudService<User, String> {
-    private static UserService INSTANCE;
+    private static final UserService INSTANCE = new UserService();
     private final UserRepository userRepository;
 
     private UserService() {
@@ -18,7 +18,6 @@ public class UserService implements CrudService<User, String> {
     }
 
     public static UserService getInstance() {
-        if(INSTANCE == null) INSTANCE = new UserService();
         return INSTANCE;
     }
 

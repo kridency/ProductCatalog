@@ -2,14 +2,14 @@ package org.example.productcatalog.terminal;
 
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.exception.ExitException;
 import org.example.productcatalog.service.UserService;
 
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.example.productcatalog.preset.ProductCatalogInit.FORCED_COMPLETION;
-import static org.example.productcatalog.preset.ProductCatalogInit.UNAUTHORIZED;
+import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class AuthTerminal extends AbstractTerminal<User> {
     private static AuthTerminal INSTANCE;
@@ -22,13 +22,14 @@ public class AuthTerminal extends AbstractTerminal<User> {
         commands = new ConcurrentHashMap<>() {{
             put("register", service::create);
             put("login", user -> {
-                Optional.ofNullable(((UserService) service).findByEmail(user.getEmail()))
+                Optional.ofNullable(user).map(x -> ((UserService) service).findByEmail(x.getEmail()))
                         .filter(value -> value.getPassword().equals(user.getPassword()))
                         .ifPresentOrElse(AbstractTerminal::setPrincipal, ()->{throw new ApplicationException(UNAUTHORIZED);});
 
-                auditor.audit(Instant.now() + " User: " + user.getEmail() + "; Successfully signed in");
+                auditor.audit(Instant.now() + " User: " + AbstractTerminal.getPrincipal().getEmail() + "; Successfully signed in");
+                throw new ApplicationException(RETURN);
             });
-            put("exit", user -> { throw new RuntimeException(FORCED_COMPLETION); });
+            put("exit", user -> { throw new ExitException(FORCED_COMPLETION); });
         }};
     }
 

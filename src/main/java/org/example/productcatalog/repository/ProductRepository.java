@@ -28,9 +28,10 @@ public class ProductRepository implements CrudRepository<Product> {
         return products.remove(product.getId());
     }
 
+    @Override
+    public Collection<Product> getAll() { return products.values(); }
+
     public Optional<Product> getByItem(String item) {
         return products.values().stream().filter(product -> product.getItem().equals(item)).findFirst();
     }
-
-    public Collection<Product> getAll() { return products.values(); }
 }

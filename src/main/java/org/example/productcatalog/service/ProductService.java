@@ -17,7 +17,7 @@ public class ProductService implements CrudService<Product, String> {
 
     private ProductService() {
         productRepository = ProductRepository.getInstance();
-        productCacheManager = ProductCacheManager.getInstance();
+        productCacheManager = new ProductCacheManager();
     }
 
     public static ProductService getInstance() {

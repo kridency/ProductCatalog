@@ -21,11 +21,7 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public User save(User user) {
-        return users.merge(user.getId(), user, (a, b) -> {
-            a.setEmail(b.getEmail());
-            a.setPassword(b.getPassword());
-            return a;
-        });
+        return users.merge(user.getId(), user, (a, b) -> b);
     }
 
     @Override
@@ -33,13 +29,10 @@ public class UserRepository implements CrudRepository<User> {
         return users.remove(user.getId());
     }
 
-    public Optional<User> getById(UUID id) {
-        return Optional.ofNullable(users.get(id));
-    }
+    @Override
+    public Collection<User> getAll() { return users.values(); }
 
     public Optional<User> getByEmail(String email) {
         return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
     }
-
-    public Collection<User> getAll() { return users.values(); }
 }
