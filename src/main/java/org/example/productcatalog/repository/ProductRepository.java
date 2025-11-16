@@ -4,7 +4,7 @@ import org.example.productcatalog.entity.Product;
 import java.util.*;
 
 public class ProductRepository implements CrudRepository<Product> {
-    private final Map<UUID, Product> products;
+    private final Map<Long, Product> products;
     private static ProductRepository INSTANCE;
 
     private ProductRepository() {
@@ -28,7 +28,6 @@ public class ProductRepository implements CrudRepository<Product> {
         return products.remove(product.getId());
     }
 
-    @Override
     public Collection<Product> getAll() { return products.values(); }
 
     public Optional<Product> getByItem(String item) {

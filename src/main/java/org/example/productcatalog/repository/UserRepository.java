@@ -5,7 +5,7 @@ import org.example.productcatalog.entity.User;
 import java.util.*;
 
 public class UserRepository implements CrudRepository<User> {
-    private final Map<UUID, User> users;
+    private final Map<Long, User> users;
     private static UserRepository INSTANCE;
 
     private UserRepository() {
@@ -29,7 +29,6 @@ public class UserRepository implements CrudRepository<User> {
         return users.remove(user.getId());
     }
 
-    @Override
     public Collection<User> getAll() { return users.values(); }
 
     public Optional<User> getByEmail(String email) {

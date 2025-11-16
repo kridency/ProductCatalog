@@ -1,25 +1,22 @@
 package org.example.productcatalog.entity;
 
-import java.util.UUID;
-
 public class User {
-    private UUID id;
+    private long id;
     private String email;
     private String password;
     private RoleType role;
 
     public User(String email, String password) {
-        this.id = UUID.randomUUID();
         this.email = email;
         this.password = password;
         this.role = RoleType.ROLE_USER;
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(long id) {
         this.id = id;
     }
 

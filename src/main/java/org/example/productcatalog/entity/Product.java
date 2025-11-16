@@ -1,9 +1,7 @@
 package org.example.productcatalog.entity;
 
-import java.util.UUID;
-
 public class Product {
-    private UUID id;
+    private long id;
     private String item;
     private String brand;
     private String title;
@@ -15,21 +13,18 @@ public class Product {
                    String title,
                    String category,
                    Double price) {
-
-        this.id = UUID.randomUUID();
         this.item = item;
         this.brand = brand;
         this.title = title;
         this.category = category;
         this.price = price;
-
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(UUID id) { this.id = id; }
+    public void setId(long id) { this.id = id; }
 
     public String getItem() {
         return item;

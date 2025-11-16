@@ -6,14 +6,64 @@
 
     <groupId>org.example.productcatalog</groupId>
     <artifactId>ProductCatalog</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.source-target.version>21</java.source-target.version>
         <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+        <postgresql.version>42.7.8</postgresql.version>
+        <liquibase.version>4.31.1</liquibase.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
+
+        <testcontainers.version>1.21.3</testcontainers.version>
+        <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -25,6 +75,24 @@
                     <source>${java.source-target.version}</source>
                     <target>${java.source-target.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibase-maven-plugin.version}</version>
+                <configuration>
+                    <propertyFileWillOverride>true</propertyFileWillOverride>
+                    <searchPath>${project.basedir}/src/main/resources</searchPath>
+                    <propertyFile>liquibase.yml</propertyFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
