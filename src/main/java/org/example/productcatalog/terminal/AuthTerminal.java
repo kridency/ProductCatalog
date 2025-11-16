@@ -5,7 +5,6 @@ import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.exception.ExitException;
 import org.example.productcatalog.service.UserService;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,7 +25,7 @@ public class AuthTerminal extends AbstractTerminal<User> {
                         .filter(value -> value.getPassword().equals(user.getPassword()))
                         .ifPresentOrElse(AbstractTerminal::setPrincipal, ()->{throw new ApplicationException(UNAUTHORIZED);});
 
-                auditor.audit(Instant.now() + " User: " + AbstractTerminal.getPrincipal().getEmail() + "; Successfully signed in");
+                auditor.audit("login", AbstractTerminal.getPrincipal().getEmail());
                 throw new ApplicationException(RETURN);
             });
             put("exit", user -> { throw new ExitException(FORCED_COMPLETION); });

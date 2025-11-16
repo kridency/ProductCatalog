@@ -23,12 +23,12 @@ public class UserService implements CrudService<User, String> {
 
     @Override
     public User create(User user) {
-        return userRepository.getByEmail(user.getEmail()).orElseGet(() -> userRepository.save(user));
+        return userRepository.getByEmail(user.getEmail()).orElseGet(() -> userRepository.add(user));
     }
 
     @Override
     public User update(User user) {
-        return userRepository.getByEmail(user.getEmail()).map(value -> userRepository.save(user)).orElse(null);
+        return userRepository.getByEmail(user.getEmail()).map(value -> userRepository.update(user)).orElse(null);
     }
 
     @Override

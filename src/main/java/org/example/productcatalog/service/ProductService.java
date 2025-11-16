@@ -28,7 +28,7 @@ public class ProductService implements CrudService<Product, String> {
     @Override
     public Product create(Product product) {
         return productCacheManager.put(productRepository.getByItem(product.getItem())
-                .orElse(productRepository.save(product)));
+                .orElse(productRepository.add(product)));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ProductService implements CrudService<Product, String> {
         obj.setTitle(product.getTitle());
         obj.setCategory(product.getCategory());
         obj.setPrice(product.getPrice());
-        return productRepository.save(obj);
+        return productRepository.update(obj);
     }
 
     @Override

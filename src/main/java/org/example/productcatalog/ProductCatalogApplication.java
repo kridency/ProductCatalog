@@ -5,7 +5,6 @@ import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.exception.ExitException;
 import org.example.productcatalog.terminal.*;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +52,7 @@ public class ProductCatalogApplication {
                                         () -> {
                                             if (command.equals("logout")) {
                                                 AbstractTerminal.getAuditor()
-                                                        .audit(Instant.now() + " User: " + user.getEmail() + "; Successfully signed out");
+                                                        .audit("logout", user.getEmail());
                                                 AbstractTerminal.setPrincipal(null);
                                             } else {
                                                 throw new ApplicationException(INPUT_ERROR);

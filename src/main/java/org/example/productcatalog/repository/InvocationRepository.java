@@ -12,14 +12,19 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class InvocationRepository implements CrudRepository<Invocation> {
     private static final InvocationRepository INSTANCE = new InvocationRepository();
+    private final UserRepository userRepository;
     private final PGConnectionPoolDataSource datasource;
     private static String SCHEMA;
 
     private InvocationRepository() {
+        userRepository = UserRepository.getInstance();
         datasource = PostgreSQLClient.getInstance().getDataSource();
         SCHEMA = datasource.getCurrentSchema();
     }
@@ -28,6 +33,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
         return INSTANCE;
     }
 
+    @Override
     public Invocation add(Invocation invocation) {
         var query = "INSERT INTO " + SCHEMA + ".\"invocation\" (date, endpoint, user_id) " + "VALUES (?,?,?)";
 
@@ -38,18 +44,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
                     statement.setTimestamp(1, Timestamp.from(value.getDate()));
                     statement.setString(2, value.getEndpoint());
                     statement.setLong(3, value.getUser().getId());
-                    if (statement.executeUpdate() == 1) {
-                        try (var resultSet = statement.getGeneratedKeys()) {
-                            while (resultSet.next()) {
-                                value.setId(resultSet.getInt(1));
-                            }
-                            return value;
-                        } catch (Exception e) {
-                            throw new ApplicationException(e.getMessage());
-                        }
-                    } else {
-                        return null;
-                    }
+                    return getEntity(statement, value, value::setId);
                 } catch (SQLException e) {
                     throw new ApplicationException(e.getMessage());
                 }
@@ -59,6 +54,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
         }
     }
 
+    @Override
     public Invocation update(Invocation invocation) {
         var query = "UPDATE " + SCHEMA + ".\"invocation\" SET endpoint=? WHERE id=?";
 
@@ -68,18 +64,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
                 try {
                     statement.setString(1, value.getEndpoint());
                     statement.setLong(2, value.getId());
-                    if (statement.executeUpdate() == 1) {
-                        try (var resultSet = statement.getGeneratedKeys()) {
-                            while (resultSet.next()) {
-                                value.setId(resultSet.getInt(1));
-                            }
-                            return value;
-                        } catch (Exception e) {
-                            throw new ApplicationException(e.getMessage());
-                        }
-                    } else {
-                        return null;
-                    }
+                    return getEntity(statement, value, value::setId);
                 } catch (SQLException e) {
                     throw new ApplicationException(e.getMessage());
                 }
@@ -89,6 +74,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
         }
     }
 
+    @Override
     public Invocation delete(Invocation invocation) {
         var query = "DELETE FROM " + SCHEMA + ".\"invocation\" WHERE id=?";
 
@@ -115,6 +101,33 @@ public class InvocationRepository implements CrudRepository<Invocation> {
                     throw new ApplicationException(e.getMessage());
                 }
             }).orElseThrow(() -> new ApplicationException("Не указана транзакция"));
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Collection<Invocation> getAll() {
+        var query = "SELECT * FROM " + SCHEMA + ".\"invocation\"";
+
+        try (var connection = datasource.getConnection();
+             var statement = connection.prepareStatement(query);
+             var resultSet = statement.executeQuery()) {
+            return Stream.generate(() -> {
+                try {
+                    if (resultSet.next()) {
+                        var entity = new Invocation(
+                                resultSet.getString("endpoint"),
+                                userRepository.getById(resultSet.getLong("user_id")).orElse(null));
+                        entity.setId(resultSet.getLong("id"));
+                        return entity;
+                    } else {
+                        return null;
+                    }
+                } catch (SQLException e) {
+                    throw new ApplicationException(e.getMessage());
+                }
+            }).takeWhile(Objects::nonNull).toList();
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }

@@ -31,17 +31,11 @@
             <column name="id" type="bigint" defaultValueSequenceNext="id_sequence">
                 <constraints primaryKey="true" nullable="false" unique="true"/>
             </column>
-            <column name="name" type="varchar">
-                <constraints nullable="false"/>
-            </column>
             <column name="email" type="varchar">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="password" type="varchar"/>
             <column name="role" type="role_type"/>
-            <column name="hash" type="varchar">
-                <constraints nullable="false" unique="true"/>
-            </column>
         </createTable>
     </changeSet>
 

@@ -9,27 +9,21 @@
     <changeSet author="kridency" id="create_users">
 
         <insert tableName="user">
-            <column name="name" value="admin"/>
             <column name="email" value="admin@hostname"/>
             <column name="password" value="admin"/>
             <column name="role" value="ROLE_ADMIN"/>
-            <column name="hash" value="FD5F08ADAE5BEBCACEB59A0358A09FE9D0C0D440"/>
         </insert>
 
         <insert tableName="user">
-            <column name="name" value="name"/>
             <column name="email" value="name@hostname"/>
             <column name="password" value="12345"/>
             <column name="role" value="ROLE_USER"/>
-            <column name="hash" value="DBAD912E791C54015954BC519E8EEFA925F91945"/>
         </insert>
 
         <insert tableName="user">
-            <column name="name" value="test"/>
             <column name="email" value="test@hostname"/>
             <column name="password" value="test"/>
             <column name="role" value="ROLE_USER"/>
-            <column name="hash" value="2C7978A1A0A0742736E63D8A8E9E81E8189C7BE6"/>
         </insert>
 
     </changeSet>
