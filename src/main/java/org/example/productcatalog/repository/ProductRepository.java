@@ -15,8 +15,8 @@ public class ProductRepository implements CrudRepository<Product> {
     private static final ProductRepository INSTANCE = new ProductRepository();
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"product\" (item, brand, title, category, price) " + "VALUES (?,?,?,?,?)";
-    private static final String UPDATE_QUERY = "UPDATE \"product\" SET brand=?, title=?, category=?, price=? WHERE id=?";
-    private static final String DELETE_QUERY = "DELETE FROM \"product\" WHERE id=?";
+    private static final String UPDATE_QUERY = "UPDATE \"product\" SET brand=?, title=?, category=?, price=? WHERE item=?";
+    private static final String DELETE_QUERY = "DELETE FROM \"product\" WHERE item=?";
     private static final String GET_ALL_QUERY = "SELECT * FROM \"product\"";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"product\" WHERE id=?";
     private static final String GET_BY_ITEM_QUERY = "SELECT * FROM \"product\" WHERE item=?";
@@ -57,6 +57,7 @@ public class ProductRepository implements CrudRepository<Product> {
                 statement.setString(2, product.getTitle());
                 statement.setString(3, product.getCategory());
                 statement.setDouble(4, product.getPrice());
+                statement.setString(5, product.getItem());
                 return setEntityId(statement, product, product::setId);
             } catch (SQLException e) {
                 throw new ApplicationException(e.getMessage());
@@ -69,19 +70,20 @@ public class ProductRepository implements CrudRepository<Product> {
     @Override
     public Product delete(Product product) {
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(DELETE_QUERY)) {
+             var statement = connection.prepareStatement(DELETE_QUERY,
+                     new String[] {"id", "item", "brand", "title", "category", "price"})) {
             try {
-                statement.setLong(1, product.getId());
+                statement.setString(1, product.getItem());
                 if (statement.executeUpdate() == 1) {
                     try (var resultSet = statement.getGeneratedKeys()) {
                         while (resultSet.next()) {
-                            product.setId(resultSet.getInt(1));
+                            product.setId(resultSet.getLong(1));
+                            product.setItem(resultSet.getString("item"));
+                            product.setBrand(resultSet.getString("brand"));
+                            product.setTitle(resultSet.getString("title"));
+                            product.setCategory(resultSet.getString("category"));
+                            product.setPrice(resultSet.getDouble("price"));
                         }
-                        product.setItem(resultSet.getString("item"));
-                        product.setBrand(resultSet.getString("brand"));
-                        product.setTitle(resultSet.getString("title"));
-                        product.setCategory(resultSet.getString("category"));
-                        product.setPrice(resultSet.getDouble("price"));
                         return product;
                     } catch (Exception e) {
                         throw new ApplicationException(e.getMessage());

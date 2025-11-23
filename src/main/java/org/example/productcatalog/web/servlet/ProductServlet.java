@@ -81,7 +81,7 @@ public class ProductServlet extends HttpServlet {
             Product newEntity = productService.update(product);
             if (newEntity != null) {
                 response.setStatus(HttpServletResponse.SC_CREATED);
-                responseText = "Транзакция " + product.getId() + " успешно изменена.";
+                responseText = "Товар " + product.getId() + " успешно изменен.";
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 responseText = "Не удалось изменить транзакцию.";
@@ -98,7 +98,7 @@ public class ProductServlet extends HttpServlet {
         try (PrintWriter writer = response.getWriter()) {
             Product newEntity = productService.remove(transaction);
             response.setStatus(HttpServletResponse.SC_OK);
-            writer.println("Транзакция " + newEntity.getId() + " успешно удалена.");
+            writer.println("Товар " + newEntity.getId() + " успешно удален.");
             writer.flush();
         } catch (Exception e) {
             if (!e.getMessage().equals(RETURN)) {
@@ -199,11 +199,11 @@ public class ProductServlet extends HttpServlet {
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
                 Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
                     try {
-                        ProductDto transactionDto = objectMapper.readValue(
+                        ProductDto productDto = objectMapper.readValue(
                                 reader.lines().collect(Collectors.joining()),
                                 ProductDto.class
                         );
-                        Product entity = productMapper.productDtoToProduct(transactionDto);
+                        Product entity = productMapper.productDtoToProduct(productDto);
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/update" -> update(response, entity);
                             default -> {

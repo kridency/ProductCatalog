@@ -2,7 +2,6 @@ package org.example.productcatalog.servlet;
 
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.entity.Product;
-import org.example.productcatalog.entity.User;
 import org.example.productcatalog.mapper.ProductMapper;
 import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.web.listener.RequestStream;
@@ -19,87 +18,76 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.time.Instant;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 
 public class ProductServletTest extends AbstractTest {
     private static final ProductService productService = Mockito.spy(ProductService.getInstance());
+    private static final ProductMapper productMapper = Mockito.spy(ProductMapper.getInstance());
 
     @Test
-    @DisplayName("Печать транзакций отфильтрованных по шаблону")
-    void givenCurrentUserAndTransaction_whenTryToListWithTemplate_thenReturnCorrectResult() throws IOException {
-        User user = userService.findByEmail("name@hostname");
-        String transactionList = objectMapper.writeValueAsString(productService.findAllByUser(user).stream()
-                .map(value -> ProductMapper.getInstance().transactionToTransactionDto(value)).toList());
+    @DisplayName("Печать товаров отфильтрованных по шаблону")
+    void givenCurrentUserAndProductTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
+        Product product = productService.find("I11");
+        String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(product));
+        String productList = objectMapper.writeValueAsString(productService.findFiltered(product).stream()
+                .map(productMapper::productToProductDto).toList());
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
-        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("DBAD912E791C54015954BC519E8EEFA925F91945");
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/transaction/list");
+        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
+        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/list");
+        Mockito.when(request.getReader())
+                .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
 
         ProductServlet.getInstance().doGet(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
-        Mockito.verify(writer).println(transactionList);
+        Mockito.verify(writer).println(productList);
     }
 
     @Test
-    @DisplayName("Попытка изменить транзакцию")
-    void givenUserAndTransaction_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        User user = userService.findByEmail("name@hostname");
-        Product transaction = productService
-                .findByDateAndUser(Instant.parse("2024-12-12T12:00:00.00Z"), user);
-        Product newTransaction = new Transaction(
-                TransactionType.DEPOSIT,
-                "Interest",
-                new BigDecimal("50"),
-                "Receive income from investment", user);
-        newTransaction.setDate(transaction.getDate());
+    @DisplayName("Попытка изменить товар")
+    void givenUserAndProduct_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
+        Product product = productService.find("I11");
+        Product newProduct = new Product("I11", "Puma", "Sneakers", "Shoes", 75.0);
+        String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(newProduct));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
-        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("DBAD912E791C54015954BC519E8EEFA925F91945");
-        Mockito.when(request.getReader()).thenReturn(new BufferedReader(new InputStreamReader(
-                new RequestStream(objectMapper.writeValueAsString(
-                        TransactionMapper.getInstance().transactionToTransactionDto(newTransaction)).getBytes()
-                )
-        )));
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/transaction/update");
+        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
+        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/update");
+        Mockito.when(request.getReader())
+                .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
 
-        TransactionServlet.getInstance().doPut(request, response);
+        ProductServlet.getInstance().doPut(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
-        Mockito.verify(writer).println("Транзакция " + transaction.getId() + " успешно изменена.");
+        Mockito.verify(writer).println("Товар " + product.getId() + " успешно изменен.");
     }
 
     @Test
-    @DisplayName("Попытка удалить транзакцию")
-    void givenUserAndTransaction_whenTryToDelete_thenReturnCorrectResult() throws IOException {
-        User user = userService.findByEmail("name@hostname");
-        Transaction transaction = transactionService
-                .findByDateAndUser(Instant.parse("2024-12-18T12:00:00.00Z"), user);
+    @DisplayName("Попытка удалить товар")
+    void givenUserAndProduct_whenTryToDelete_thenReturnCorrectResult() throws IOException {
+        Product product = productService.find("I11");
+        String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(product));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
-        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("DBAD912E791C54015954BC519E8EEFA925F91945");
-        Mockito.when(request.getReader()).thenReturn(new BufferedReader(new InputStreamReader(
-                new RequestStream(objectMapper.writeValueAsString(
-                        TransactionMapper.getInstance().transactionToTransactionDto(transaction)).getBytes()
-                )
-        )));
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/transaction/delete");
+        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
+        Mockito.when(request.getReader())
+                .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
+        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/delete");
         Mockito.when(response.getWriter()).thenReturn(writer);
 
-        TransactionServlet.getInstance().doDelete(request, response);
+        ProductServlet.getInstance().doDelete(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
-        Mockito.verify(writer).println("Транзакция " + transaction.getId() + " успешно удалена.");
+        Mockito.verify(writer).println("Товар " + product.getId() + " успешно удален.");
     }
 }

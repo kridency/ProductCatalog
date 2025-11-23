@@ -11,13 +11,13 @@ public class Product {
     private String brand;
     private String title;
     private String category;
-    private Double price;
+    private double price;
 
     public Product(String item,
                    String brand,
                    String title,
                    String category,
-                   Double price) {
+                   double price) {
         this.item = item;
         this.brand = brand;
         this.title = title;

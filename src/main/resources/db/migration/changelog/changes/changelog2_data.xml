@@ -28,4 +28,16 @@
 
     </changeSet>
 
+    <changeSet  author="kridency" id="create_products">
+
+        <insert tableName="product">
+            <column name="item" value="I11"/>
+            <column name="brand" value="Addidas"/>
+            <column name="title" value="Sneakers"/>
+            <column name="category" value="Shoes"/>
+            <column name="price" value="100.0"/>
+        </insert>
+
+    </changeSet>
+
 </databaseChangeLog>
