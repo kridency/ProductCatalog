@@ -31,7 +31,7 @@ public class ExchangeAspect {
                             return new Cookie(cookie[0], cookie[1]);
                         }).filter(cookie -> cookie.getName().equals("JSESSIONID"))
                         .map(Cookie::getValue).reduce((a, b) -> b)).orElse(null);
-        if ((user = userService.findByHash(sessionId)) != null) {
+        if ((user = userService.findByEmail(sessionId)) != null) {
             invocationRepository.add(new Invocation(endpoint, user));
         }
         return pjp.proceed(pjp.getArgs());

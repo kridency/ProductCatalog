@@ -112,7 +112,8 @@ public class ProductServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
         String path = request.getPathInfo();
-        try (PrintWriter writer = response.getWriter()) {
+        try (PrintWriter writer = response.getWriter();
+                BufferedReader reader = request.getReader()) {
             Supplier<Void> unauthorized = () -> {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 writer.println(UNAUTHORIZED);
@@ -121,12 +122,22 @@ public class ProductServlet extends HttpServlet {
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
                     Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
-                        switch (path.substring(path.lastIndexOf('/'))) {
-                            case "/list" -> list(response, principal);
-                            default -> {
-                                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                                writer.println(BAD_ENDPOINT);
+                        try {
+                            ProductDto product = objectMapper.readValue(
+                                    reader.lines().collect(Collectors.joining()),
+                                    ProductDto.class
+                            );
+                            Product entity = productMapper.productDtoToProduct(product);
+                            switch (path.substring(path.lastIndexOf('/'))) {
+                                case "/list" -> list(response, entity);
+                                default -> {
+                                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                                    writer.println(BAD_ENDPOINT);
+                                }
                             }
+                        } catch (JsonProcessingException e) {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            writer.println(BAD_REQUEST);
                         }
                     }, unauthorized::get), unauthorized::get);
         } catch (Exception e) {
