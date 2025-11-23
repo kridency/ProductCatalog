@@ -21,6 +21,12 @@ public class UserService implements CrudService<User, String> {
         return INSTANCE;
     }
 
+    public User login(User user) {
+        return Optional.ofNullable(user).map(value -> findByEmail(value.getEmail()))
+                .filter(value -> value.getPassword().equals(user.getPassword()))
+                .orElseThrow(() -> new ApplicationException(UNAUTHORIZED));
+    }
+
     @Override
     public User create(User user) {
         return userRepository.getByEmail(user.getEmail()).orElseGet(() -> userRepository.save(user));
@@ -48,6 +54,11 @@ public class UserService implements CrudService<User, String> {
     public User find(String email) {
         return Optional.ofNullable(email).map(value -> userRepository.getByEmail(email)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))).orElse(null);
+    }
+
+    public User findById(long id) {
+        return userRepository.getById(id)
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
     }
 
     @Override

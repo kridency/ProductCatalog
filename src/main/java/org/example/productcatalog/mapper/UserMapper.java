@@ -1,0 +1,72 @@
+package org.example.productcatalog.mapper;
+
+import org.example.productcatalog.dto.UserDto;
+import org.example.productcatalog.entity.RoleType;
+import org.example.productcatalog.entity.User;
+import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.service.UserService;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
+
+import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
+
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Named("UserMapper")
+public interface UserMapper {
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    @Named("getUserMapper")
+    static UserMapper getInstance() {
+        return INSTANCE;
+    }
+
+    @Named("getUserId")
+    default long getUserId(UserDto data) {
+        try {
+            return UserService.getInstance().findByEmail(data.getEmail()).getId();
+        } catch (ApplicationException e) {
+            return 0L;
+        }
+    }
+
+    @Named("getRole")
+    default RoleType getRole(UserDto data) {
+        try {
+            return UserService.getInstance().findByEmail(data.getEmail()).getRole();
+        } catch (ApplicationException e) {
+            return RoleType.ROLE_USER;
+        }
+    }
+
+    @Named("getHash")
+    default String getHash(UserDto data) {
+        try {
+            return DatatypeConverter.printHexBinary(MessageDigest
+                    .getInstance("SHA-1")
+                    .digest(objectMapper.writeValueAsString(data).getBytes(StandardCharsets.US_ASCII)));
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new ApplicationException(e.getMessage());
+        }
+    }
+
+    @Mappings({
+            @Mapping(source = "email", target = "email"),
+            @Mapping(source = "password", target = "password")
+    })
+    UserDto userToUserDto(User data);
+
+    @Mappings({
+            @Mapping(target = "id", expression = "java(getUserId(data))"),
+            @Mapping(source = "email", target = "email"),
+            @Mapping(source = "password", target = "password"),
+            @Mapping(target = "role", expression = "java(getRole(data))"),
+            @Mapping(target = "hash", expression = "java(getHash(data))", dependsOn = {"email", "password"})
+    })
+    User userDtoToUser(UserDto data);
+}
