@@ -10,7 +10,7 @@ import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.property.ApplicationProperties;
 import org.example.productcatalog.property.LiquibaseProperties;
 import org.example.productcatalog.service.UserService;
-import org.postgresql.ds.PGConnectionPoolDataSource;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -27,7 +27,7 @@ public class AbstractTest {
     @Container
     protected static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:12.20"));
-    protected static PGConnectionPoolDataSource datasource;
+    protected static PGSimpleDataSource datasource;
     protected final static UserService userService;
 
     static {

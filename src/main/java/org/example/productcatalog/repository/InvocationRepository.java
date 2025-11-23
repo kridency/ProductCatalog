@@ -4,29 +4,34 @@ import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Invocation;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
-import org.postgresql.ds.PGConnectionPoolDataSource;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.example.productcatalog.preset.ProductCatalogInit.DATETIME_FORMATTER;
+
 public class InvocationRepository implements CrudRepository<Invocation> {
     private static final InvocationRepository INSTANCE = new InvocationRepository();
-    private final UserRepository userRepository;
-    private final PGConnectionPoolDataSource datasource;
-    private static String SCHEMA;
+    private final CrudRepository<User> userRepository;
+    private final DataSource datasource;
+    private static final String INSERT_QUERY = "INSERT INTO \"invocation\" (date, endpoint, user_id) VALUES (?,?,?)";
+    private static final String UPDATE_QUERY = "UPDATE \"invocation\" SET endpoint=? WHERE id=?";
+    private static final String DELETE_QUERY = "DELETE FROM \"invocation\" WHERE id=?";
+    private static final String GET_ALL_QUERY = "SELECT * FROM \"invocation\"";
+    private static final String GET_BY_KEY_QUERY = "SELECT * FROM \"invocation\" WHERE date=? AND user_id=?";
+    private static final String GET_BY_ID_QUERY = "SELECT * FROM \"invokation\" WHERE id=?";
 
     private InvocationRepository() {
         userRepository = UserRepository.getInstance();
         datasource = PostgreSQLClient.getInstance().getDataSource();
-        SCHEMA = datasource.getCurrentSchema();
     }
 
     public static InvocationRepository getInstance() {
@@ -35,16 +40,15 @@ public class InvocationRepository implements CrudRepository<Invocation> {
 
     @Override
     public Invocation add(Invocation invocation) {
-        var query = "INSERT INTO " + SCHEMA + ".\"invocation\" (date, endpoint, user_id) " + "VALUES (?,?,?)";
 
         try(var connection = datasource.getConnection();
-            var statement = connection.prepareStatement(query, new String[] {"id"})) {
+            var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
             return Optional.ofNullable(invocation).map(value -> {
                 try {
                     statement.setTimestamp(1, Timestamp.from(value.getDate()));
                     statement.setString(2, value.getEndpoint());
                     statement.setLong(3, value.getUser().getId());
-                    return getEntity(statement, value, value::setId);
+                    return setEntityId(statement, value, value::setId);
                 } catch (SQLException e) {
                     throw new ApplicationException(e.getMessage());
                 }
@@ -56,15 +60,13 @@ public class InvocationRepository implements CrudRepository<Invocation> {
 
     @Override
     public Invocation update(Invocation invocation) {
-        var query = "UPDATE " + SCHEMA + ".\"invocation\" SET endpoint=? WHERE id=?";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query, new String[] {"id"})) {
+             var statement = connection.prepareStatement(UPDATE_QUERY, new String[] {"id"})) {
             return Optional.ofNullable(invocation).map(value -> {
                 try {
                     statement.setString(1, value.getEndpoint());
                     statement.setLong(2, value.getId());
-                    return getEntity(statement, value, value::setId);
+                    return setEntityId(statement, value, value::setId);
                 } catch (SQLException e) {
                     throw new ApplicationException(e.getMessage());
                 }
@@ -76,31 +78,27 @@ public class InvocationRepository implements CrudRepository<Invocation> {
 
     @Override
     public Invocation delete(Invocation invocation) {
-        var query = "DELETE FROM " + SCHEMA + ".\"invocation\" WHERE id=?";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query)) {
-            return Optional.ofNullable(invocation).map(value -> {
-                try {
-                    statement.setLong(1, value.getId());
-                    if (statement.executeUpdate() == 1) {
-                        try (var resultSet = statement.getGeneratedKeys()) {
-                            while (resultSet.next()) {
-                                value.setId(resultSet.getInt(1));
-                            }
-                            value.setDate(resultSet.getTimestamp("date").toInstant());
-                            value.setEndpoint(resultSet.getString("endpoint"));
-                            return value;
-                        } catch (Exception e) {
-                            throw new ApplicationException(e.getMessage());
+             var statement = connection.prepareStatement(DELETE_QUERY)) {
+            try {
+                statement.setLong(1, invocation.getId());
+                if (statement.executeUpdate() == 1) {
+                    try (var resultSet = statement.getGeneratedKeys()) {
+                        while (resultSet.next()) {
+                            invocation.setId(resultSet.getInt(1));
                         }
-                    } else {
-                        return null;
+                        invocation.setDate(resultSet.getTimestamp("date").toInstant());
+                        invocation.setEndpoint(resultSet.getString("endpoint"));
+                        return invocation;
+                    } catch (Exception e) {
+                        throw new ApplicationException(e.getMessage());
                     }
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
+                } else {
+                    return null;
                 }
-            }).orElseThrow(() -> new ApplicationException("Не указана транзакция"));
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -108,10 +106,8 @@ public class InvocationRepository implements CrudRepository<Invocation> {
 
     @Override
     public Collection<Invocation> getAll() {
-        var query = "SELECT * FROM " + SCHEMA + ".\"invocation\"";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query);
+             var statement = connection.prepareStatement(GET_ALL_QUERY);
              var resultSet = statement.executeQuery()) {
             return Stream.generate(() -> {
                 try {
@@ -134,35 +130,45 @@ public class InvocationRepository implements CrudRepository<Invocation> {
     }
 
     public Optional<Invocation> getByDateAndUser(Instant instant, User user) {
-        var query = "SELECT * FROM " + SCHEMA + ".\"invocation\" WHERE date=? AND user_id=?";
+        try (var connection = datasource.getConnection();
+             var statement = connection.prepareStatement(GET_BY_KEY_QUERY)) {
+            String timestamp = instant.atOffset(ZoneOffset.UTC).format(DATETIME_FORMATTER);
+            statement.setString(1, timestamp);
+            statement.setLong(2, user.getId());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                Invocation entity = null;
+                while (resultSet.next()) {
+                    entity = new Invocation(resultSet.getString("endpoint"), user);
+                    entity.setId(resultSet.getLong("id"));
+                    entity.setDate(resultSet.getTimestamp("date").toInstant());
+                }
+                return Optional.ofNullable(entity);
+            } catch (Exception e) {
+                throw new ApplicationException(e.getMessage());
+            }
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
+    }
 
-        return Optional.ofNullable(instant).map(date ->
-                Optional.ofNullable(user).map(principal -> {
-                    try (var connection = datasource.getConnection();
-                         var statement = connection.prepareStatement(query)) {
-                        String timestamp = date.atOffset(ZoneOffset.UTC)
-                                .format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSSSSS"));
-                        statement.setString(1, timestamp);
-                        statement.setLong(2, principal.getId());
-                        try (ResultSet resultSet = statement.executeQuery()) {
-                            Invocation entity = null;
-                            while (resultSet.next()) {
-                                entity = new Invocation(
-                                        resultSet.getString("endpoint"),
-                                        principal
-                                );
-                                entity.setId(resultSet.getLong("id"));
-                                entity.setDate(resultSet.getTimestamp("date")
-                                        .toLocalDateTime().toInstant(ZoneOffset.UTC));
-                            }
-                            return entity;
-                        } catch (Exception e) {
-                            throw new ApplicationException(e.getMessage());
-                        }
-                    } catch (Exception e) {
-                        throw new ApplicationException(e.getMessage());
-                    }
-                })
-        ).orElseThrow(() -> new ApplicationException("Не указана дата"));
+    public Optional<Invocation> getById(long id) {
+        try (var connection = datasource.getConnection();
+             var statement = connection.prepareStatement(GET_BY_ID_QUERY)) {
+            statement.setLong(1, id);
+            try (var resultSet = statement.executeQuery()) {
+                Invocation entity = null;
+                while (resultSet.next()) {
+                    var user = userRepository.getById(resultSet.getLong("user_id")).orElse(null);
+                    entity = new Invocation(resultSet.getString("endpoint"), user);
+                    entity.setId(resultSet.getLong("id"));
+                    entity.setDate(resultSet.getTimestamp("date").toInstant());
+                }
+                return Optional.ofNullable(entity);
+            } catch (Exception e) {
+                throw new ApplicationException(e.getMessage());
+            }
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
     }
 }

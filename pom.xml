@@ -12,6 +12,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.source-target.version>21</java.source-target.version>
         <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
+
+        <lombok.version>1.18.42</lombok.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <postgresql.version>42.7.8</postgresql.version>
         <liquibase.version>4.31.1</liquibase.version>
@@ -24,6 +26,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>

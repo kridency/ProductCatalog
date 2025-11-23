@@ -1,5 +1,7 @@
 package org.example.productcatalog.util.specification;
 
+import org.example.productcatalog.exception.ApplicationException;
+
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -17,7 +19,7 @@ public record Specification<T>(T entity) implements Function<Collection<T>, Coll
                 var fieldObj = field.get(obj);
                 return ind == -1 ? fieldObj : getPath.apply(path.substring(ind + 1), fieldObj);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new ApplicationException(e.getMessage());
             }
         }
     };
@@ -29,7 +31,7 @@ public record Specification<T>(T entity) implements Function<Collection<T>, Coll
                         field.setAccessible(true);
                         return Optional.ofNullable(field.get(entity));
                     } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
+                        throw new ApplicationException(e.getMessage());
                     }
                 }));
     }

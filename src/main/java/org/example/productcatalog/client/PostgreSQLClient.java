@@ -1,17 +1,16 @@
 package org.example.productcatalog.client;
 
 import org.example.productcatalog.property.ApplicationProperties;
-import org.postgresql.ds.PGConnectionPoolDataSource;
-
+import org.postgresql.ds.PGSimpleDataSource;
 
 public class PostgreSQLClient {
     private static PostgreSQLClient INSTANCE;
 
-    private static PGConnectionPoolDataSource datasource;
+    private static PGSimpleDataSource datasource;
 
     private PostgreSQLClient() {
         ApplicationProperties applicationProperties = ApplicationProperties.getInstance();
-        datasource = new PGConnectionPoolDataSource();
+        datasource = new PGSimpleDataSource();
         datasource.setURL(applicationProperties.getProperty("datasource.url"));
         datasource.setPortNumbers(new int[]{Integer.parseInt(applicationProperties.getProperty("datasource.port"))});
         datasource.setDatabaseName(applicationProperties.getProperty("datasource.database"));
@@ -28,7 +27,7 @@ public class PostgreSQLClient {
         return INSTANCE;
     }
 
-    public PGConnectionPoolDataSource getDataSource() {
+    public PGSimpleDataSource getDataSource() {
         return datasource;
     }
 }

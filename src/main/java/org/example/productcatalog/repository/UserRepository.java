@@ -6,18 +6,25 @@ import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Stream;
+import lombok.NonNull;
 
 public class UserRepository implements CrudRepository<User> {
     private static final UserRepository INSTANCE = new UserRepository();
-    private final PGConnectionPoolDataSource datasource;
-    private static String SCHEMA;
+    private final DataSource datasource;
+    private static final String INSERT_QUERY = "INSERT INTO \"user\" (email, password, role) VALUES (?,?,?)";
+    private static final String UPDATE_QUERY = "UPDATE \"user\" SET password=? WHERE email=?";
+    private static final String DELETE_QUERY = "DELETE FROM \"user\" WHERE email=?";
+    private static final String GET_ALL_QUERY = "SELECT * FROM \"user\"";
+    private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM \"user\" WHERE email=?";
+    private static final String GET_BY_ID_QUERY = "SELECT * FROM \"user\" WHERE id=?";
 
     private UserRepository() {
         datasource = PostgreSQLClient.getInstance().getDataSource();
-        SCHEMA = datasource.getCurrentSchema();
     }
 
     public synchronized static UserRepository getInstance() {
@@ -26,20 +33,16 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public User add(User user) {
-        var query = "INSERT INTO " + SCHEMA + ".\"user\" (email, password, role) VALUES (?,?,?)";
-
-        try(var connection = datasource.getConnection();
-            var statement = connection.prepareStatement(query, new String[] {"id"})) {
-            return Optional.ofNullable(user).map(value -> {
-                try {
-                    statement.setString(1, value.getEmail());
-                    statement.setString(2, value.getPassword());
-                    statement.setString(3, value.getRole().toString());
-                    return getEntity(statement, value, value::setId);
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).orElseThrow(() -> new ApplicationException("Не указан пользователь"));
+        try(var connection = ((PGConnectionPoolDataSource)datasource).getConnection();
+            var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
+            try {
+                statement.setString(1, user.getEmail());
+                statement.setString(2, user.getPassword());
+                statement.setString(3, user.getRole().toString());
+                return setEntityId(statement, user, user::setId);
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -47,19 +50,15 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public User update(User user) {
-        var query = "UPDATE " + SCHEMA + ".\"user\" SET password=? WHERE email=?";
-
-        try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query)) {
-            return Optional.ofNullable(user).map(value -> {
-                try {
-                    statement.setString(1, value.getPassword());
-                    statement.setString(2, value.getEmail());
-                    return getEntity(statement, value, value::setId);
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).orElseThrow(() -> new ApplicationException("Не указан пользователь"));
+        try (var connection = ((PGConnectionPoolDataSource)datasource).getConnection();
+             var statement = connection.prepareStatement(UPDATE_QUERY)) {
+            try {
+                statement.setString(1, user.getPassword());
+                statement.setString(2, user.getEmail());
+                return setEntityId(statement, user, user::setId);
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -67,29 +66,25 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public User delete(User user) {
-        var query = "DELETE FROM " + SCHEMA + ".\"user\" WHERE email=?";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query, new String[] {"id"})) {
-            return Optional.ofNullable(user).map(value -> {
-                try {
-                    statement.setString(1, value.getEmail());
-                    if(statement.executeUpdate() == 1) {
-                        try (var resultSet = statement.getGeneratedKeys()) {
-                            while (resultSet.next()) {
-                                value.setId(resultSet.getInt(1));
-                            }
-                            return value;
-                        } catch (Exception e) {
-                            throw new ApplicationException(e.getMessage());
+             var statement = connection.prepareStatement(DELETE_QUERY, new String[] {"id"})) {
+            try {
+                statement.setString(1, user.getEmail());
+                if(statement.executeUpdate() == 1) {
+                    try (var resultSet = statement.getGeneratedKeys()) {
+                        while (resultSet.next()) {
+                            user.setId(resultSet.getInt(1));
                         }
-                    } else {
-                        return null;
+                        return user;
+                    } catch (Exception e) {
+                        throw new ApplicationException(e.getMessage());
                     }
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
+                } else {
+                    return null;
                 }
-            }).orElseThrow(() -> new ApplicationException("Не указан пользователь"));
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -97,17 +92,13 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public Collection<User> getAll() {
-        var query = "SELECT * FROM " + SCHEMA + ".\"user\"";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query);
+             var statement = connection.prepareStatement(GET_ALL_QUERY);
              var resultSet = statement.executeQuery()) {
             return Stream.generate(() -> {
                 try {
                     if (resultSet.next()) {
-                        var entity = new User(
-                                resultSet.getString("email"),
-                                resultSet.getString("password"));
+                        var entity = new User(resultSet.getString("email"), resultSet.getString("password"));
                         entity.setId(resultSet.getLong("id"));
                         entity.setRole(RoleType.valueOf(resultSet.getString("role")));
                         return entity;
@@ -124,49 +115,37 @@ public class UserRepository implements CrudRepository<User> {
     }
 
     public Optional<User> getByEmail(String email) {
-        var query = "SELECT * FROM " + SCHEMA + ".\"user\" WHERE email=?";
-        return Optional.ofNullable(email).map(value -> {
-            try (var connection = datasource.getConnection();
-                 var statement = connection.prepareStatement(query, new String[] {"id"})) {
-                statement.setString(1, email);
-                try (var resultSet = statement.executeQuery()) {
-                    User entity = null;
-                    while (resultSet.next()) {
-                        entity = new User(
-                                resultSet.getString("email"),
-                                resultSet.getString("password"));
-                        entity.setId(resultSet.getLong("id"));
-                        entity.setRole(RoleType.valueOf(resultSet.getString("role")));
-                    }
-                    return Optional.ofNullable(entity);
-                } catch (Exception e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            } catch (Exception e) {
-                throw new ApplicationException(e.getMessage());
-            }
-        }).orElseThrow(() -> new ApplicationException("Не указан адрес электронной почты."));
+        try (var connection = datasource.getConnection();
+             var statement = connection.prepareStatement(GET_BY_EMAIL_QUERY, new String[] {"id"})) {
+            statement.setString(1, email);
+            return getUser(statement);
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
     }
 
     public synchronized Optional<User> getById(long id) {
-        var query = "SELECT * FROM " + SCHEMA + ".\"user\" WHERE id=?";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query)) {
+             var statement = connection.prepareStatement(GET_BY_ID_QUERY)) {
             statement.setLong(1, id);
-            try (var resultSet = statement.executeQuery()) {
-                User entity = null;
-                while (resultSet.next()) {
-                    entity = new User(
-                            resultSet.getString("email"),
-                            resultSet.getString("password"));
-                    entity.setId(resultSet.getLong("id"));
-                    entity.setRole(RoleType.valueOf(resultSet.getString("role")));
-                }
-                return Optional.ofNullable(entity);
-            } catch (Exception e) {
-                throw new ApplicationException(e.getMessage());
+            return getUser(statement);
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
+    }
+
+    @NonNull
+    private Optional<User> getUser(PreparedStatement statement) {
+        try (var resultSet = statement.executeQuery()) {
+            User entity = null;
+            while (resultSet.next()) {
+                entity = new User(
+                        resultSet.getString("email"),
+                        resultSet.getString("password"));
+                entity.setId(resultSet.getLong("id"));
+                entity.setRole(RoleType.valueOf(resultSet.getString("role")));
             }
+            return Optional.ofNullable(entity);
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }

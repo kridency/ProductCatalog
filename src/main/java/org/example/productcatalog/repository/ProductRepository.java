@@ -1,10 +1,11 @@
 package org.example.productcatalog.repository;
 
+import lombok.NonNull;
 import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
-import org.postgresql.ds.PGConnectionPoolDataSource;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -12,12 +13,16 @@ import java.util.stream.Stream;
 
 public class ProductRepository implements CrudRepository<Product> {
     private static final ProductRepository INSTANCE = new ProductRepository();
-    private final PGConnectionPoolDataSource datasource;
-    private static String SCHEMA;
+    private final DataSource datasource;
+    private static final String INSERT_QUERY = "INSERT INTO \"product\" (item, brand, title, category, price) " + "VALUES (?,?,?,?,?)";
+    private static final String UPDATE_QUERY = "UPDATE \"product\" SET brand=?, title=?, category=?, price=? WHERE id=?";
+    private static final String DELETE_QUERY = "DELETE FROM \"product\" WHERE id=?";
+    private static final String GET_ALL_QUERY = "SELECT * FROM \"product\"";
+    private static final String GET_BY_ID_QUERY = "SELECT * FROM \"product\" WHERE id=?";
+    private static final String GET_BY_ITEM_QUERY = "SELECT * FROM \"product\" WHERE item=?";
 
     private ProductRepository() {
         datasource = PostgreSQLClient.getInstance().getDataSource();
-        SCHEMA = datasource.getCurrentSchema();
     }
 
     public static ProductRepository getInstance() {
@@ -26,22 +31,18 @@ public class ProductRepository implements CrudRepository<Product> {
 
     @Override
     public Product add(Product product) {
-        var query = "INSERT INTO " + SCHEMA + ".\"product\" (item, brand, title, category, price) " + "VALUES (?,?,?,?,?)";
-
         try(var connection = datasource.getConnection();
-            var statement = connection.prepareStatement(query, new String[] {"id"})) {
-            return Optional.ofNullable(product).map(value -> {
-                try {
-                    statement.setString(1, value.getItem());
-                    statement.setString(2, value.getBrand());
-                    statement.setString(3, value.getTitle());
-                    statement.setString(4, value.getCategory());
-                    statement.setDouble(5, value.getPrice());
-                    return getEntity(statement, value, value::setId);
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).orElseThrow(() -> new ApplicationException("Не указан товар"));
+            var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
+            try {
+                statement.setString(1, product.getItem());
+                statement.setString(2, product.getBrand());
+                statement.setString(3, product.getTitle());
+                statement.setString(4, product.getCategory());
+                statement.setDouble(5, product.getPrice());
+                return setEntityId(statement, product, product::setId);
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -49,21 +50,17 @@ public class ProductRepository implements CrudRepository<Product> {
 
     @Override
     public Product update(Product product) {
-        var query = "UPDATE " + SCHEMA + ".\"product\" SET brand=?, title=?, category=?, price=? WHERE id=?";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query, new String[] {"id"})) {
-            return Optional.ofNullable(product).map(value -> {
-                try {
-                    statement.setString(1, value.getBrand());
-                    statement.setString(2, value.getTitle());
-                    statement.setString(3, value.getCategory());
-                    statement.setDouble(4, value.getPrice());
-                    return getEntity(statement, value, value::setId);
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).orElseThrow(() -> new ApplicationException("Не указан товар"));
+             var statement = connection.prepareStatement(UPDATE_QUERY, new String[] {"id"})) {
+            try {
+                statement.setString(1, product.getBrand());
+                statement.setString(2, product.getTitle());
+                statement.setString(3, product.getCategory());
+                statement.setDouble(4, product.getPrice());
+                return setEntityId(statement, product, product::setId);
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -71,42 +68,38 @@ public class ProductRepository implements CrudRepository<Product> {
 
     @Override
     public Product delete(Product product) {
-        var query = "DELETE FROM " + SCHEMA + ".\"product\" WHERE id=?";
-
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query)) {
-            return Optional.ofNullable(product).map(value -> {
-                try {
-                    statement.setLong(1, value.getId());
-                    if (statement.executeUpdate() == 1) {
-                        try (var resultSet = statement.getGeneratedKeys()) {
-                            while (resultSet.next()) {
-                                value.setId(resultSet.getInt(1));
-                            }
-                            value.setItem(resultSet.getString("item"));
-                            value.setBrand(resultSet.getString("brand"));
-                            value.setTitle(resultSet.getString("title"));
-                            value.setCategory(resultSet.getString("category"));
-                            value.setPrice(resultSet.getDouble("price"));
-                            return value;
-                        } catch (Exception e) {
-                            throw new ApplicationException(e.getMessage());
+             var statement = connection.prepareStatement(DELETE_QUERY)) {
+            try {
+                statement.setLong(1, product.getId());
+                if (statement.executeUpdate() == 1) {
+                    try (var resultSet = statement.getGeneratedKeys()) {
+                        while (resultSet.next()) {
+                            product.setId(resultSet.getInt(1));
                         }
-                    } else {
-                        return null;
+                        product.setItem(resultSet.getString("item"));
+                        product.setBrand(resultSet.getString("brand"));
+                        product.setTitle(resultSet.getString("title"));
+                        product.setCategory(resultSet.getString("category"));
+                        product.setPrice(resultSet.getDouble("price"));
+                        return product;
+                    } catch (Exception e) {
+                        throw new ApplicationException(e.getMessage());
                     }
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
+                } else {
+                    return null;
                 }
-            }).orElseThrow(() -> new ApplicationException("Не указан товар"));
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
     }
 
-    public Collection<Product> getAll() { var query = "SELECT * FROM " + SCHEMA + ".\"product\"";
+    public Collection<Product> getAll() {
         try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(query);
+             var statement = connection.prepareStatement(GET_ALL_QUERY);
              var resultSet = statement.executeQuery()) {
             return Stream.generate(() -> {
                 try {
@@ -133,31 +126,46 @@ public class ProductRepository implements CrudRepository<Product> {
     }
 
     public Optional<Product> getByItem(String item) {
-        var query = "SELECT * FROM " + SCHEMA + ".\"product\" WHERE item=?";
-
-        return Optional.ofNullable(item).map(value -> {
-            try (var connection = datasource.getConnection();
-                 var statement = connection.prepareStatement(query)) {
-                statement.setString(1, item);
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    Product entity = null;
-                    while (resultSet.next()) {
-                        entity = new Product(
-                                resultSet.getString("item"),
-                                resultSet.getString("brand"),
-                                resultSet.getString("title"),
-                                resultSet.getString("category"),
-                                resultSet.getDouble("price")
-                        );
-                        entity.setId(resultSet.getLong("id"));
-                    }
-                    return entity;
-                } catch (Exception e) {
-                    throw new ApplicationException(e.getMessage());
-                }
+        try (var connection = datasource.getConnection();
+             var statement = connection.prepareStatement(GET_BY_ITEM_QUERY)) {
+            statement.setString(1, item);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return getProduct(resultSet);
             } catch (Exception e) {
                 throw new ApplicationException(e.getMessage());
             }
-        });
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
+    }
+
+    @NonNull
+    private Optional<Product> getProduct(ResultSet resultSet) throws SQLException {
+        Product entity = null;
+        while (resultSet.next()) {
+            entity = new Product(
+                    resultSet.getString("item"),
+                    resultSet.getString("brand"),
+                    resultSet.getString("title"),
+                    resultSet.getString("category"),
+                    resultSet.getDouble("price")
+            );
+            entity.setId(resultSet.getLong("id"));
+        }
+        return Optional.ofNullable(entity);
+    }
+
+    public synchronized Optional<Product> getById(long id) {
+        try (var connection = datasource.getConnection();
+             var statement = connection.prepareStatement(GET_BY_ID_QUERY)) {
+            statement.setLong(1, id);
+            try (var resultSet = statement.executeQuery()) {
+                return getProduct(resultSet);
+            } catch (Exception e) {
+                throw new ApplicationException(e.getMessage());
+            }
+        } catch (Exception e) {
+            throw new ApplicationException(e.getMessage());
+        }
     }
 }

@@ -28,6 +28,6 @@ public abstract class AbstractProperties extends Properties {
                     } else {
                         throw new ApplicationException("Property " + propertyName + " is not a string");
                     }
-                }).orElse("");
+                }).orElse(null);
     }
 }

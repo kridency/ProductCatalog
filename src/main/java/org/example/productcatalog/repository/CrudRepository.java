@@ -5,6 +5,7 @@ import org.example.productcatalog.exception.ApplicationException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface CrudRepository<T> {
@@ -15,7 +16,9 @@ public interface CrudRepository<T> {
 
     Collection<T> getAll();
 
-    default T getEntity(PreparedStatement statement, T entity, Consumer<Long> consumer) throws SQLException {
+    Optional<T> getById(long id);
+
+    default T setEntityId(PreparedStatement statement, T entity, Consumer<Long> consumer) throws SQLException {
         if (statement.executeUpdate() == 1) {
             try (var resultSet = statement.getGeneratedKeys()) {
                 while (resultSet.next()) {
