@@ -1,0 +1,12 @@
+datasource:
+    url: jdbc:postgresql://localhost/
+    port: 5432
+    database: product_db
+    username: intern
+    password: 1gjAVnJ
+    currentSchema: custom
+    driver-class-name: org.postgresql.Driver
+
+security:
+    user:
+      roles: ROLE_USER

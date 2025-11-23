@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet author="kridency" id="create_users">
+
+        <insert tableName="user">
+            <column name="email" value="admin@hostname"/>
+            <column name="password" value="admin"/>
+            <column name="role" value="ROLE_ADMIN"/>
+        </insert>
+
+        <insert tableName="user">
+            <column name="email" value="name@hostname"/>
+            <column name="password" value="12345"/>
+            <column name="role" value="ROLE_USER"/>
+        </insert>
+
+        <insert tableName="user">
+            <column name="email" value="test@hostname"/>
+            <column name="password" value="test"/>
+            <column name="role" value="ROLE_USER"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>
