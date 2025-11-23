@@ -7,7 +7,7 @@ import org.example.productcatalog.repository.UserRepository;
 import java.util.Collection;
 import java.util.Optional;
 
-import static org.example.productcatalog.preset.ProductCatalogInit.USER_NOT_FOUND;
+import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class UserService implements CrudService<User, String> {
     private static final UserService INSTANCE = new UserService();
@@ -29,17 +29,22 @@ public class UserService implements CrudService<User, String> {
 
     @Override
     public User create(User user) {
-        return userRepository.getByEmail(user.getEmail()).orElseGet(() -> userRepository.save(user));
+        return Optional.ofNullable(user).map(x -> userRepository.getByEmail(x.getEmail())
+                .orElse(userRepository.add(user))).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     @Override
     public User update(User user) {
-        return userRepository.getByEmail(user.getEmail()).map(value -> userRepository.save(user)).orElse(null);
+        return Optional.ofNullable(user).map(x -> userRepository.getByEmail(x.getEmail()).map(value -> userRepository.update(x))
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
+                .orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     @Override
     public User remove(User user) {
-        return userRepository.getByEmail(user.getEmail()).map(userRepository::delete).orElse(null);
+        return Optional.ofNullable(user).map(x -> userRepository.getByEmail(x.getEmail()).map(userRepository::delete)
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
+                .orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     @Override
@@ -47,13 +52,15 @@ public class UserService implements CrudService<User, String> {
 
     public User findByEmail(String email) {
         return Optional.ofNullable(email).map(value -> userRepository.getByEmail(email)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))).orElse(null);
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
+                .orElseThrow(() -> new ApplicationException(EMAIL_ERROR));
     }
 
     @Override
     public User find(String email) {
         return Optional.ofNullable(email).map(value -> userRepository.getByEmail(email)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))).orElse(null);
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
+                .orElseThrow(() -> new ApplicationException(EMAIL_ERROR));
     }
 
     public User findById(long id) {

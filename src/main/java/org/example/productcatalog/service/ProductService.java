@@ -9,6 +9,7 @@ import org.example.productcatalog.util.specification.Specification;
 import java.util.*;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_FOUND;
+import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_SPECIFIED;
 
 public class ProductService implements CrudService<Product, String> {
     private static ProductService INSTANCE;
@@ -27,27 +28,30 @@ public class ProductService implements CrudService<Product, String> {
 
     @Override
     public Product create(Product product) {
-        return productCacheManager.put(productRepository.getByItem(product.getItem())
-                .orElse(productRepository.save(product)));
+        return Optional.ofNullable(product).map(x -> productCacheManager.put(productRepository.getByItem(x.getItem())
+                .orElse(productRepository.add(x))))
+                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
     public Product update(Product product) {
-        var obj = productCacheManager.put(productRepository.getByItem(product.getItem()).orElseThrow(() ->
-                        new ApplicationException(PRODUCT_NOT_FOUND)));
+        var newProduct = Optional.ofNullable(product).map(x -> productCacheManager.put(productRepository.getByItem(x.getItem())
+                        .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND))))
+                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
 
-        obj.setBrand(product.getBrand());
-        obj.setTitle(product.getTitle());
-        obj.setCategory(product.getCategory());
-        obj.setPrice(product.getPrice());
-        return productRepository.save(obj);
+        newProduct.setBrand(product.getBrand());
+        newProduct.setTitle(product.getTitle());
+        newProduct.setCategory(product.getCategory());
+        newProduct.setPrice(product.getPrice());
+        return productRepository.update(newProduct);
     }
 
     @Override
     public Product remove(Product product) {
-        return productRepository.delete(productCacheManager.clear(product.getItem()).orElseGet(() ->
-                productRepository.getByItem(product.getItem()).orElseThrow(() ->
-                        new ApplicationException(PRODUCT_NOT_FOUND))));
+        return Optional.ofNullable(product).map(x -> productRepository.delete(productCacheManager.clear(x.getItem()).orElseGet(() ->
+                productRepository.getByItem(x.getItem()).orElseThrow(() ->
+                        new ApplicationException(PRODUCT_NOT_FOUND)))))
+                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
@@ -60,7 +64,8 @@ public class ProductService implements CrudService<Product, String> {
 
     @Override
     public Product find(String item) {
-        return productCacheManager.get(item).orElse(productRepository.getByItem(item).orElseThrow(() ->
-                new ApplicationException(PRODUCT_NOT_FOUND)));
+        return Optional.ofNullable(item).map(x -> productCacheManager.get(x).orElse(productRepository.getByItem(x).orElseThrow(() ->
+                new ApplicationException(PRODUCT_NOT_FOUND))))
+                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 }

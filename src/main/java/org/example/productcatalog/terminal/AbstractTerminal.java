@@ -1,5 +1,6 @@
 package org.example.productcatalog.terminal;
 
+import lombok.Getter;
 import org.example.productcatalog.audit.Auditor;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
@@ -15,7 +16,9 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public abstract class AbstractTerminal<T> {
     protected static final Scanner scanner = new Scanner(System.in);
+    @Getter
     protected static final Auditor auditor = Auditor.getInstance();
+    @Getter
     protected static User principal;
     protected String commandMenu;
     protected Map<String, Consumer<T>> commands;
@@ -51,10 +54,4 @@ public abstract class AbstractTerminal<T> {
             principal = null;
         }
     }
-
-    public static User getPrincipal() {
-        return principal;
-    }
-
-    public static Auditor getAuditor() { return auditor; }
 }
