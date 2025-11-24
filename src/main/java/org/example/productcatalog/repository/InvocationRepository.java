@@ -43,16 +43,14 @@ public class InvocationRepository implements CrudRepository<Invocation> {
 
         try(var connection = datasource.getConnection();
             var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
-            return Optional.ofNullable(invocation).map(value -> {
-                try {
-                    statement.setTimestamp(1, Timestamp.from(value.getDate()));
-                    statement.setString(2, value.getEndpoint());
-                    statement.setLong(3, value.getUser().getId());
-                    return setEntityId(statement, value, value::setId);
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).orElseThrow(() -> new ApplicationException("Не указан вызов"));
+            try {
+                statement.setTimestamp(1, Timestamp.from(invocation.getDate()));
+                statement.setString(2, invocation.getEndpoint());
+                statement.setLong(3, invocation.getUser().getId());
+                return setEntityId(statement, invocation, invocation::setId);
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
@@ -62,15 +60,13 @@ public class InvocationRepository implements CrudRepository<Invocation> {
     public Invocation update(Invocation invocation) {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(UPDATE_QUERY, new String[] {"id"})) {
-            return Optional.ofNullable(invocation).map(value -> {
-                try {
-                    statement.setString(1, value.getEndpoint());
-                    statement.setLong(2, value.getId());
-                    return setEntityId(statement, value, value::setId);
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).orElseThrow(() -> new ApplicationException("Не указан вызов"));
+            try {
+                statement.setString(1, invocation.getEndpoint());
+                statement.setLong(2, invocation.getId());
+                return setEntityId(statement, invocation, invocation::setId);
+            } catch (SQLException e) {
+                throw new ApplicationException(e.getMessage());
+            }
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }

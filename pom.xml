@@ -21,8 +21,10 @@
         <jackson.version>2.18.2</jackson.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
+        <assertj-core.version>3.27.3</assertj-core.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <aspect-maven-plugin.version>1.15.0</aspect-maven-plugin.version>
         <postgresql.version>42.7.8</postgresql.version>
         <liquibase.version>4.31.1</liquibase.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
@@ -82,6 +84,14 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -177,9 +187,9 @@
                     <target>${java.source-target.version}</target>
                     <useIncrementalCompilation>true</useIncrementalCompilation>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <generatedSourcesDirectory>
-                        ${project.build.directory}/generated-sources
-                    </generatedSourcesDirectory>
+                    <generatedTestSourcesDirectory>
+                        ${project.build.directory}/generated-test-sources/test-annotations
+                    </generatedTestSourcesDirectory>
                     <compilerArgs>
                         <compilerArg>
                             -Amapstruct.defaultComponentModel=jsr330
@@ -198,11 +208,6 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
                             <version>${lombok-mapstruct-binding.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -235,9 +240,47 @@
                     </includes>
                     <argLine>
                         -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
                         -Xshare:off
                     </argLine>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>${aspect-maven-plugin.version}</version>
+                <configuration>
+                    <source>${java.source-target.version}</source>
+                    <target>${java.source-target.version}</target>
+                    <Xlint>ignore</Xlint>
+                    <complianceLevel>${java.source-target.version}</complianceLevel>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <proc>none</proc>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <weaveMainSourceFolder>true</weaveMainSourceFolder>
+                            <Xset>
+                                <overWeaving>true</overWeaving>
+                                <avoidFinal>false</avoidFinal>
+                            </Xset>
+                        </configuration>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

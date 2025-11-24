@@ -14,9 +14,9 @@ public class Invocation {
     private User user;
 
     public Invocation(String endpoint, User user) {
-        setDate(Instant.now());
-        setEndpoint(endpoint);
-        setUser(user);
+        this.date = Instant.now();
+        this.endpoint = endpoint;
+        this.user = user;
     }
 
 }
