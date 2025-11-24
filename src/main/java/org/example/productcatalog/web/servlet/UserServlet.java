@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -136,9 +137,12 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void list(HttpServletResponse response) {
+    private void list(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
-            writer.println(objectMapper.writeValueAsString(userService.findAll()));
+            Collection<UserDto> list = userService.findFiltered(user).stream()
+                    .map(userMapper::userToUserDto)
+                    .toList();
+            writer.println(objectMapper.writeValueAsString(list));
             writer.flush();
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
@@ -153,7 +157,8 @@ public class UserServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
         String path = request.getPathInfo();
-        try (PrintWriter writer = response.getWriter()) {
+        try (PrintWriter writer = response.getWriter();
+             BufferedReader reader = request.getReader()) {
             Supplier<Void> unauthorized = () -> {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 writer.println(UNAUTHORIZED);
@@ -164,14 +169,21 @@ public class UserServlet extends HttpServlet {
                 Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
                     if (path.contains("/api/v1/administration")) {
                         if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
-                            String id = request.getParameter("id");
-                            long userId = id == null ? 0L : Long.parseLong(id);
-                            switch (path.substring(path.lastIndexOf('/'))) {
-                                case "/list" -> list(response);
-                                default -> {
-                                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                                    writer.println(BAD_ENDPOINT);
+                            try {
+                                UserDto userDto = objectMapper.readValue(
+                                        reader.lines().collect(Collectors.joining()),
+                                        UserDto.class);
+                                User entity = userMapper.userDtoToUser(userDto);
+                                switch (path.substring(path.lastIndexOf('/'))) {
+                                    case "/list" -> list(response, entity);
+                                    default -> {
+                                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                                        writer.println(BAD_ENDPOINT);
+                                    }
                                 }
+                            } catch (JsonProcessingException e) {
+                                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                                writer.println(BAD_REQUEST);
                             }
                         } else {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

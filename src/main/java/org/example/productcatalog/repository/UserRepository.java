@@ -4,7 +4,6 @@ import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
-import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -33,7 +32,7 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public User add(User user) {
-        try(var connection = ((PGConnectionPoolDataSource)datasource).getConnection();
+        try(var connection = datasource.getConnection();
             var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
             try {
                 statement.setString(1, user.getEmail());
@@ -50,7 +49,7 @@ public class UserRepository implements CrudRepository<User> {
 
     @Override
     public User update(User user) {
-        try (var connection = ((PGConnectionPoolDataSource)datasource).getConnection();
+        try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(UPDATE_QUERY)) {
             try {
                 statement.setString(1, user.getPassword());

@@ -3,6 +3,7 @@ package org.example.productcatalog.service;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.repository.UserRepository;
+import org.example.productcatalog.util.specification.Specification;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -69,5 +70,7 @@ public class UserService implements CrudService<User, String> {
     }
 
     @Override
-    public Collection<User> findFiltered(User user) { return null; }
+    public Collection<User> findFiltered(User user) {
+        return new Specification<>(user).apply(userRepository.getAll());
+    }
 }

@@ -24,6 +24,7 @@ import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 public class ProductServletTest extends AbstractTest {
     private static final ProductService productService = Mockito.spy(ProductService.getInstance());
     private static final ProductMapper productMapper = Mockito.spy(ProductMapper.getInstance());
+    private static final ProductServlet productServlet = Mockito.spy(ProductServlet.getInstance());
 
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")
@@ -43,7 +44,7 @@ public class ProductServletTest extends AbstractTest {
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
 
-        ProductServlet.getInstance().doGet(request, response);
+        productServlet.doGet(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
         Mockito.verify(writer).println(productList);
     }
@@ -65,7 +66,7 @@ public class ProductServletTest extends AbstractTest {
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
 
-        ProductServlet.getInstance().doPut(request, response);
+        productServlet.doPut(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
         Mockito.verify(writer).println("Товар " + product.getId() + " успешно изменен.");
     }
@@ -86,7 +87,7 @@ public class ProductServletTest extends AbstractTest {
         Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/delete");
         Mockito.when(response.getWriter()).thenReturn(writer);
 
-        ProductServlet.getInstance().doDelete(request, response);
+        productServlet.doDelete(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
         Mockito.verify(writer).println("Товар " + product.getId() + " успешно удален.");
     }
