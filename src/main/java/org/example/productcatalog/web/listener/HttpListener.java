@@ -10,13 +10,8 @@ import java.net.InetSocketAddress;
 public class HttpListener {
     private static HttpListener INSTANCE;
     private HttpServer httpServer;
-    private final UserHandler userHandler;
-    private final ProductHandler productHandler;
-
-    private HttpListener() {
-        userHandler = UserHandler.getInstance();
-        productHandler = ProductHandler.getInstance();
-    }
+    private final UserHandler userHandler = new UserHandler();
+    private final ProductHandler productHandler = new ProductHandler();
 
     public static HttpListener getInstance() {
         if(INSTANCE == null) {

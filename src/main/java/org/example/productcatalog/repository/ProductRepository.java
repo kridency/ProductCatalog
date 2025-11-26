@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class ProductRepository implements CrudRepository<Product> {
-    private static final ProductRepository INSTANCE = new ProductRepository();
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"product\" (item, brand, title, category, price) " + "VALUES (?,?,?,?,?)";
     private static final String UPDATE_QUERY = "UPDATE \"product\" SET brand=?, title=?, category=?, price=? WHERE item=?";
@@ -21,12 +20,8 @@ public class ProductRepository implements CrudRepository<Product> {
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"product\" WHERE id=?";
     private static final String GET_BY_ITEM_QUERY = "SELECT * FROM \"product\" WHERE item=?";
 
-    private ProductRepository() {
+    public ProductRepository() {
         datasource = PostgreSQLClient.getInstance().getDataSource();
-    }
-
-    public static ProductRepository getInstance() {
-        return INSTANCE;
     }
 
     @Override
@@ -127,7 +122,8 @@ public class ProductRepository implements CrudRepository<Product> {
         }
     }
 
-    public Optional<Product> getByItem(String item) {
+    @Override
+    public Optional<Product> getByKey(String item) {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(GET_BY_ITEM_QUERY)) {
             statement.setString(1, item);

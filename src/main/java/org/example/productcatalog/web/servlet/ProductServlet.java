@@ -3,8 +3,10 @@ package org.example.productcatalog.web.servlet;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.entity.Product;
+import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.ProductMapper;
+import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.service.UserService;
 
@@ -21,22 +23,14 @@ import java.util.stream.Collectors;
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class ProductServlet extends HttpServlet {
-    private static ProductServlet INSTANCE;
-    private final UserService userService;
-    private final ProductService productService;
+    private final CrudService<User, String> userService;
+    private final CrudService<Product, String> productService;
     private final ProductMapper productMapper;
 
-    private ProductServlet() {
-        userService = UserService.getInstance();
-        productService = ProductService.getInstance();
+    public ProductServlet() {
+        userService = new UserService();
+        productService = new ProductService();
         productMapper = ProductMapper.getInstance();
-    }
-
-    public static ProductServlet getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new ProductServlet();
-        }
-        return INSTANCE;
     }
 
     private void create(HttpServletResponse response, Product product) {
@@ -49,7 +43,7 @@ public class ProductServlet extends HttpServlet {
                 responseText = "Транзакция " + newEntity.getId() + " успешно создана." + overdraft;
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                responseText = "Не удалось создать транзакцию.";
+                responseText = PRODUCT_NOT_CREATED;
             }
             writer.println(responseText);
             writer.flush();
@@ -84,7 +78,7 @@ public class ProductServlet extends HttpServlet {
                 responseText = "Товар " + product.getId() + " успешно изменен.";
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                responseText = "Не удалось изменить транзакцию.";
+                responseText = PRODUCT_NOT_UPDATED;
             }
             writer.println(responseText);
             writer.flush();
@@ -121,7 +115,7 @@ public class ProductServlet extends HttpServlet {
             };
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                    Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+                    Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
                         try {
                             ProductDto product = objectMapper.readValue(
                                     reader.lines().collect(Collectors.joining()),
@@ -159,7 +153,7 @@ public class ProductServlet extends HttpServlet {
             };
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+                Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
                     try {
                         ProductDto productDto = objectMapper.readValue(
                                 reader.lines().collect(Collectors.joining()),
@@ -197,7 +191,7 @@ public class ProductServlet extends HttpServlet {
             };
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+                Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
                     try {
                         ProductDto productDto = objectMapper.readValue(
                                 reader.lines().collect(Collectors.joining()),
@@ -235,7 +229,7 @@ public class ProductServlet extends HttpServlet {
             };
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+                Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
                     try {
                         ProductDto productDto = objectMapper.readValue(
                                 reader.lines().collect(Collectors.joining()),

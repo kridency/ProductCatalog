@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 
 public class UserRepository implements CrudRepository<User> {
-    private static final UserRepository INSTANCE = new UserRepository();
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"user\" (email, password, role) VALUES (?,?,?)";
     private static final String UPDATE_QUERY = "UPDATE \"user\" SET password=? WHERE email=?";
@@ -22,12 +21,8 @@ public class UserRepository implements CrudRepository<User> {
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM \"user\" WHERE email=?";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"user\" WHERE id=?";
 
-    private UserRepository() {
+    public UserRepository() {
         datasource = PostgreSQLClient.getInstance().getDataSource();
-    }
-
-    public synchronized static UserRepository getInstance() {
-        return INSTANCE;
     }
 
     @Override
@@ -113,7 +108,8 @@ public class UserRepository implements CrudRepository<User> {
         }
     }
 
-    public Optional<User> getByEmail(String email) {
+    @Override
+    public Optional<User> getByKey(String email) {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(GET_BY_EMAIL_QUERY, new String[] {"id"})) {
             statement.setString(1, email);

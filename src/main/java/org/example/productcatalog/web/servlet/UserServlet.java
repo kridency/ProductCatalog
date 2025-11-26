@@ -6,15 +6,18 @@ import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
+import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -22,20 +25,12 @@ import java.util.stream.Collectors;
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class UserServlet extends HttpServlet {
-    private static UserServlet INSTANCE;
-    private final UserService userService;
+    private final CrudService<User, String> userService;
     private final UserMapper userMapper;
 
-    private UserServlet() {
-        userService = UserService.getInstance();
+    public UserServlet() {
+        userService = new UserService();
         userMapper = UserMapper.getInstance();
-    }
-
-    public static UserServlet getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new UserServlet();
-        }
-        return INSTANCE;
     }
 
     private void create(HttpServletResponse response, User user) {
@@ -99,22 +94,21 @@ public class UserServlet extends HttpServlet {
 
     private void login(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
-            String responseText;
-            if (userService.login(user) != null) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                responseText = "Пользователь " + user.getEmail() + " успешно аутентифицирован.";
-                Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
-                cookie.setPath("/api/v1");
-                cookie.setMaxAge(2592000);
-                response.addCookie(cookie);
-            }
-            else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                responseText = "Не удалось аутентифицировать пользователя " + user.getEmail() + ".";
-            }
-            writer.println(responseText);
+            writer.println(Optional.of(userService.find(user.getEmail()))
+                    .filter(value -> value.getPassword().equals(user.getPassword()))
+                    .map(value -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
+                        cookie.setPath("/api/v1");
+                        cookie.setMaxAge(2592000);
+                        response.addCookie(cookie);
+                        return "Пользователь " + user.getEmail() + " успешно аутентифицирован.";
+                    }).orElseGet(() -> {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        return "Не удалось аутентифицировать пользователя " + user.getEmail() + ".";
+                    }));
             writer.flush();
-        } catch(Exception e) {
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             throw new ApplicationException(e.getMessage());
         }
@@ -166,7 +160,7 @@ public class UserServlet extends HttpServlet {
             };
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+                Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
                     if (path.contains("/api/v1/administration")) {
                         if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
                             try {
@@ -210,7 +204,7 @@ public class UserServlet extends HttpServlet {
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId -> {
                 if (path.contains("/api/v1/auth")) {
                     response.setStatus(HttpServletResponse.SC_OK);
-                    writer.println("Для использования сервиса аутентификации следует завершить текущую сессию.");
+                    writer.println(SESSION_EXIST);
                 } else {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     writer.println(BAD_ENDPOINT);
@@ -225,7 +219,9 @@ public class UserServlet extends HttpServlet {
                         User principal = userMapper.userDtoToUser(userDto);
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/create" -> create(response, principal);
-                            case "/login" -> login(response, principal);
+                            case "/login" -> {
+                                    login(response, principal);
+                            }
                             default -> {
                                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                 writer.println(BAD_ENDPOINT);
@@ -262,7 +258,7 @@ public class UserServlet extends HttpServlet {
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId -> {
                 if (path.contains("/api/v1/identity")) {
-                    Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+                    Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/update" -> {
                                 try {
@@ -305,8 +301,8 @@ public class UserServlet extends HttpServlet {
                 return null;
             };
 
-            Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                    Optional.ofNullable(userService.findByEmail(sessionId.toString())).ifPresentOrElse(principal -> {
+            Optional.ofNullable(request.getAttribute("JSESSIONID")).map(Objects::toString).map(userService::find)
+                    .ifPresentOrElse(principal -> {
                         if (path.contains("/api/v1/administration")) {
                             if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
                                 String id = request.getParameter("id");
@@ -335,7 +331,7 @@ public class UserServlet extends HttpServlet {
                             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                             writer.println(BAD_ENDPOINT);
                         }
-                    }, unauthorized::get), unauthorized::get);
+                    }, unauthorized::get);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ApplicationException(e.getMessage());

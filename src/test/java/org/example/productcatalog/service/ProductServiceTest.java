@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class ProductServiceTest extends AbstractTest {
-    private static final ProductService productService = Mockito.spy(ProductService.getInstance());
+    private static final ProductService productService = Mockito.mock(ProductService.class);
 
     @Test
     void givenCurrentUserAndProduct_whenTryToAdd_thenReturnCorrectResult() {

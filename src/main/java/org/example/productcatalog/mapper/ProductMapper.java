@@ -6,7 +6,7 @@ import org.example.productcatalog.service.ProductService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { ProductDto.class })
 @Named("ProductMapper")
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
@@ -18,7 +18,7 @@ public interface ProductMapper {
 
     @Named("getProductId")
     default long getProductId(ProductDto data) {
-        return ProductService.getInstance().find(data.getItem()).getId();
+        return new ProductService().find(data.getItem()).getId();
     }
 
     @Mappings({

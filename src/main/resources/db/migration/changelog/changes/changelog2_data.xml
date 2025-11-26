@@ -32,10 +32,18 @@
 
         <insert tableName="product">
             <column name="item" value="I11"/>
-            <column name="brand" value="Addidas"/>
+            <column name="brand" value="Adidas"/>
             <column name="title" value="Sneakers"/>
             <column name="category" value="Shoes"/>
             <column name="price" value="100.0"/>
+        </insert>
+
+        <insert tableName="product">
+            <column name="item" value="I21"/>
+            <column name="brand" value="Nike"/>
+            <column name="title" value="Sneakers"/>
+            <column name="category" value="Shoes"/>
+            <column name="price" value="120.0"/>
         </insert>
 
     </changeSet>

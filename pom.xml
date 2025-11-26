@@ -185,11 +185,12 @@
                 <configuration>
                     <source>${java.source-target.version}</source>
                     <target>${java.source-target.version}</target>
-                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                    <useIncrementalCompilation>true</useIncrementalCompilation>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <generatedTestSourcesDirectory>
                         ${project.build.directory}/generated-test-sources/test-annotations
                     </generatedTestSourcesDirectory>
+                    <proc>only</proc>
                     <compilerArgs>
                         <compilerArg>
                             -Amapstruct.defaultComponentModel=jsr330
@@ -200,11 +201,6 @@
                     </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
                             <version>${lombok-mapstruct-binding.version}</version>
@@ -213,6 +209,11 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -241,7 +242,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/*Tests.java</include>
+                        <include>**/*Test.java</include>
                     </includes>
                     <argLine>
                         -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar

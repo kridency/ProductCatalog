@@ -1,4 +1,4 @@
-package org.example.productcatalog.servlet;
+package org.example.productcatalog.web.servlet;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,7 +9,6 @@ import org.example.productcatalog.service.UserService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
-import org.example.productcatalog.web.servlet.UserServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,9 +21,9 @@ import java.io.PrintWriter;
 import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 
 public class UserServletTest extends AbstractTest {
-    private static final UserService userService = Mockito.spy(UserService.getInstance());
+    private static final UserService userService = Mockito.spy(UserService.class);
     private static final UserMapper userMapper = Mockito.spy(UserMapper.getInstance());
-    private static final UserServlet userServlet = Mockito.spy(UserServlet.getInstance());
+    private static final UserServlet userServlet = Mockito.spy(UserServlet.class);
 
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")

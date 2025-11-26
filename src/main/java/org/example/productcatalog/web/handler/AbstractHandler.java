@@ -38,12 +38,13 @@ public abstract class AbstractHandler implements HttpHandler {
             newInput.reset();
         }
 
-        RequestWrapper req = new RequestWrapper(createUnimplementedAdapter(HttpServletRequest.class), httpExchange, parsePostData, is);
-        ResponseWrapper resp = new ResponseWrapper(createUnimplementedAdapter(HttpServletResponse.class), httpExchange);
-
         try {
+            RequestWrapper req = new RequestWrapper(createUnimplementedAdapter(HttpServletRequest.class), httpExchange, parsePostData, is);
+            ResponseWrapper resp = new ResponseWrapper(createUnimplementedAdapter(HttpServletResponse.class), httpExchange);
+            httpExchange.setAttribute("JSESSIONID", req.getUserPrincipal().getName());
             servlet.service(req, resp);
             resp.complete();
+            httpExchange.close();
         } catch (ServletException e) {
             throw new IOException(e);
         }
@@ -63,7 +64,7 @@ public abstract class AbstractHandler implements HttpHandler {
                 new UnimplementedHandler());
     }
 
-    protected byte[] getBytes(InputStream in) throws IOException {
+    private byte[] getBytes(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         while (true) {
@@ -75,7 +76,7 @@ public abstract class AbstractHandler implements HttpHandler {
         return out.toByteArray();
     }
 
-    public static Map<String, String[]> splitQuery(String query) throws UnsupportedEncodingException {
+    private Map<String, String[]> splitQuery(String query) throws UnsupportedEncodingException {
         final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
         return Optional.ofNullable(query).map(value -> value.split("&")).map(pairs -> {
             for (String pair : pairs) {

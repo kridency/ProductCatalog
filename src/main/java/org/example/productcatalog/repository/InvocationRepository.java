@@ -9,17 +9,14 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.example.productcatalog.preset.ProductCatalogInit.DATETIME_FORMATTER;
+import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 
 public class InvocationRepository implements CrudRepository<Invocation> {
-    private static final InvocationRepository INSTANCE = new InvocationRepository();
     private final CrudRepository<User> userRepository;
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"invocation\" (date, endpoint, user_id) VALUES (?,?,?)";
@@ -29,18 +26,13 @@ public class InvocationRepository implements CrudRepository<Invocation> {
     private static final String GET_BY_KEY_QUERY = "SELECT * FROM \"invocation\" WHERE date=? AND user_id=?";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"invokation\" WHERE id=?";
 
-    private InvocationRepository() {
-        userRepository = UserRepository.getInstance();
+    public InvocationRepository() {
+        userRepository = new UserRepository();
         datasource = PostgreSQLClient.getInstance().getDataSource();
-    }
-
-    public static InvocationRepository getInstance() {
-        return INSTANCE;
     }
 
     @Override
     public Invocation add(Invocation invocation) {
-
         try(var connection = datasource.getConnection();
             var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
             try {
@@ -125,11 +117,13 @@ public class InvocationRepository implements CrudRepository<Invocation> {
         }
     }
 
-    public Optional<Invocation> getByDateAndUser(Instant instant, User user) {
+    @Override
+    public Optional<Invocation> getByKey(String key) {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(GET_BY_KEY_QUERY)) {
-            String timestamp = instant.atOffset(ZoneOffset.UTC).format(DATETIME_FORMATTER);
-            statement.setString(1, timestamp);
+            var invocation = objectMapper.readValue(key, Invocation.class);
+            var user = invocation.getUser();
+            statement.setString(1, invocation.getDate().toString());
             statement.setLong(2, user.getId());
             try (ResultSet resultSet = statement.executeQuery()) {
                 Invocation entity = null;

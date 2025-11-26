@@ -4,13 +4,15 @@ import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { UserDto.class })
 @Named("UserMapper")
 public interface UserMapper {
+    CrudService<User, String> userService = new UserService();
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Named("getUserMapper")
@@ -21,7 +23,7 @@ public interface UserMapper {
     @Named("getUserId")
     default long getUserId(UserDto data) {
         try {
-            return UserService.getInstance().findByEmail(data.getEmail()).getId();
+            return userService.find(data.getEmail()).getId();
         } catch (ApplicationException e) {
             return 0L;
         }
@@ -30,7 +32,7 @@ public interface UserMapper {
     @Named("getRole")
     default RoleType getRole(UserDto data) {
         try {
-            return UserService.getInstance().findByEmail(data.getEmail()).getRole();
+            return userService.find(data.getEmail()).getRole();
         } catch (ApplicationException e) {
             return RoleType.ROLE_USER;
         }
@@ -43,10 +45,10 @@ public interface UserMapper {
     UserDto userToUserDto(User data);
 
     @Mappings({
-            @Mapping(target = "id", expression = "java(getUserId(data))"),
+            @Mapping(target = "id", expression = "java(getUserId(data))", dependsOn = {"email"}),
             @Mapping(source = "email", target = "email"),
             @Mapping(source = "password", target = "password"),
-            @Mapping(target = "role", expression = "java(getRole(data))")
+            @Mapping(target = "role", expression = "java(getRole(data))", dependsOn = {"email"})
     })
     User userDtoToUser(UserDto data);
 }

@@ -1,4 +1,4 @@
-package org.example.productcatalog.servlet;
+package org.example.productcatalog.web.servlet;
 
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.entity.Product;
@@ -7,7 +7,6 @@ import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
-import org.example.productcatalog.web.servlet.ProductServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,9 +21,9 @@ import java.io.PrintWriter;
 import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 
 public class ProductServletTest extends AbstractTest {
-    private static final ProductService productService = Mockito.spy(ProductService.getInstance());
+    private static final ProductService productService = Mockito.spy(ProductService.class);
     private static final ProductMapper productMapper = Mockito.spy(ProductMapper.getInstance());
-    private static final ProductServlet productServlet = Mockito.spy(ProductServlet.getInstance());
+    private static final ProductServlet productServlet = Mockito.spy(ProductServlet.class);
 
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")

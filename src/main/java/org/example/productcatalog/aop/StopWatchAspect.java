@@ -6,8 +6,10 @@ import org.aspectj.lang.annotation.Aspect;
 
 @Aspect
 public class StopWatchAspect {
-    @Around("execution(* *(..)) && within(org.example.productcatalog..*) && !within(org.example.productcatalog.aop..*)" +
-            "&& !within(org.example.productcatalog.*Test..*) && !within(org.example.productcatalog.mapper..*)")
+    @Around("execution(* *(..)) && within(org.example.productcatalog..*) " +
+            "&& !within(org.example.productcatalog.aop..*)" +
+            "&& !within(org.example.productcatalog.mapper..*)" +
+            "&& !within(org.example.productcatalog.web.servlet.*Test..*)")
     public Object logExecutionDuration(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.nanoTime();
         try {

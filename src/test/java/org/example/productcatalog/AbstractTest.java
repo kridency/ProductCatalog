@@ -44,7 +44,7 @@ public class AbstractTest {
                 postgreSQLContainer
                         .getMappedPort(Integer.parseInt(applicationProperties.getProperty("datasource.port")))
         });
-        userService = UserService.getInstance();
+        userService = new UserService();
 
         try(var connection = datasource.getConnection()) {
             var database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));

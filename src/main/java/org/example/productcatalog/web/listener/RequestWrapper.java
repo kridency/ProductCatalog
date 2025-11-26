@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.security.Principal;
 import java.util.*;
 
 public class RequestWrapper extends HttpServletRequestWrapper {
@@ -16,18 +17,12 @@ public class RequestWrapper extends HttpServletRequestWrapper {
     private final ServletInputStream is;
     private final Map<String, Object> attributes = new HashMap<>();
 
-    public RequestWrapper(HttpServletRequest request, HttpExchange ex, Map<String, String[]> postData, ServletInputStream is) {
+    public RequestWrapper(HttpServletRequest request, HttpExchange ex, Map<String, String[]> postData, ServletInputStream is) throws ServletException {
         super(request);
         this.ex = ex;
         this.postData = postData;
-        Optional.ofNullable(getCookies()).ifPresent(value -> setAttribute("JSESSIONID",
-            Arrays.stream(value)
-                    .filter(cookie -> cookie.getName().equals("JSESSIONID"))
-                    .map(Cookie::getValue)
-                    .reduce((a, b) -> b)
-                    .orElse(null))
-        );
         this.is = is;
+        attributes.put("JSESSIONID", getUserPrincipal().getName());
     }
 
     @Override
@@ -116,5 +111,13 @@ public class RequestWrapper extends HttpServletRequestWrapper {
                     return new Cookie(cookie[0], cookie[1]);
                 }).toArray(Cookie[]::new)
         ).orElse(null);
+    }
+
+    @Override
+    public Principal getUserPrincipal() {
+        return () -> Optional.ofNullable(getCookies()).flatMap(value -> Arrays.stream(value)
+                .filter(cookie -> cookie.getName().equals("JSESSIONID"))
+                .map(Cookie::getValue)
+                .reduce((a, b) -> b)).orElse(null);
     }
 }
