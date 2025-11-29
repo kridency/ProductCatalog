@@ -44,7 +44,6 @@ public abstract class AbstractHandler implements HttpHandler {
             httpExchange.setAttribute("JSESSIONID", req.getUserPrincipal().getName());
             servlet.service(req, resp);
             resp.complete();
-            httpExchange.close();
         } catch (ServletException e) {
             throw new IOException(e);
         }

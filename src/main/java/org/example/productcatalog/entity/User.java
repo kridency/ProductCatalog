@@ -1,10 +1,9 @@
 package org.example.productcatalog.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
 @Setter
+@Getter
 public class User {
     private long id;
     private String email;

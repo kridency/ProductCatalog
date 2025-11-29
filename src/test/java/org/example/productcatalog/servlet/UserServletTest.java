@@ -1,4 +1,4 @@
-package org.example.productcatalog.web.servlet;
+package org.example.productcatalog.servlet;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,6 +9,7 @@ import org.example.productcatalog.service.UserService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
+import org.example.productcatalog.web.servlet.UserServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,7 +28,7 @@ public class UserServletTest extends AbstractTest {
 
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")
-    void givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
+    public void givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
         User user = userService.find("name@hostname");
         String userString = objectMapper.writeValueAsString(userMapper.userToUserDto(user));
         String userList = objectMapper.writeValueAsString(userService.findFiltered(user).stream()
@@ -50,7 +51,7 @@ public class UserServletTest extends AbstractTest {
 
     @Test
     @DisplayName("Попытка изменить пароль пользователя")
-    void givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
+    public void givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
         User user = userService.find("name@hostname");
         User newUser = new User("name@hostname", "111111");
         String userString = objectMapper.writeValueAsString(userMapper.userToUserDto(newUser));
@@ -72,7 +73,7 @@ public class UserServletTest extends AbstractTest {
 
     @Test
     @DisplayName("Попытка удалить пользователя")
-    void givenUser_whenTryToDelete_thenReturnCorrectResult() throws IOException {
+    public void givenUser_whenTryToDelete_thenReturnCorrectResult() throws IOException {
         User user = userService.find("test@hostname");
         String userString = objectMapper.writeValueAsString(userMapper.userToUserDto(user));
 

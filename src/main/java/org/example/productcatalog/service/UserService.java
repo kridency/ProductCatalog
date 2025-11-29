@@ -42,7 +42,7 @@ public class UserService implements CrudService<User, String> {
     @Override
     public User find(String email) {
         return Optional.ofNullable(email).flatMap(repository::getByKey).orElseThrow(() ->
-                new ApplicationException(EMAIL_ERROR));
+                new ApplicationException(USER_NOT_FOUND));
     }
 
     @Override

@@ -4,15 +4,13 @@ import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
-import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { UserDto.class })
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserService.class})
 @Named("UserMapper")
 public interface UserMapper {
-    CrudService<User, String> userService = new UserService();
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Named("getUserMapper")
@@ -23,7 +21,7 @@ public interface UserMapper {
     @Named("getUserId")
     default long getUserId(UserDto data) {
         try {
-            return userService.find(data.getEmail()).getId();
+            return new UserService().find(data.getEmail()).getId();
         } catch (ApplicationException e) {
             return 0L;
         }
@@ -32,7 +30,7 @@ public interface UserMapper {
     @Named("getRole")
     default RoleType getRole(UserDto data) {
         try {
-            return userService.find(data.getEmail()).getRole();
+            return new UserService().find(data.getEmail()).getRole();
         } catch (ApplicationException e) {
             return RoleType.ROLE_USER;
         }

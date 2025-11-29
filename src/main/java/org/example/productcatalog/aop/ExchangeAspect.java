@@ -1,7 +1,6 @@
 package org.example.productcatalog.aop;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.example.productcatalog.entity.Invocation;
@@ -21,5 +20,6 @@ public class ExchangeAspect {
         var endpoint = exchange.getRequestURI().getPath();
         Optional.ofNullable(exchange.getAttribute("JSESSIONID")).map(Object::toString).ifPresent(sessionId ->
                 invocationRepository.add(new Invocation(endpoint, userService.find(sessionId))));
+        exchange.close();
     }
 }

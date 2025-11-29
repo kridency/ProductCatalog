@@ -6,7 +6,7 @@ import org.example.productcatalog.service.ProductService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { ProductDto.class })
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ProductService.class})
 @Named("ProductMapper")
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);

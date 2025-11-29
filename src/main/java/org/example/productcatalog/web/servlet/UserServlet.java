@@ -44,7 +44,6 @@ public class UserServlet extends HttpServlet {
                 responseText = "Не удалось зарегистрировать пользователя " + user.getEmail() + ".";
             }
             writer.println(responseText);
-            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             throw new ApplicationException(e.getMessage());
@@ -67,7 +66,6 @@ public class UserServlet extends HttpServlet {
                 responseText = "Не удалось изменить пользователя " + user.getEmail() + ".";
             }
             writer.println(responseText);
-            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ApplicationException(e.getMessage());
@@ -79,7 +77,6 @@ public class UserServlet extends HttpServlet {
             User user = userService.remove(userService.findById(id));
             response.setStatus(HttpServletResponse.SC_OK);
             writer.println("Пользователь " + user.getEmail() + " успешно удален.");
-            writer.flush();
             Cookie cookie = new Cookie("JSESSIONID", null);
             cookie.setPath("/api/v1");
             cookie.setMaxAge(0);
@@ -107,7 +104,6 @@ public class UserServlet extends HttpServlet {
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         return "Не удалось аутентифицировать пользователя " + user.getEmail() + ".";
                     }));
-            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             throw new ApplicationException(e.getMessage());
@@ -118,7 +114,6 @@ public class UserServlet extends HttpServlet {
         try (PrintWriter writer = response.getWriter()) {
             response.setStatus(HttpServletResponse.SC_OK);
             writer.println("Пользователь " + user.getEmail() + " успешно завершил сеанс.");
-            writer.flush();
             Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
             cookie.setPath("/api/v1");
             cookie.setMaxAge(0);
@@ -137,7 +132,6 @@ public class UserServlet extends HttpServlet {
                     .map(userMapper::userToUserDto)
                     .toList();
             writer.println(objectMapper.writeValueAsString(list));
-            writer.flush();
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
             if (!e.getMessage().equals(RETURN)) {
@@ -188,6 +182,7 @@ public class UserServlet extends HttpServlet {
                         writer.println(BAD_ENDPOINT);
                     }
                 }, unauthorized::get), unauthorized::get);
+            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ApplicationException(e.getMessage());
@@ -227,7 +222,7 @@ public class UserServlet extends HttpServlet {
                                 writer.println(BAD_ENDPOINT);
                             }
                         }
-                    } catch (ApplicationException e ) {
+                    } catch (ApplicationException e) {
                         writer.println(e.getMessage());
                     } catch(JsonProcessingException e) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -238,6 +233,7 @@ public class UserServlet extends HttpServlet {
                     writer.println(BAD_ENDPOINT);
                 }
             });
+            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ApplicationException(e.getMessage());
@@ -284,6 +280,7 @@ public class UserServlet extends HttpServlet {
                     writer.println(BAD_ENDPOINT);
                 }
             }, unauthorized::get);
+            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ApplicationException(e.getMessage());
@@ -332,6 +329,7 @@ public class UserServlet extends HttpServlet {
                             writer.println(BAD_ENDPOINT);
                         }
                     }, unauthorized::get);
+            writer.flush();
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw new ApplicationException(e.getMessage());

@@ -7,13 +7,15 @@
     <groupId>org.example.productcatalog</groupId>
     <artifactId>ProductCatalog</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
         <java.source-target.version>21</java.source-target.version>
         <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
 
-        <lombok.version>1.18.42</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
         <jakarta-validation.version>3.1.0</jakarta-validation.version>
@@ -23,8 +25,10 @@
         <aspectj.version>1.9.23</aspectj.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
         <aspect-maven-plugin.version>1.15.0</aspect-maven-plugin.version>
+        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
         <postgresql.version>42.7.8</postgresql.version>
         <liquibase.version>4.31.1</liquibase.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
@@ -33,13 +37,30 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito.version>5.16.0</mockito.version>
         <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
+
+        <database.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</database.url>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>environment-override</id>
+            <activation>
+                <property>
+                    <name>env.POSTGRES_DATASOURCE_URL</name>
+                </property>
+            </activation>
+            <properties>
+                <database.url>${env.POSTGRES_DATASOURCE_URL}</database.url>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -73,6 +94,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
@@ -82,16 +109,8 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <version>${mapstruct.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj-core.version}</version>
-            <scope>test</scope>
-        </dependency>
-
 
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -131,19 +150,6 @@
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
@@ -159,6 +165,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>${commons-compress.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -179,44 +186,63 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>${aspect-maven-plugin.version}</version>
                 <configuration>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                        <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                    </weaveDirectories>
                     <source>${java.source-target.version}</source>
                     <target>${java.source-target.version}</target>
-                    <useIncrementalCompilation>true</useIncrementalCompilation>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <generatedTestSourcesDirectory>
-                        ${project.build.directory}/generated-test-sources/test-annotations
-                    </generatedTestSourcesDirectory>
-                    <proc>only</proc>
-                    <compilerArgs>
-                        <compilerArg>
-                            -Amapstruct.defaultComponentModel=jsr330
-                        </compilerArg>
-                        <compilerArg>
-                            -Amapstruct.verbose=true
-                        </compilerArg>
-                    </compilerArgs>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok-mapstruct-binding</artifactId>
-                            <version>${lombok-mapstruct-binding.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
+                    <Xlint>ignore</Xlint>
+                    <complianceLevel>${java.source-target.version}</complianceLevel>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <excludes>
+                        <exclude>**/*.java</exclude>
+                    </excludes>
+                    <weaveMainSourceFolder>true</weaveMainSourceFolder>
+                    <verbose>true</verbose>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test-compile</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.liquibase</groupId>
@@ -225,6 +251,10 @@
                 <configuration>
                     <propertyFileWillOverride>true</propertyFileWillOverride>
                     <searchPath>${project.basedir}/src/main/resources</searchPath>
+                    <driver>org.postgresql.Driver</driver>
+                    <url>${database.url}</url>
+                    <username>intern</username>
+                    <password>1gjAVnJ</password>
                     <propertyFile>liquibase.yml</propertyFile>
                 </configuration>
                 <executions>
@@ -238,9 +268,39 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <release>${java.source-target.version}</release>
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <createMissingPackageInfoClass>true</createMissingPackageInfoClass>
+                    <parameters>true</parameters>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <testSourceDirectory>src/test/java</testSourceDirectory>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
@@ -252,41 +312,28 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>aspectj-maven-plugin</artifactId>
-                <version>${aspect-maven-plugin.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
                 <configuration>
-                    <source>${java.source-target.version}</source>
-                    <target>${java.source-target.version}</target>
-                    <Xlint>ignore</Xlint>
-                    <complianceLevel>${java.source-target.version}</complianceLevel>
-                    <forceAjcCompile>true</forceAjcCompile>
-                    <proc>none</proc>
-                    <verbose>true</verbose>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.example.productcatalog.ProductCatalogApplication</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <weaveMainSourceFolder>true</weaveMainSourceFolder>
-                            <Xset>
-                                <overWeaving>true</overWeaving>
-                                <avoidFinal>false</avoidFinal>
-                            </Xset>
-                        </configuration>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>compile</goal>
-                            <goal>test-compile</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjtools</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

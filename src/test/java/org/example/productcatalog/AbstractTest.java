@@ -9,26 +9,20 @@ import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.property.ApplicationProperties;
 import org.example.productcatalog.property.LiquibaseProperties;
-import org.example.productcatalog.service.UserService;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
-@Testcontainers
 public class AbstractTest {
     protected static final ApplicationProperties applicationProperties = ApplicationProperties.getInstance();
     protected static final LiquibaseProperties liquibaseProperties = LiquibaseProperties.getInstance();
 
-    @Container
     protected static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:12.20"));
     protected static PGSimpleDataSource datasource;
-    protected final static UserService userService;
 
     static {
         postgreSQLContainer
@@ -44,7 +38,6 @@ public class AbstractTest {
                 postgreSQLContainer
                         .getMappedPort(Integer.parseInt(applicationProperties.getProperty("datasource.port")))
         });
-        userService = new UserService();
 
         try(var connection = datasource.getConnection()) {
             var database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
@@ -53,7 +46,6 @@ public class AbstractTest {
             var liquibase  = new Liquibase(liquibaseProperties.getProperty("changeLogFile"), new ClassLoaderResourceAccessor(), database);
             liquibase.setChangeLogParameter("schemaName", liquibaseProperties.getProperty("defaultSchemaName"));
             liquibase.update(new Contexts("test"));
-            //objectMapper.registerModule(new JavaTimeModule());
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }

@@ -1,4 +1,4 @@
-package org.example.productcatalog.web.servlet;
+package org.example.productcatalog.servlet;
 
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.entity.Product;
@@ -7,6 +7,7 @@ import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
+import org.example.productcatalog.web.servlet.ProductServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,7 +28,7 @@ public class ProductServletTest extends AbstractTest {
 
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")
-    void givenCurrentUserAndProductTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
+    public void givenCurrentUserAndProductTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
         Product product = productService.find("I11");
         String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(product));
         String productList = objectMapper.writeValueAsString(productService.findFiltered(product).stream()
@@ -50,7 +51,7 @@ public class ProductServletTest extends AbstractTest {
 
     @Test
     @DisplayName("Попытка изменить товар")
-    void givenUserAndProduct_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
+    public void givenUserAndProduct_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
         Product product = productService.find("I11");
         Product newProduct = new Product("I11", "Puma", "Sneakers", "Shoes", 75.0);
         String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(newProduct));
@@ -72,7 +73,7 @@ public class ProductServletTest extends AbstractTest {
 
     @Test
     @DisplayName("Попытка удалить товар")
-    void givenUserAndProduct_whenTryToDelete_thenReturnCorrectResult() throws IOException {
+    public void givenUserAndProduct_whenTryToDelete_thenReturnCorrectResult() throws IOException {
         Product product = productService.find("I11");
         String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(product));
 

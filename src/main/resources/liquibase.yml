@@ -1,10 +1,6 @@
 changeLogFile: db/migration/changelog/dbChangeLog.xml
 defaultSchemaName: custom
 liquibaseSchemaName: auxiliary
-driver: org.postgresql.Driver
-url: jdbc:postgresql://localhost:5432/product_db?useUnicode=true&serverTimezone=UTC
-username: intern
-password: 1gjAVnJ
 contexts: production
 verbose: true
 dropFirst: true

@@ -4,19 +4,24 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import java.time.Instant;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Aspect
 public class StopWatchAspect {
+    protected final Logger LOGGER = Logger.getLogger(StopWatchAspect.class.getName());
+
     @Around("execution(* *(..)) && within(org.example.productcatalog..*) " +
             "&& !within(org.example.productcatalog.aop..*)" +
-            "&& !within(org.example.productcatalog.mapper..*)" +
-            "&& !within(org.example.productcatalog.web.servlet.*Test..*)")
+            "&& !within(org.example.productcatalog.mapper..*)")
     public Object logExecutionDuration(ProceedingJoinPoint joinPoint) throws Throwable {
-        long startTime = System.nanoTime();
+        long startTime = Instant.now().toEpochMilli();
         try {
             return joinPoint.proceed();
         }
         finally {
-            System.out.println(joinPoint + " -> " + (System.nanoTime() - startTime) / 1000000 + " ms");
+            LOGGER.log(Level.INFO, joinPoint + " -> " + (Instant.now().toEpochMilli() - startTime) / 1000000 + " ms");
         }
     }
 }
