@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Main-Class: org.example.productcatalog.ProductCatalogApplication
+Class-Path: postgresql-42.7.8.jar jackson-annotations-2.18.2.jar mapstru
+ ct-1.6.3.jar jackson-module-parameter-names-2.18.2.jar commons-lang3-3.
+ 19.0.jar lombok-1.18.32.jar jakarta.servlet-api-6.1.0.jar aspectjrt-1.9
+ .23.jar commons-io-2.18.0.jar checker-qual-3.49.5.jar jakarta.validatio
+ n-api-3.1.0.jar jackson-datatype-jsr310-2.18.2.jar liquibase-core-4.31.
+ 1.jar commons-text-1.13.0.jar jackson-core-2.18.2.jar jaxb-api-2.3.1.ja
+ r jakarta.inject-api-2.0.1.jar aspectjweaver-1.9.23.jar snakeyaml-2.3.j
+ ar commons-collections4-4.4.jar jackson-databind-2.18.2.jar opencsv-5.9
+ .jar
+

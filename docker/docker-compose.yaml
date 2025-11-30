@@ -1,0 +1,23 @@
+services:
+  postgres:
+    container_name: postgres-container
+    image: postgres:12.20
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=intern
+      - POSTGRES_PASSWORD=1gjAVnJ
+      - POSTGRES_DB=product_db
+      - POSTGRES_SCHEMA=custom
+    expose:
+      - 5432
+    networks:
+      - docker_default 
+    restart: unless-stopped
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+networks:
+      docker_default:
+        external: true
+        name: docker_default
