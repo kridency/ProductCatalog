@@ -16,8 +16,9 @@ public class ProductCacheManager implements CacheManager<String, Product> {
 
     @Override
     public Product put(Product value) {
-        get(value.getItem()).ifPresent(x -> clear(x.getItem()));
-        cache.put(new AbstractMap.SimpleEntry<>(Instant.now(), value::getItem), value);
+        Optional.ofNullable(value).map(Product::getItem).ifPresent(this::clear);
+        Optional.ofNullable(value)
+                .ifPresent(x -> cache.put(new AbstractMap.SimpleEntry<>(Instant.now(), x::getItem), x));
         return value;
     }
 
