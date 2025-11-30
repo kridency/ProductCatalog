@@ -21,6 +21,9 @@ public class ProductCatalogInit {
     public static final String PRODUCT_NOT_SPECIFIED = "Не указан товар";
     public static final String BAD_REQUEST = "Входящие данные не соответствуют формату";
     public static final String BAD_ENDPOINT = "Недопустимая операция";
+    public static final String CREATED = "Объект успешно создан";
+    public static final String UPDATED = "Объект успешно изменен";
+    public static final String DELETED = "Объект успешно удален";
     public static final DateTimeFormatter DATE_FORMAT;
     public static final DateTimeFormatter DATETIME_FORMATTER;
     public static final Scanner SCANNER;

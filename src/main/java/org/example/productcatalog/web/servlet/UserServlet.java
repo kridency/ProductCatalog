@@ -6,7 +6,6 @@ import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.Cookie;
@@ -15,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -24,73 +22,16 @@ import java.util.stream.Collectors;
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class UserServlet extends AbstractServlet<User> {
-    private final CrudService<User, String> userService;
     private final UserMapper userMapper;
 
     public UserServlet() {
-        userService = new UserService();
+        service = new UserService();
         userMapper = UserMapper.getInstance();
-    }
-
-    protected void create(HttpServletResponse response, User user) {
-        try (PrintWriter writer = response.getWriter()) {
-            String responseText;
-            if (userService.create(user) != null) {
-                response.setStatus(HttpServletResponse.SC_CREATED);
-                responseText = "Пользователь " + user.getEmail() + " успешно зарегистрирован.";
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                responseText = "Не удалось зарегистрировать пользователя " + user.getEmail() + ".";
-            }
-            writer.println(responseText);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            throw new ApplicationException(e.getMessage());
-        }
-    }
-
-    protected void update(HttpServletResponse response, User user) {
-        try (PrintWriter writer = response.getWriter()) {
-            String responseText;
-            User newUser = userService.update(user);
-            if (newUser != null) {
-                response.setStatus(HttpServletResponse.SC_CREATED);
-                responseText = "Пользователь " + newUser.getEmail() + " успешно изменен.";
-                Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
-                cookie.setPath("/api/v1");
-                cookie.setMaxAge(2592000);
-                response.addCookie(cookie);
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                responseText = "Не удалось изменить пользователя " + user.getEmail() + ".";
-            }
-            writer.println(responseText);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            throw new ApplicationException(e.getMessage());
-        }
-    }
-
-    protected void delete(HttpServletResponse response, User user) {
-        try (PrintWriter writer = response.getWriter()) {
-            User oldUser = userService.remove(user);
-            response.setStatus(HttpServletResponse.SC_OK);
-            writer.println("Пользователь " + oldUser.getEmail() + " успешно удален.");
-            Cookie cookie = new Cookie("JSESSIONID", null);
-            cookie.setPath("/api/v1");
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        } catch (Exception e) {
-            if (!e.getMessage().equals(RETURN)) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                throw new ApplicationException(e.getMessage());
-            }
-        }
     }
 
     private void login(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
-            writer.println(Optional.of(userService.find(user.getEmail()))
+            writer.println(Optional.of(service.find(user.getEmail()))
                     .filter(value -> value.getPassword().equals(user.getPassword()))
                     .map(value -> {
                         response.setStatus(HttpServletResponse.SC_OK);
@@ -112,26 +53,11 @@ public class UserServlet extends AbstractServlet<User> {
     private void logout(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
             response.setStatus(HttpServletResponse.SC_OK);
-            writer.println("Пользователь " + user.getEmail() + " успешно завершил сеанс.");
             Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
             cookie.setPath("/api/v1");
             cookie.setMaxAge(0);
             response.addCookie(cookie);
-        } catch (Exception e) {
-            if (!e.getMessage().equals(RETURN)) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                throw new ApplicationException(e.getMessage());
-            }
-        }
-    }
-
-    protected void list(HttpServletResponse response, User user) {
-        try (PrintWriter writer = response.getWriter()) {
-            Collection<UserDto> list = userService.findFiltered(user).stream()
-                    .map(userMapper::userToUserDto)
-                    .toList();
-            writer.println(objectMapper.writeValueAsString(list));
-            response.setStatus(HttpServletResponse.SC_OK);
+            writer.println("Пользователь " + user.getEmail() + " успешно завершил сеанс.");
         } catch (Exception e) {
             if (!e.getMessage().equals(RETURN)) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -153,14 +79,14 @@ public class UserServlet extends AbstractServlet<User> {
             };
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId ->
-                Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
+                Optional.ofNullable(service.find(sessionId.toString())).ifPresentOrElse(principal -> {
                     if (path.contains("/api/v1/administration")) {
                         if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
                             try {
                                 UserDto userDto = objectMapper.readValue(
                                         reader.lines().collect(Collectors.joining()),
                                         UserDto.class);
-                                User entity = userMapper.userDtoToUser(userDto);
+                                User entity = userMapper.fromDto(userDto);
                                 switch (path.substring(path.lastIndexOf('/'))) {
                                     case "/list" -> list(response, entity);
                                     default -> {
@@ -210,7 +136,7 @@ public class UserServlet extends AbstractServlet<User> {
                                 reader.lines().collect(Collectors.joining()),
                                 UserDto.class
                         );
-                        User principal = userMapper.userDtoToUser(userDto);
+                        User principal = userMapper.fromDto(userDto);
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/create" -> create(response, principal);
                             case "/login" -> login(response, principal);
@@ -251,11 +177,11 @@ public class UserServlet extends AbstractServlet<User> {
 
             Optional.ofNullable(request.getAttribute("JSESSIONID")).ifPresentOrElse(sessionId -> {
                 if (path.contains("/api/v1/identity")) {
-                    Optional.ofNullable(userService.find(sessionId.toString())).ifPresentOrElse(principal -> {
+                    Optional.ofNullable(service.find(sessionId.toString())).ifPresentOrElse(principal -> {
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/update" -> {
                                 try {
-                                    User newUser = userMapper.userDtoToUser(objectMapper.readValue(
+                                    User newUser = userMapper.fromDto(objectMapper.readValue(
                                             reader.lines().collect(Collectors.joining()),
                                             UserDto.class
                                     ));
@@ -295,12 +221,12 @@ public class UserServlet extends AbstractServlet<User> {
                 return null;
             };
 
-            Optional.ofNullable(request.getAttribute("JSESSIONID")).map(Objects::toString).map(userService::find)
+            Optional.ofNullable(request.getAttribute("JSESSIONID")).map(Objects::toString).map(service::find)
                     .ifPresentOrElse(principal -> {
                         if (path.contains("/api/v1/administration")) {
                             if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
                                 String id = request.getParameter("id");
-                                User user = userService.findById(id == null ? 0L : Long.parseLong(id));
+                                User user = service.findById(id == null ? 0L : Long.parseLong(id));
                                 switch (path.substring(path.lastIndexOf('/'))) {
                                     case "/delete" -> delete(response, user);
                                     default -> {

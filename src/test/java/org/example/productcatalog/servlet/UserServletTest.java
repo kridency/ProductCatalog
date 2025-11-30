@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
+import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class UserServletTest extends AbstractTest {
     private static final UserService userService = Mockito.spy(UserService.class);
@@ -46,16 +46,15 @@ public class UserServletTest extends AbstractTest {
 
         userServlet.doPost(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
-        Mockito.verify(writer).println("Пользователь " + userDto.getEmail() + " успешно зарегистрирован.");
+        Mockito.verify(writer).println(CREATED);
     }
 
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")
     public void givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
         User user = userService.find("name@hostname");
-        String userString = objectMapper.writeValueAsString(userMapper.userToUserDto(user));
-        String userList = objectMapper.writeValueAsString(userService.findFiltered(user).stream()
-                .map(userMapper::userToUserDto).toList());
+        String userString = objectMapper.writeValueAsString(userMapper.toDto(user));
+        String userList = objectMapper.writeValueAsString(userService.findFiltered(user).stream().toList());
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -75,9 +74,8 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить пароль пользователя")
     public void givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        User user = userService.find("name@hostname");
         User newUser = new User("name@hostname", "111111");
-        String userString = objectMapper.writeValueAsString(userMapper.userToUserDto(newUser));
+        String userString = objectMapper.writeValueAsString(userMapper.toDto(newUser));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -91,14 +89,14 @@ public class UserServletTest extends AbstractTest {
 
         userServlet.doPut(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
-        Mockito.verify(writer).println("Пользователь " + user.getEmail() + " успешно изменен.");
+        Mockito.verify(writer).println(UPDATED);
     }
 
     @Test
     @DisplayName("Попытка удалить пользователя")
     public void givenUser_whenTryToDelete_thenReturnCorrectResult() throws IOException {
         User user = userService.find("test@hostname");
-        String userString = objectMapper.writeValueAsString(userMapper.userToUserDto(user));
+        String userString = objectMapper.writeValueAsString(userMapper.toDto(user));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -112,6 +110,6 @@ public class UserServletTest extends AbstractTest {
 
         userServlet.doDelete(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
-        Mockito.verify(writer).println("Пользователь " + user.getEmail() + " успешно удален.");
+        Mockito.verify(writer).println(DELETED);
     }
 }

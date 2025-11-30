@@ -40,7 +40,7 @@ public interface UserMapper {
             @Mapping(source = "email", target = "email"),
             @Mapping(source = "password", target = "password")
     })
-    UserDto userToUserDto(User data);
+    UserDto toDto(User data);
 
     @Mappings({
             @Mapping(target = "id", expression = "java(getUserId(data))", dependsOn = {"email"}),
@@ -48,5 +48,5 @@ public interface UserMapper {
             @Mapping(source = "password", target = "password"),
             @Mapping(target = "role", expression = "java(getRole(data))", dependsOn = {"email"})
     })
-    User userDtoToUser(UserDto data);
+    User fromDto(UserDto data);
 }

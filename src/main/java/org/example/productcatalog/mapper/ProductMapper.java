@@ -33,7 +33,7 @@ public interface ProductMapper {
             @Mapping(source = "category", target = "category"),
             @Mapping(source = "price", target = "price"),
     })
-    ProductDto productToProductDto(Product data);
+    ProductDto toDto(Product data);
 
     @Mappings({
             @Mapping(target = "id", expression = "java(getProductId(data))", dependsOn = {"item"}),
@@ -43,5 +43,5 @@ public interface ProductMapper {
             @Mapping(source = "category", target = "category"),
             @Mapping(source = "price", target = "price")
     })
-    Product productDtoToProduct(ProductDto data);
+    Product fromDto(ProductDto data);
 }

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
+import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class ProductServletTest extends AbstractTest {
     private static final ProductService productService = Mockito.spy(ProductService.class);
@@ -50,16 +50,15 @@ public class ProductServletTest extends AbstractTest {
 
         productServlet.doPost(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
-        Mockito.verify(writer).println("Товар " + productService.find(productDto.getItem()).getId() + " успешно создан.");
+        Mockito.verify(writer).println(CREATED);
     }
 
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")
     public void givenCurrentUserAndProductTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
         Product product = productService.find("I11");
-        String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(product));
-        String productList = objectMapper.writeValueAsString(productService.findFiltered(product).stream()
-                .map(productMapper::productToProductDto).toList());
+        String productString = objectMapper.writeValueAsString(productMapper.toDto(product));
+        String productList = objectMapper.writeValueAsString(productService.findFiltered(product).stream().toList());
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -79,9 +78,8 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить товар")
     public void givenUserAndProduct_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        Product product = productService.find("I11");
         Product newProduct = new Product("I11", "Puma", "Sneakers", "Shoes", 75.0);
-        String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(newProduct));
+        String productString = objectMapper.writeValueAsString(productMapper.toDto(newProduct));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -95,14 +93,14 @@ public class ProductServletTest extends AbstractTest {
 
         productServlet.doPut(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
-        Mockito.verify(writer).println("Товар " + product.getId() + " успешно изменен.");
+        Mockito.verify(writer).println(UPDATED);
     }
 
     @Test
     @DisplayName("Попытка удалить товар")
     public void givenUserAndProduct_whenTryToDelete_thenReturnCorrectResult() throws IOException {
         Product product = productService.find("I11");
-        String productString = objectMapper.writeValueAsString(productMapper.productToProductDto(product));
+        String productString = objectMapper.writeValueAsString(productMapper.toDto(product));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -116,6 +114,6 @@ public class ProductServletTest extends AbstractTest {
 
         productServlet.doDelete(request, response);
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
-        Mockito.verify(writer).println("Товар " + product.getId() + " успешно удален.");
+        Mockito.verify(writer).println(DELETED);
     }
 }
