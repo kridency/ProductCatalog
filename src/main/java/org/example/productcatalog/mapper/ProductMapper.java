@@ -2,6 +2,7 @@ package org.example.productcatalog.mapper;
 
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.entity.Product;
+import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.service.ProductService;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -18,7 +19,11 @@ public interface ProductMapper {
 
     @Named("getProductId")
     default long getProductId(ProductDto data) {
-        return new ProductService().find(data.getItem()).getId();
+        try {
+            return new ProductService().find(data.getItem()).getId();
+        } catch (ApplicationException e) {
+            return 0L;
+        }
     }
 
     @Mappings({

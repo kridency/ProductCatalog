@@ -16,7 +16,7 @@ public class ExchangeAspect {
 
     @After(value = "execution(* org.example.productcatalog.web.handler.AbstractHandler.handle(com.sun.net.httpserver.HttpExchange, ..))" +
             "&& args(exchange, ..)", argNames = "exchange")
-    public void httpExchangeCheckToHandle(HttpExchange exchange) throws Throwable {
+    public void httpExchangeCheckToHandle(HttpExchange exchange) {
         var endpoint = exchange.getRequestURI().getPath();
         Optional.ofNullable(exchange.getAttribute("JSESSIONID")).map(Object::toString).ifPresent(sessionId ->
                 invocationRepository.add(new Invocation(endpoint, userService.find(sessionId))));

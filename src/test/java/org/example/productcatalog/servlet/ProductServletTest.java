@@ -1,6 +1,7 @@
 package org.example.productcatalog.servlet;
 
 import org.example.productcatalog.AbstractTest;
+import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.mapper.ProductMapper;
 import org.example.productcatalog.service.ProductService;
@@ -25,6 +26,32 @@ public class ProductServletTest extends AbstractTest {
     private static final ProductService productService = Mockito.spy(ProductService.class);
     private static final ProductMapper productMapper = Mockito.spy(ProductMapper.getInstance());
     private static final ProductServlet productServlet = Mockito.spy(ProductServlet.class);
+
+    @Test
+    @DisplayName("Попытка создать новый товар")
+    public void givenNewProduct_whenTryToCreate_thenReturnCorrectResult() throws IOException {
+        ProductDto productDto = new ProductDto();
+        productDto.setItem("I12");
+        productDto.setBrand("Puma");
+        productDto.setTitle("Flip-flop");
+        productDto.setCategory("Shoes");
+        productDto.setPrice(12.99);
+        String productString = objectMapper.writeValueAsString(productDto);
+
+        final PrintWriter writer = Mockito.mock(PrintWriter.class);
+        HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
+        HttpServletRequest request = Mockito.mock(RequestWrapper.class);
+
+        Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
+        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/create");
+        Mockito.when(request.getReader())
+                .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
+        Mockito.when(response.getWriter()).thenReturn(writer);
+
+        productServlet.doPost(request, response);
+        Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
+        Mockito.verify(writer).println("Товар " + productService.find(productDto.getItem()).getId() + " успешно создан.");
+    }
 
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")

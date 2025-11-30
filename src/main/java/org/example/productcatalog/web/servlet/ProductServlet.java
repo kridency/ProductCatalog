@@ -10,7 +10,6 @@ import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.service.UserService;
 
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-public class ProductServlet extends HttpServlet {
+public class ProductServlet extends AbstractServlet<Product> {
     private final CrudService<User, String> userService;
     private final CrudService<Product, String> productService;
     private final ProductMapper productMapper;
@@ -33,18 +32,18 @@ public class ProductServlet extends HttpServlet {
         productMapper = ProductMapper.getInstance();
     }
 
-    private void create(HttpServletResponse response, Product product) {
+    protected void create(HttpServletResponse response, Product product) {
         try (PrintWriter writer = response.getWriter()) {
             String responseText, overdraft = "";
 
             Product newEntity = productService.create(product);
-            if (newEntity != null) {
+            responseText = Optional.ofNullable(newEntity).map(x -> {
                 response.setStatus(HttpServletResponse.SC_CREATED);
-                responseText = "Транзакция " + newEntity.getId() + " успешно создана." + overdraft;
-            } else {
+                return "Товар " + newEntity.getId() + " успешно создан." + overdraft;
+            }).orElseGet(() -> {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                responseText = PRODUCT_NOT_CREATED;
-            }
+                return PRODUCT_NOT_CREATED;
+            });
             writer.println(responseText);
             writer.flush();
         } catch (Exception e) {
@@ -53,7 +52,7 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-    private void list(HttpServletResponse response, Product product) {
+    protected void list(HttpServletResponse response, Product product) {
         try (PrintWriter writer = response.getWriter()) {
             Collection<ProductDto> list = productService.findFiltered(product).stream()
                     .map(productMapper::productToProductDto)
@@ -69,7 +68,7 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-    private void update(HttpServletResponse response, Product product) {
+    protected void update(HttpServletResponse response, Product product) {
         try (PrintWriter writer = response.getWriter()) {
             String responseText;
             Product newEntity = productService.update(product);
@@ -88,9 +87,9 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-    private void delete(HttpServletResponse response, Product transaction) {
+    protected void delete(HttpServletResponse response, Product product) {
         try (PrintWriter writer = response.getWriter()) {
-            Product newEntity = productService.remove(transaction);
+            Product newEntity = productService.remove(product);
             response.setStatus(HttpServletResponse.SC_OK);
             writer.println("Товар " + newEntity.getId() + " успешно удален.");
             writer.flush();

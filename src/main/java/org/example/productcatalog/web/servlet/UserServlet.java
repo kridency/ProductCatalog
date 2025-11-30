@@ -10,7 +10,6 @@ import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-public class UserServlet extends HttpServlet {
+public class UserServlet extends AbstractServlet<User> {
     private final CrudService<User, String> userService;
     private final UserMapper userMapper;
 
@@ -33,7 +32,7 @@ public class UserServlet extends HttpServlet {
         userMapper = UserMapper.getInstance();
     }
 
-    private void create(HttpServletResponse response, User user) {
+    protected void create(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
             String responseText;
             if (userService.create(user) != null) {
@@ -50,7 +49,7 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void update(HttpServletResponse response, User user) {
+    protected void update(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
             String responseText;
             User newUser = userService.update(user);
@@ -72,11 +71,11 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void delete(HttpServletResponse response, long id) {
+    protected void delete(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
-            User user = userService.remove(userService.findById(id));
+            User oldUser = userService.remove(user);
             response.setStatus(HttpServletResponse.SC_OK);
-            writer.println("Пользователь " + user.getEmail() + " успешно удален.");
+            writer.println("Пользователь " + oldUser.getEmail() + " успешно удален.");
             Cookie cookie = new Cookie("JSESSIONID", null);
             cookie.setPath("/api/v1");
             cookie.setMaxAge(0);
@@ -126,7 +125,7 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void list(HttpServletResponse response, User user) {
+    protected void list(HttpServletResponse response, User user) {
         try (PrintWriter writer = response.getWriter()) {
             Collection<UserDto> list = userService.findFiltered(user).stream()
                     .map(userMapper::userToUserDto)
@@ -214,9 +213,7 @@ public class UserServlet extends HttpServlet {
                         User principal = userMapper.userDtoToUser(userDto);
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/create" -> create(response, principal);
-                            case "/login" -> {
-                                    login(response, principal);
-                            }
+                            case "/login" -> login(response, principal);
                             default -> {
                                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                 writer.println(BAD_ENDPOINT);
@@ -303,9 +300,9 @@ public class UserServlet extends HttpServlet {
                         if (path.contains("/api/v1/administration")) {
                             if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
                                 String id = request.getParameter("id");
-                                long userId = id == null ? 0L : Long.parseLong(id);
+                                User user = userService.findById(id == null ? 0L : Long.parseLong(id));
                                 switch (path.substring(path.lastIndexOf('/'))) {
-                                    case "/delete" -> delete(response, userId);
+                                    case "/delete" -> delete(response, user);
                                     default -> {
                                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                         writer.println(BAD_ENDPOINT);
@@ -318,7 +315,7 @@ public class UserServlet extends HttpServlet {
                         } else if (path.contains("/api/v1/identity")) {
                             switch (path.substring(path.lastIndexOf('/'))) {
                                 case "/logout" -> logout(response, principal);
-                                case "/delete" -> delete(response, principal.getId());
+                                case "/delete" -> delete(response, principal);
                                 default -> {
                                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                     writer.println(BAD_ENDPOINT);

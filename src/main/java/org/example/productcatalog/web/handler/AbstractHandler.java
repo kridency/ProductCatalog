@@ -75,7 +75,7 @@ public abstract class AbstractHandler implements HttpHandler {
         return out.toByteArray();
     }
 
-    private Map<String, String[]> splitQuery(String query) throws UnsupportedEncodingException {
+    private Map<String, String[]> splitQuery(String query) {
         final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
         return Optional.ofNullable(query).map(value -> value.split("&")).map(pairs -> {
             for (String pair : pairs) {

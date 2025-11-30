@@ -3,6 +3,7 @@ package org.example.productcatalog.servlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.productcatalog.AbstractTest;
+import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.mapper.UserMapper;
 import org.example.productcatalog.service.UserService;
@@ -25,6 +26,28 @@ public class UserServletTest extends AbstractTest {
     private static final UserService userService = Mockito.spy(UserService.class);
     private static final UserMapper userMapper = Mockito.spy(UserMapper.getInstance());
     private static final UserServlet userServlet = Mockito.spy(UserServlet.class);
+
+    @Test
+    @DisplayName("Попытка создать нового пользователя")
+    public void givenNewUserCredentials_whenTryToCreate_thenReturnCorrectResult() throws IOException {
+        UserDto userDto = new UserDto();
+        userDto.setEmail("new@hostname");
+        userDto.setPassword("111111");
+        String userString = objectMapper.writeValueAsString(userDto);
+
+        final PrintWriter writer = Mockito.mock(PrintWriter.class);
+        HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
+        HttpServletRequest request = Mockito.mock(RequestWrapper.class);
+
+        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/auth/create");
+        Mockito.when(request.getReader())
+                .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(userString.getBytes()))));
+        Mockito.when(response.getWriter()).thenReturn(writer);
+
+        userServlet.doPost(request, response);
+        Mockito.verify(response).setStatus(HttpServletResponse.SC_CREATED);
+        Mockito.verify(writer).println("Пользователь " + userDto.getEmail() + " успешно зарегистрирован.");
+    }
 
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")
