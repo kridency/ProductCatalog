@@ -5,23 +5,25 @@ import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.ProductMapper;
 import org.example.productcatalog.repository.CrudRepository;
-import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.Specification;
+
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
+@Service
 public class ProductService implements CrudService<ProductDto, String> {
     private final CrudRepository<Product> repository;
     private final ProductMapper mapper;
     private final ProductCacheManager productCacheManager;
 
-    public ProductService() {
-        repository = new ProductRepository();
-        mapper = ProductMapper.getInstance();
-        productCacheManager = new ProductCacheManager();
+    public ProductService(CrudRepository<Product> repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
+        this.repository = repository;
+        this.mapper = mapper;
+        this.productCacheManager = productCacheManager;
     }
 
     @Override

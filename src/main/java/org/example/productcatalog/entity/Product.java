@@ -1,27 +1,19 @@
 package org.example.productcatalog.entity;
 
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.Setter;
+import lombok.Getter;
 
 @Setter
 @Getter
+@Entity
 public class Product {
+    @Id
     private long id;
     private String item;
     private String brand;
     private String title;
     private String category;
     private double price;
-
-    public Product(String item,
-                   String brand,
-                   String title,
-                   String category,
-                   double price) {
-        this.item = item;
-        this.brand = brand;
-        this.title = title;
-        this.category = category;
-        this.price = price;
-    }
-
 }

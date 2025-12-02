@@ -7,19 +7,21 @@ import org.example.productcatalog.mapper.UserMapper;
 import org.example.productcatalog.repository.CrudRepository;
 import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.util.specification.Specification;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
+@Service
 public class UserService implements CrudService<UserDto, String> {
     private final UserMapper mapper;
     private final CrudRepository<User> repository;
 
-    public UserService() {
-        mapper = UserMapper.getInstance();
-        repository = new UserRepository();
+    public UserService(CrudRepository<User> repository, UserMapper mapper) {
+        this.mapper = mapper;
+        this.repository = repository;
     }
 
     @Override

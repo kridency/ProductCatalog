@@ -2,8 +2,11 @@ package org.example.productcatalog.controller;
 
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.dto.ProductDto;
+import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.Product;
+import org.example.productcatalog.entity.User;
 import org.example.productcatalog.mapper.ProductMapper;
+import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
@@ -11,10 +14,13 @@ import org.example.productcatalog.web.listener.ResponseWrapper;
 import org.example.productcatalog.web.controller.ProductServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,9 +29,15 @@ import java.io.PrintWriter;
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class ProductServletTest extends AbstractTest {
-    private static final ProductService productService = Mockito.spy(ProductService.class);
+    @Mock
+    private CrudService<ProductDto, String> productService;
+
+    @Mock
+    private CrudService<UserDto, String> userService;
+
     private static final ProductMapper productMapper = Mockito.spy(ProductMapper.getInstance());
-    private static final ProductServlet productServlet = Mockito.spy(ProductServlet.class);
+
+    private final ProductServlet productServlet = new ProductServlet(userService, productService);
 
     @Test
     @DisplayName("Попытка создать новый товар")
@@ -78,7 +90,12 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить товар")
     public void givenUserAndProduct_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        Product newProduct = new Product("I11", "Puma", "Sneakers", "Shoes", 75.0);
+        Product newProduct = new Product();
+        newProduct.setItem("I11");
+        newProduct.setBrand("Puma");
+        newProduct.setTitle("Sneakers");
+        newProduct.setCategory("Shoes");
+        newProduct.setPrice(75.0);
         String productString = objectMapper.writeValueAsString(productMapper.toDto(newProduct));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);

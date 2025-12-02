@@ -3,6 +3,7 @@ package org.example.productcatalog.repository;
 import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Invocation;
 import org.example.productcatalog.exception.ApplicationException;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 
+@Repository
 public class InvocationRepository implements CrudRepository<Invocation> {
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"invocation\" (date, endpoint, user_id) VALUES (?,?,?)";

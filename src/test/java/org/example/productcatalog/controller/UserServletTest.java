@@ -6,6 +6,7 @@ import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.mapper.UserMapper;
+import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
@@ -13,7 +14,9 @@ import org.example.productcatalog.web.listener.ResponseWrapper;
 import org.example.productcatalog.web.controller.UserServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,9 +26,13 @@ import java.io.PrintWriter;
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class UserServletTest extends AbstractTest {
-    private static final UserService userService = Mockito.spy(UserService.class);
+    @Mock
+    private CrudService<UserDto, String> userService;
+
     private static final UserMapper userMapper = Mockito.spy(UserMapper.getInstance());
-    private static final UserServlet userServlet = Mockito.spy(UserServlet.class);
+
+    @Autowired
+    private UserServlet userServlet;
 
     @Test
     @DisplayName("Попытка создать нового пользователя")
@@ -74,7 +81,9 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить пароль пользователя")
     public void givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        User newUser = new User("name@hostname", "111111");
+        User newUser = new User();
+        newUser.setEmail("name@hostname");
+        newUser.setPassword("111111");
         String userString = objectMapper.writeValueAsString(userMapper.toDto(newUser));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);

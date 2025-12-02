@@ -5,11 +5,13 @@ import jakarta.servlet.annotation.WebServlet;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -20,11 +22,11 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@WebServlet(urlPatterns = {"/auth/*", "/identity/*", "/administration/*"})
+@WebServlet(name = "UserServlet", urlPatterns = {"/auth/*", "/identity/*", "/administration/*"})
 public class UserServlet extends AbstractServlet<UserDto> {
 
-    public UserServlet() {
-        service = new UserService();
+    public UserServlet(CrudService<UserDto, String> service) {
+        this.service = service;
     }
 
     private void login(HttpServletResponse response, UserDto data) {
@@ -149,7 +151,7 @@ public class UserServlet extends AbstractServlet<UserDto> {
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    writer.println(BAD_ENDPOINT + " -> " + path);
+                    writer.println(BAD_ENDPOINT);
                 }
             });
             writer.flush();

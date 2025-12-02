@@ -4,6 +4,7 @@ import lombok.NonNull;
 import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -11,6 +12,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Repository
 public class ProductRepository implements CrudRepository<Product> {
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"product\" (item, brand, title, category, price) " + "VALUES (?,?,?,?,?)";
@@ -102,13 +104,12 @@ public class ProductRepository implements CrudRepository<Product> {
             return Stream.generate(() -> {
                 try {
                     if (resultSet.next()) {
-                        var entity = new Product(
-                                resultSet.getString("item"),
-                                resultSet.getString("brand"),
-                                resultSet.getString("title"),
-                                resultSet.getString("category"),
-                                resultSet.getDouble("price")
-                        );
+                        var entity = new Product();
+                        entity.setItem(resultSet.getString("item"));
+                        entity.setBrand(resultSet.getString("brand"));
+                        entity.setTitle(resultSet.getString("title"));
+                        entity.setCategory(resultSet.getString("category"));
+                        entity.setPrice(resultSet.getDouble("price"));
                         entity.setId(resultSet.getLong("id"));
                         return entity;
                     } else {
@@ -142,13 +143,12 @@ public class ProductRepository implements CrudRepository<Product> {
     private Optional<Product> getProduct(ResultSet resultSet) throws SQLException {
         Product entity = null;
         while (resultSet.next()) {
-            entity = new Product(
-                    resultSet.getString("item"),
-                    resultSet.getString("brand"),
-                    resultSet.getString("title"),
-                    resultSet.getString("category"),
-                    resultSet.getDouble("price")
-            );
+            entity = new Product();
+            entity.setItem(resultSet.getString("item"));
+            entity.setBrand(resultSet.getString("brand"));
+            entity.setTitle(resultSet.getString("title"));
+            entity.setCategory(resultSet.getString("category"));
+            entity.setPrice(resultSet.getDouble("price"));
             entity.setId(resultSet.getLong("id"));
         }
         return Optional.ofNullable(entity);

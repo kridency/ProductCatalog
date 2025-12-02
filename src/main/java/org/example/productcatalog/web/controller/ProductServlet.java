@@ -11,6 +11,8 @@ import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.Optional;
@@ -19,13 +21,13 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@WebServlet(urlPatterns = {"/product/*"})
+@WebServlet(name = "ProductServlet", urlPatterns = {"/product/*"})
 public class ProductServlet extends AbstractServlet<ProductDto> {
     private final CrudService<UserDto, String> userService;
 
-    public ProductServlet() {
-        userService = new UserService();
-        service = new ProductService();
+    public ProductServlet(CrudService<UserDto, String> userService, CrudService<ProductDto, String> productService) {
+        this.userService = userService;
+        this.service = productService;
     }
 
     @Override

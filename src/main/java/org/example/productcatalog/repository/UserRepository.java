@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.NonNull;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserRepository implements CrudRepository<User> {
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"user\" (email, password, role) VALUES (?,?,?)";
@@ -93,7 +95,9 @@ public class UserRepository implements CrudRepository<User> {
             return Stream.generate(() -> {
                 try {
                     if (resultSet.next()) {
-                        var entity = new User(resultSet.getString("email"), resultSet.getString("password"));
+                        var entity = new User();
+                        entity.setEmail(resultSet.getString("email"));
+                        entity.setPassword(resultSet.getString("password"));
                         entity.setId(resultSet.getLong("id"));
                         entity.setRole(RoleType.valueOf(resultSet.getString("role")));
                         return entity;
@@ -135,9 +139,9 @@ public class UserRepository implements CrudRepository<User> {
         try (var resultSet = statement.executeQuery()) {
             User entity = null;
             while (resultSet.next()) {
-                entity = new User(
-                        resultSet.getString("email"),
-                        resultSet.getString("password"));
+                entity = new User();
+                entity.setEmail(resultSet.getString("email"));
+                entity.setPassword(resultSet.getString("password"));
                 entity.setId(resultSet.getLong("id"));
                 entity.setRole(RoleType.valueOf(resultSet.getString("role")));
             }
