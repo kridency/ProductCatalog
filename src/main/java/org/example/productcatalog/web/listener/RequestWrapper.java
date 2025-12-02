@@ -77,7 +77,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public String getPathInfo() {
+    public String getRequestURI() {
         return ex.getRequestURI().getPath();
     }
 

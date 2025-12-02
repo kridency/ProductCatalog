@@ -1,4 +1,4 @@
-package org.example.productcatalog.servlet;
+package org.example.productcatalog.controller;
 
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.dto.ProductDto;
@@ -8,7 +8,7 @@ import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
-import org.example.productcatalog.web.servlet.ProductServlet;
+import org.example.productcatalog.web.controller.ProductServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,7 +43,7 @@ public class ProductServletTest extends AbstractTest {
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/create");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/product/create");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -56,16 +56,16 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")
     public void givenCurrentUserAndProductTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
-        Product product = productService.find("I11");
-        String productString = objectMapper.writeValueAsString(productMapper.toDto(product));
-        String productList = objectMapper.writeValueAsString(productService.findFiltered(product).stream().toList());
+        var productDto = productService.find("I11");
+        String productString = objectMapper.writeValueAsString(productDto);
+        String productList = objectMapper.writeValueAsString(productService.findFiltered(productDto).stream().toList());
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/list");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/product/list");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -86,7 +86,7 @@ public class ProductServletTest extends AbstractTest {
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/update");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/product/update");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -99,8 +99,8 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка удалить товар")
     public void givenUserAndProduct_whenTryToDelete_thenReturnCorrectResult() throws IOException {
-        Product product = productService.find("I11");
-        String productString = objectMapper.writeValueAsString(productMapper.toDto(product));
+        var productDto = productService.find("I11");
+        String productString = objectMapper.writeValueAsString(productDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -109,7 +109,7 @@ public class ProductServletTest extends AbstractTest {
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(productString.getBytes()))));
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/product/delete");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/product/delete");
         Mockito.when(response.getWriter()).thenReturn(writer);
 
         productServlet.doDelete(request, response);

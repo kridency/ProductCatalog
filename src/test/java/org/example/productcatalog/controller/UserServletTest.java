@@ -1,4 +1,4 @@
-package org.example.productcatalog.servlet;
+package org.example.productcatalog.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,7 +10,7 @@ import org.example.productcatalog.service.UserService;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
-import org.example.productcatalog.web.servlet.UserServlet;
+import org.example.productcatalog.web.controller.UserServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,7 +39,7 @@ public class UserServletTest extends AbstractTest {
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/auth/create");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/auth/create");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(userString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -52,16 +52,16 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")
     public void givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
-        User user = userService.find("name@hostname");
-        String userString = objectMapper.writeValueAsString(userMapper.toDto(user));
-        String userList = objectMapper.writeValueAsString(userService.findFiltered(user).stream().toList());
+        var userDto = userService.find("name@hostname");
+        String userString = objectMapper.writeValueAsString(userDto);
+        String userList = objectMapper.writeValueAsString(userService.findFiltered(userDto).stream().toList());
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("admin@hostname");
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/administration/list");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/administration/list");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(userString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -82,7 +82,7 @@ public class UserServletTest extends AbstractTest {
         HttpServletRequest request = Mockito.mock(RequestWrapper.class);
 
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("name@hostname");
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/identity/update");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/identity/update");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(userString.getBytes()))));
         Mockito.when(response.getWriter()).thenReturn(writer);
@@ -95,8 +95,8 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка удалить пользователя")
     public void givenUser_whenTryToDelete_thenReturnCorrectResult() throws IOException {
-        User user = userService.find("test@hostname");
-        String userString = objectMapper.writeValueAsString(userMapper.toDto(user));
+        var userDto = userService.find("test@hostname");
+        String userString = objectMapper.writeValueAsString(userDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -105,7 +105,7 @@ public class UserServletTest extends AbstractTest {
         Mockito.when(request.getAttribute("JSESSIONID")).thenReturn("test@hostname");
         Mockito.when(request.getReader())
                 .thenReturn(new BufferedReader(new InputStreamReader(new RequestStream(userString.getBytes()))));
-        Mockito.when(request.getPathInfo()).thenReturn("/api/v1/identity/delete");
+        Mockito.when(request.getRequestURI()).thenReturn("/api/v1/identity/delete");
         Mockito.when(response.getWriter()).thenReturn(writer);
 
         userServlet.doDelete(request, response);

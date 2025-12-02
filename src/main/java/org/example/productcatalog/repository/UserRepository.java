@@ -15,7 +15,7 @@ import lombok.NonNull;
 public class UserRepository implements CrudRepository<User> {
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"user\" (email, password, role) VALUES (?,?,?)";
-    private static final String UPDATE_QUERY = "UPDATE \"user\" SET password=? WHERE email=?";
+    private static final String UPDATE_QUERY = "UPDATE \"user\" SET email=?, password=? WHERE id=?";
     private static final String DELETE_QUERY = "DELETE FROM \"user\" WHERE email=?";
     private static final String GET_ALL_QUERY = "SELECT * FROM \"user\"";
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM \"user\" WHERE email=?";
@@ -47,8 +47,9 @@ public class UserRepository implements CrudRepository<User> {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(UPDATE_QUERY)) {
             try {
-                statement.setString(1, user.getPassword());
-                statement.setString(2, user.getEmail());
+                statement.setString(1, user.getEmail());
+                statement.setString(2, user.getPassword());
+                statement.setLong(3, user.getId());
                 return setEntityId(statement, user, user::setId);
             } catch (SQLException e) {
                 throw new ApplicationException(e.getMessage());

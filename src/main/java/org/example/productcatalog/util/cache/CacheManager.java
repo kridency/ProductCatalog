@@ -5,5 +5,5 @@ import java.util.Optional;
 public interface CacheManager<K, V> {
     V put(V value);
     Optional<V> get(K objKey);
-    Optional<V> clear(K objKey);
+    V clear(K objKey);
 }
