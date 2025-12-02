@@ -1,0 +1,66 @@
+-------------------------------------------------------------------------------
+Test set: org.example.productcatalog.controller.UserServletTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 1, Errors: 3, Skipped: 0, Time elapsed: 0.286 s <<< FAILURE! -- in org.example.productcatalog.controller.UserServletTest
+org.example.productcatalog.controller.UserServletTest.givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult -- Time elapsed: 0.008 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.example.productcatalog.service.CrudService.find(Object)" because "ajc$this.userService" is null
+	at org.example.productcatalog.controller.UserServletTest.givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult_aroundBody2(UserServletTest.java:61)
+	at org.example.productcatalog.controller.UserServletTest$AjcClosure3.run(UserServletTest.java:1)
+	at org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:164)
+	at org.example.productcatalog.aop.StopWatchAspect.logExecutionDuration(StopWatchAspect.java:21)
+	at org.example.productcatalog.controller.UserServletTest.givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult(UserServletTest.java:61)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+org.example.productcatalog.controller.UserServletTest.givenUser_whenTryToDelete_thenReturnCorrectResult -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.example.productcatalog.service.CrudService.find(Object)" because "ajc$this.userService" is null
+	at org.example.productcatalog.controller.UserServletTest.givenUser_whenTryToDelete_thenReturnCorrectResult_aroundBody6(UserServletTest.java:106)
+	at org.example.productcatalog.controller.UserServletTest$AjcClosure7.run(UserServletTest.java:1)
+	at org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:164)
+	at org.example.productcatalog.aop.StopWatchAspect.logExecutionDuration(StopWatchAspect.java:21)
+	at org.example.productcatalog.controller.UserServletTest.givenUser_whenTryToDelete_thenReturnCorrectResult(UserServletTest.java:106)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+org.example.productcatalog.controller.UserServletTest.givenNewUserCredentials_whenTryToCreate_thenReturnCorrectResult -- Time elapsed: 0.143 s <<< FAILURE!
+Argument(s) are different! Wanted:
+responseWrapper.setStatus(201);
+-> at org.example.productcatalog.web.listener.ResponseWrapper.setStatus(ResponseWrapper.java:50)
+Actual invocations have different arguments:
+responseWrapper.setContentType("text/html");
+-> at org.example.productcatalog.web.controller.UserServlet.doPost_aroundBody6(UserServlet.java:117)
+responseWrapper.getWriter();
+-> at org.example.productcatalog.web.controller.UserServlet.doPost_aroundBody6(UserServlet.java:119)
+responseWrapper.getWriter();
+-> at org.example.productcatalog.web.controller.AbstractServlet.create_aroundBody0(AbstractServlet.java:18)
+responseWrapper.setStatus(400);
+-> at org.example.productcatalog.web.controller.AbstractServlet.create_aroundBody0(AbstractServlet.java:27)
+
+	at org.example.productcatalog.web.listener.ResponseWrapper.setStatus(ResponseWrapper.java:50)
+	at org.example.productcatalog.controller.UserServletTest.givenNewUserCredentials_whenTryToCreate_thenReturnCorrectResult_aroundBody0(UserServletTest.java:54)
+	at org.example.productcatalog.controller.UserServletTest$AjcClosure1.run(UserServletTest.java:1)
+	at org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:164)
+	at org.example.productcatalog.aop.StopWatchAspect.logExecutionDuration(StopWatchAspect.java:21)
+	at org.example.productcatalog.controller.UserServletTest.givenNewUserCredentials_whenTryToCreate_thenReturnCorrectResult(UserServletTest.java:39)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+org.example.productcatalog.controller.UserServletTest.givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult -- Time elapsed: 0.020 s <<< ERROR!
+org.example.productcatalog.exception.ApplicationException: Cannot invoke "org.example.productcatalog.service.CrudService.find(Object)" because "ajc$this.service" is null
+	at org.example.productcatalog.web.controller.UserServlet.doPut_aroundBody8(UserServlet.java:205)
+	at org.example.productcatalog.web.controller.UserServlet$AjcClosure9.run(UserServlet.java:1)
+	at org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:164)
+	at org.example.productcatalog.aop.StopWatchAspect.logExecutionDuration(StopWatchAspect.java:21)
+	at org.example.productcatalog.web.controller.UserServlet.doPut(UserServlet.java:165)
+	at org.example.productcatalog.controller.UserServletTest.givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult_aroundBody4(UserServletTest.java:98)
+	at org.example.productcatalog.controller.UserServletTest$AjcClosure5.run(UserServletTest.java:1)
+	at org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:164)
+	at org.example.productcatalog.aop.StopWatchAspect.logExecutionDuration(StopWatchAspect.java:21)
+	at org.example.productcatalog.controller.UserServletTest.givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult(UserServletTest.java:83)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

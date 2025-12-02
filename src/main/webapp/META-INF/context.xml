@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Resource Definition for a JDBC DataSource -->
+    <!--<Resource name="jdbc/myDataSource"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="100"
+              maxIdle="30"
+              maxWaitMillis="10000"
+              username="dbuser"
+              password="dbpassword"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/mydatabase?serverTimezone=UTC"/> -->
+
+    <!-- Environment Entry for an application-specific property -->
+    <!-- <Environment name="appName"
+                 type="java.lang.String"
+                 value="MyAwesomeWebApp"/> -->
+
+    <!-- Manager configuration for session management (e.g., disabling session persistence) -->
+    <Manager pathname=""/>
+
+    <!-- Watch for changes in WEB-INF/web.xml for automatic reloading -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+
+    <!-- Enable cross-context communication (if needed) -->
+    <!-- <CrossContext enabled="true"/> -->
+
+    <!-- Enable/Disable XML validation for TLD files -->
+    <!-- <Resources tldValidation="true" tldNamespaceAware="true"/> -->
+</Context>

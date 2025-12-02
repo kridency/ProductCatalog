@@ -2,8 +2,8 @@ package org.example.productcatalog.repository;
 
 import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Invocation;
-import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 
+@Repository
 public class InvocationRepository implements CrudRepository<Invocation> {
-    private final CrudRepository<User> userRepository;
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"invocation\" (date, endpoint, user_id) VALUES (?,?,?)";
     private static final String UPDATE_QUERY = "UPDATE \"invocation\" SET endpoint=? WHERE id=?";
@@ -27,7 +27,6 @@ public class InvocationRepository implements CrudRepository<Invocation> {
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"invokation\" WHERE id=?";
 
     public InvocationRepository() {
-        userRepository = new UserRepository();
         datasource = PostgreSQLClient.getInstance().getDataSource();
     }
 
@@ -38,7 +37,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
             try {
                 statement.setTimestamp(1, Timestamp.from(invocation.getDate()));
                 statement.setString(2, invocation.getEndpoint());
-                statement.setLong(3, invocation.getUser().getId());
+                statement.setString(3, invocation.getEmail());
                 return setEntityId(statement, invocation, invocation::setId);
             } catch (SQLException e) {
                 throw new ApplicationException(e.getMessage());
@@ -102,7 +101,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
                     if (resultSet.next()) {
                         var entity = new Invocation(
                                 resultSet.getString("endpoint"),
-                                userRepository.getById(resultSet.getLong("user_id")).orElse(null));
+                                resultSet.getString("email"));
                         entity.setId(resultSet.getLong("id"));
                         return entity;
                     } else {
@@ -122,13 +121,13 @@ public class InvocationRepository implements CrudRepository<Invocation> {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(GET_BY_KEY_QUERY)) {
             var invocation = objectMapper.readValue(key, Invocation.class);
-            var user = invocation.getUser();
+            var email = invocation.getEmail();
             statement.setString(1, invocation.getDate().toString());
-            statement.setLong(2, user.getId());
+            statement.setString(2, email);
             try (ResultSet resultSet = statement.executeQuery()) {
                 Invocation entity = null;
                 while (resultSet.next()) {
-                    entity = new Invocation(resultSet.getString("endpoint"), user);
+                    entity = new Invocation(resultSet.getString("endpoint"), email);
                     entity.setId(resultSet.getLong("id"));
                     entity.setDate(resultSet.getTimestamp("date").toInstant());
                 }
@@ -148,8 +147,8 @@ public class InvocationRepository implements CrudRepository<Invocation> {
             try (var resultSet = statement.executeQuery()) {
                 Invocation entity = null;
                 while (resultSet.next()) {
-                    var user = userRepository.getById(resultSet.getLong("user_id")).orElse(null);
-                    entity = new Invocation(resultSet.getString("endpoint"), user);
+                    var email = resultSet.getString("email");
+                    entity = new Invocation(resultSet.getString("endpoint"), email);
                     entity.setId(resultSet.getLong("id"));
                     entity.setDate(resultSet.getTimestamp("date").toInstant());
                 }

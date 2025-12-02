@@ -10,12 +10,12 @@ public class Invocation {
     private long id;
     private Instant date;
     private String endpoint;
-    private User user;
+    private String email;
 
-    public Invocation(String endpoint, User user) {
+    public Invocation(String endpoint, String email) {
         this.date = Instant.now();
         this.endpoint = endpoint;
-        this.user = user;
+        this.email = email;
     }
 
 }

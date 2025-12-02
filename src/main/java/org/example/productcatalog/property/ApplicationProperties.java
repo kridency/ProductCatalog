@@ -2,6 +2,7 @@ package org.example.productcatalog.property;
 
 import org.yaml.snakeyaml.Yaml;
 
+
 public class ApplicationProperties extends AbstractProperties {
     private static ApplicationProperties INSTANCE;
 

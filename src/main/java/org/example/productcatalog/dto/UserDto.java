@@ -3,6 +3,7 @@ package org.example.productcatalog.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
+import org.example.productcatalog.entity.RoleType;
 
 import java.io.Serializable;
 
@@ -17,4 +18,5 @@ public class UserDto implements Serializable {
     private String email;
     @NotEmpty(message = "Password cannot be blank")
     private String password;
+    private RoleType role;
 }

@@ -11,11 +11,13 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.NonNull;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserRepository implements CrudRepository<User> {
     private final DataSource datasource;
     private static final String INSERT_QUERY = "INSERT INTO \"user\" (email, password, role) VALUES (?,?,?)";
-    private static final String UPDATE_QUERY = "UPDATE \"user\" SET password=? WHERE email=?";
+    private static final String UPDATE_QUERY = "UPDATE \"user\" SET email=?, password=? WHERE id=?";
     private static final String DELETE_QUERY = "DELETE FROM \"user\" WHERE email=?";
     private static final String GET_ALL_QUERY = "SELECT * FROM \"user\"";
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM \"user\" WHERE email=?";
@@ -47,8 +49,9 @@ public class UserRepository implements CrudRepository<User> {
         try (var connection = datasource.getConnection();
              var statement = connection.prepareStatement(UPDATE_QUERY)) {
             try {
-                statement.setString(1, user.getPassword());
-                statement.setString(2, user.getEmail());
+                statement.setString(1, user.getEmail());
+                statement.setString(2, user.getPassword());
+                statement.setLong(3, user.getId());
                 return setEntityId(statement, user, user::setId);
             } catch (SQLException e) {
                 throw new ApplicationException(e.getMessage());
@@ -92,7 +95,9 @@ public class UserRepository implements CrudRepository<User> {
             return Stream.generate(() -> {
                 try {
                     if (resultSet.next()) {
-                        var entity = new User(resultSet.getString("email"), resultSet.getString("password"));
+                        var entity = new User();
+                        entity.setEmail(resultSet.getString("email"));
+                        entity.setPassword(resultSet.getString("password"));
                         entity.setId(resultSet.getLong("id"));
                         entity.setRole(RoleType.valueOf(resultSet.getString("role")));
                         return entity;
@@ -134,9 +139,9 @@ public class UserRepository implements CrudRepository<User> {
         try (var resultSet = statement.executeQuery()) {
             User entity = null;
             while (resultSet.next()) {
-                entity = new User(
-                        resultSet.getString("email"),
-                        resultSet.getString("password"));
+                entity = new User();
+                entity.setEmail(resultSet.getString("email"));
+                entity.setPassword(resultSet.getString("password"));
                 entity.setId(resultSet.getLong("id"));
                 entity.setRole(RoleType.valueOf(resultSet.getString("role")));
             }

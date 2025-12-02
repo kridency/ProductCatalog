@@ -1,20 +1,15 @@
 # Базовый образ, содержащий Java 21
 FROM tomcat:10-jdk21
 
-#Директория приложения внутри контейнера
-WORKDIR /app
-
 ENV POSTGRES_DATASOURCE_URL=jdbc:postgresql://postgres-container.docker_default:5432/product_db
 #ENV JAVA_TOOL_OPTIONS=-javaagent:/app/lib/spring-instrument-6.1.9.jar
 
-RUN apt-get update && apt-get install -y netcat-traditional 
+RUN apt-get update && apt-get install -y netcat-traditional
 
-EXPOSE 8088
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-#Копирование JAP-файла приложения в контейнер
-COPY ./target/ProductCatalog-1.0.0-SNAPSHOT-jar-with-dependencies.jar /app/product_catalog.jar
-RUN mkdir -p /app/lib
-#COPY ./target/lib/ /app/lib/
+# Копирование WAP-файла приложения в контейнер
+COPY ./target/ProductCatalog-1.0.0-SNAPSHOT.war '/usr/local/tomcat/webapps/api#v1.war'
 
-#Команда для запуска приложения
-ENTRYPOINT ["java", "-jar", "product_catalog.jar"]
+# Выставление порта Tomcat
+EXPOSE 8080
