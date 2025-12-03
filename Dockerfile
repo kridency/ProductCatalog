@@ -1,7 +1,7 @@
 # Базовый образ, содержащий Java 21
 FROM tomcat:10-jdk21
 
-ENV POSTGRES_DATASOURCE_URL=jdbc:postgresql://postgres-container.docker_default:5432/product_db
+ENV POSTGRES_DATASOURCE_URL='jdbc:postgresql://postgres-container.docker_default:5432/product_db?createDatabaseIfNotExist=true'
 #ENV JAVA_TOOL_OPTIONS=-javaagent:/app/lib/spring-instrument-6.1.9.jar
 
 RUN apt-get update && apt-get install -y netcat-traditional

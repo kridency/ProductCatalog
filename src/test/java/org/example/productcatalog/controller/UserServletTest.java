@@ -27,9 +27,7 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка создать нового пользователя")
     public void givenNewUserCredentials_whenTryToCreate_thenReturnCorrectResult() throws IOException {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("new@hostname");
-        userDto.setPassword("111111");
+        UserDto userDto = new UserDto("new@hostname", "111111", RoleType.ROLE_USER);
         String userString = objectMapper.writeValueAsString(userDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
@@ -49,10 +47,7 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")
     public void givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("name@hostname");
-        userDto.setPassword("12345");
-        userDto.setRole(RoleType.ROLE_USER);
+        UserDto userDto = new UserDto("name@hostname", "12345", RoleType.ROLE_USER);
         String userString = objectMapper.writeValueAsString(userDto);
         String userList = objectMapper.writeValueAsString(List.of(userDto));
 
@@ -74,9 +69,7 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить пароль пользователя")
     public void givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        UserDto newUser = new UserDto();
-        newUser.setEmail("name@hostname");
-        newUser.setPassword("111111");
+        UserDto newUser = new UserDto("name@hostname", "111111", RoleType.ROLE_USER);
         String userString = objectMapper.writeValueAsString(newUser);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
@@ -97,8 +90,7 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка удалить пользователя")
     public void givenUser_whenTryToDelete_thenReturnCorrectResult() throws IOException {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("name@hostname");
+        UserDto userDto = new UserDto("name@hostname", null, null);
         String userString = objectMapper.writeValueAsString(userDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);

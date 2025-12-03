@@ -1,27 +1,24 @@
 package org.example.productcatalog.config;
 
 import liquibase.integration.spring.SpringLiquibase;
-import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.*;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.web.context.support.StandardServletEnvironment;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 import java.util.Map;
 
 @Configuration
 @ComponentScan("org.example.productcatalog")
+@EnableWebMvc
 @EnableJpaRepositories(
         basePackages = "org.example.productcatalog.repository",
         entityManagerFactoryRef = "entityManager")
@@ -45,7 +42,7 @@ public class AppConfiguration {
     @Value("${spring.datasource.username}")
     private String dataUsername;
 
-    @Value("${spring.datasource.pasword}")
+    @Value("${spring.datasource.password}")
     private String dataPassword;
 
     @Value("${spring.datasource.currentSchema}")
@@ -93,7 +90,6 @@ public class AppConfiguration {
             }
         };
         entityManager.setJpaVendorAdapter(vendorAdapter);
-        System.out.println("DEBUG !!!");
         return entityManager;
     }
 

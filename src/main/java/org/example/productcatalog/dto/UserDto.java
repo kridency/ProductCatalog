@@ -12,6 +12,8 @@ import static org.example.productcatalog.preset.ProductCatalogInit.EMAIL_NOT_SPE
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto implements Serializable {
     @Email(message = EMAIL_ERROR)
     @NotEmpty(message = EMAIL_NOT_SPECIFIED)

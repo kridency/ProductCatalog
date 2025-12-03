@@ -27,12 +27,7 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка создать новый товар")
     public void givenNewProduct_whenTryToCreate_thenReturnCorrectResult() throws IOException {
-        ProductDto productDto = new ProductDto();
-        productDto.setItem("I12");
-        productDto.setBrand("Puma");
-        productDto.setTitle("Flip-flop");
-        productDto.setCategory("Shoes");
-        productDto.setPrice(12.99);
+        ProductDto productDto = new ProductDto("I12", "Puma", "Flip-flop", "Shoes", 12.99);
         String productString = objectMapper.writeValueAsString(productDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
@@ -53,12 +48,7 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Печать товаров отфильтрованных по шаблону")
     public void givenCurrentUserAndProductTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
-        ProductDto productDto = new ProductDto();
-        productDto.setItem("I21");
-        productDto.setBrand("Nike");
-        productDto.setTitle("Sneakers");
-        productDto.setCategory("Shoes");
-        productDto.setPrice(120.0);
+        ProductDto productDto = new ProductDto("I21", "Nike", "Sneakers", "Shoes", 120.0);
         String productString = objectMapper.writeValueAsString(productDto);
         String productList = objectMapper.writeValueAsString(List.of(productDto));
 
@@ -80,12 +70,7 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить товар")
     public void givenUserAndProduct_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        ProductDto newProduct = new ProductDto();
-        newProduct.setItem("I11");
-        newProduct.setBrand("Puma");
-        newProduct.setTitle("Sneakers");
-        newProduct.setCategory("Shoes");
-        newProduct.setPrice(75.0);
+        ProductDto newProduct = new ProductDto("I11", "Puma", "Sneakers", "Shoes", 75.0);
         String productString = objectMapper.writeValueAsString(newProduct);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
@@ -106,8 +91,7 @@ public class ProductServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка удалить товар")
     public void givenUserAndProduct_whenTryToDelete_thenReturnCorrectResult() throws IOException {
-        ProductDto productDto = new ProductDto();
-        productDto.setItem("I11");
+        ProductDto productDto = new ProductDto("I11", null, null, null, 0.0);
         String productString = objectMapper.writeValueAsString(productDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
