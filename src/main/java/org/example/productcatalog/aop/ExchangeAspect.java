@@ -3,15 +3,24 @@ package org.example.productcatalog.aop;
 import com.sun.net.httpserver.HttpExchange;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Invocation;
+import org.example.productcatalog.property.ApplicationProperties;
 import org.example.productcatalog.repository.CrudRepository;
 import org.example.productcatalog.repository.InvocationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Aspect
 public class ExchangeAspect {
-    private final CrudRepository<Invocation> invocationRepository = new InvocationRepository();
+    private final CrudRepository<Invocation> invocationRepository;
+
+    public ExchangeAspect(CrudRepository<Invocation> invocationRepository) {
+        this.invocationRepository = invocationRepository;
+
+    }
 
     @After(value = "execution(* org.example.productcatalog.web.handler.AbstractHandler.handle(com.sun.net.httpserver.HttpExchange, ..))" +
             "&& args(exchange, ..)", argNames = "exchange")

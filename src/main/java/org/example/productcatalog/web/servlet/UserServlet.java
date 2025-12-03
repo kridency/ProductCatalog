@@ -1,17 +1,19 @@
-package org.example.productcatalog.web.controller;
+package org.example.productcatalog.web.servlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.annotation.WebServlet;
+import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.exception.ApplicationException;
-import org.example.productcatalog.service.CrudService;
+import org.example.productcatalog.mapper.UserMapper;
+import org.example.productcatalog.property.ApplicationProperties;
+import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -22,11 +24,12 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@WebServlet(name = "UserServlet", urlPatterns = {"/auth/*", "/identity/*", "/administration/*"})
 public class UserServlet extends AbstractServlet<UserDto> {
 
-    public UserServlet(CrudService<UserDto, String> service) {
-        this.service = service;
+    public UserServlet() {
+        this.service = new UserService(
+                new UserRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
+                UserMapper.getInstance());
     }
 
     private void login(HttpServletResponse response, UserDto data) {

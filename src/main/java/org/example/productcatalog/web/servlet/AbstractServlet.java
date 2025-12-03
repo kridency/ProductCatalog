@@ -1,4 +1,4 @@
-package org.example.productcatalog.web.controller;
+package org.example.productcatalog.web.servlet;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;

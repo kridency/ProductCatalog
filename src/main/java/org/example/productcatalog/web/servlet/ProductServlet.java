@@ -1,17 +1,23 @@
-package org.example.productcatalog.web.controller;
+package org.example.productcatalog.web.servlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.annotation.WebServlet;
+import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.exception.ApplicationException;
+import org.example.productcatalog.mapper.ProductMapper;
+import org.example.productcatalog.mapper.UserMapper;
+import org.example.productcatalog.property.ApplicationProperties;
+import org.example.productcatalog.repository.ProductRepository;
+import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.service.CrudService;
 import org.example.productcatalog.service.ProductService;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
+import org.example.productcatalog.util.cache.ProductCacheManager;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -21,13 +27,19 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@WebServlet(name = "ProductServlet", urlPatterns = {"/product/*"})
 public class ProductServlet extends AbstractServlet<ProductDto> {
     private final CrudService<UserDto, String> userService;
 
-    public ProductServlet(CrudService<UserDto, String> userService, CrudService<ProductDto, String> productService) {
-        this.userService = userService;
-        this.service = productService;
+    public ProductServlet() {
+        this.userService = new UserService(
+                new UserRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
+                UserMapper.getInstance()
+        );
+        this.service = new ProductService(
+                new ProductRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
+                ProductMapper.getInstance(),
+                new ProductCacheManager()
+        );
     }
 
     @Override

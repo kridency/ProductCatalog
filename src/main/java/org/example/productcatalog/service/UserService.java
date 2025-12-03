@@ -7,6 +7,7 @@ import org.example.productcatalog.mapper.UserMapper;
 import org.example.productcatalog.repository.CrudRepository;
 import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.util.specification.Specification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -19,6 +20,7 @@ public class UserService implements CrudService<UserDto, String> {
     private final UserMapper mapper;
     private final CrudRepository<User> repository;
 
+    @Autowired
     public UserService(CrudRepository<User> repository, UserMapper mapper) {
         this.mapper = mapper;
         this.repository = repository;

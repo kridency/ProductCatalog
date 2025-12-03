@@ -3,6 +3,7 @@ package org.example.productcatalog.repository;
 import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Invocation;
 import org.example.productcatalog.exception.ApplicationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -26,8 +27,9 @@ public class InvocationRepository implements CrudRepository<Invocation> {
     private static final String GET_BY_KEY_QUERY = "SELECT * FROM \"invocation\" WHERE date=? AND user_id=?";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"invokation\" WHERE id=?";
 
-    public InvocationRepository() {
-        datasource = PostgreSQLClient.getInstance().getDataSource();
+    @Autowired
+    public InvocationRepository(DataSource datasource) {
+        this.datasource = datasource;
     }
 
     @Override

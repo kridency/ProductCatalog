@@ -1,5 +1,6 @@
 package org.example.productcatalog.entity;
 
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.Instant;

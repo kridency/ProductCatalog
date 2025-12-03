@@ -20,9 +20,10 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
         <jakarta-validation.version>3.1.0</jakarta-validation.version>
+        <jakarta-inject.version>2.0.1</jakarta-inject.version>
+        <jakarta-activation.version>2.1.4</jakarta-activation.version>
         <hibernate-core.version>6.6.37.Final</hibernate-core.version>
         <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
-        <jakarta-inject.version>2.0.1</jakarta-inject.version>
         <jackson.version>2.18.2</jackson.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
@@ -41,19 +42,19 @@
         <mockito.version>5.16.0</mockito.version>
         <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
 
-        <database.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</database.url>
+        <spring.datasource.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</spring.datasource.url>
     </properties>
 
     <profiles>
         <profile>
-            <id>environment-override</id>
+            <id>tomcat</id>
             <activation>
                 <property>
                     <name>env.POSTGRES_DATASOURCE_URL</name>
                 </property>
             </activation>
             <properties>
-                <database.url>${env.POSTGRES_DATASOURCE_URL}</database.url>
+                <spring.datasource.url>${env.POSTGRES_DATASOURCE_URL}</spring.datasource.url>
             </properties>
         </profile>
     </profiles>
@@ -63,6 +64,18 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>4.0.0</version>
         </dependency>
 
         <dependency>
@@ -85,13 +98,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
@@ -102,6 +108,18 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${jakarta-servlet.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>${jakarta-inject.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>${jakarta-activation.version}</version>
         </dependency>
 
         <dependency>
@@ -128,12 +146,6 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>${jakarta-validation.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.inject</groupId>
-            <artifactId>jakarta.inject-api</artifactId>
-            <version>${jakarta-inject.version}</version>
         </dependency>
 
         <dependency>
@@ -236,6 +248,12 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.5</version> <!-- Use the appropriate version -->
+        </dependency>
     </dependencies>
 
     <build>
@@ -307,7 +325,7 @@
                     <propertyFileWillOverride>true</propertyFileWillOverride>
                     <searchPath>${project.basedir}/src/main/resources</searchPath>
                     <driver>org.postgresql.Driver</driver>
-                    <url>${database.url}</url>
+                    <url>${spring.datasource.url}</url>
                     <username>intern</username>
                     <password>1gjAVnJ</password>
                     <propertyFile>liquibase.yml</propertyFile>
