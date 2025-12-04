@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,8 +24,9 @@ public class UserRepository implements CrudRepository<User> {
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM \"user\" WHERE email=?";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"user\" WHERE id=?";
 
-    public UserRepository() {
-        datasource = PostgreSQLClient.getInstance().getDataSource();
+    @Autowired
+    public UserRepository(DataSource datasource) {
+        this.datasource = datasource;
     }
 
     @Override

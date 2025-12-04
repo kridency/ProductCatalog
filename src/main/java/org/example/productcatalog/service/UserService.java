@@ -1,12 +1,15 @@
 package org.example.productcatalog.service;
 
+import lombok.NonNull;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
 import org.example.productcatalog.repository.CrudRepository;
-import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.util.specification.Specification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -15,10 +18,11 @@ import java.util.Optional;
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 @Service
-public class UserService implements CrudService<UserDto, String> {
+public class UserService implements CrudService<UserDto, String>, UserDetailsService {
     private final UserMapper mapper;
     private final CrudRepository<User> repository;
 
+    @Autowired
     public UserService(CrudRepository<User> repository, UserMapper mapper) {
         this.mapper = mapper;
         this.repository = repository;
@@ -60,5 +64,19 @@ public class UserService implements CrudService<UserDto, String> {
     @Override
     public UserDto findById(long id) {
         return repository.getById(id).map(mapper::toDto).orElse(null);
+    }
+
+    /**
+     * Converts user account database record description object to spring security object.
+     * Overloaded method for receiving spring security object.
+     * @param username  email address of the user requested for authentication
+     *
+     * @return  spring security user account description object
+     */
+    @Override
+    @NonNull
+    public UserDto loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+        return repository.getByKey(username).map(mapper::toDto)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found. Email is: " + username));
     }
 }

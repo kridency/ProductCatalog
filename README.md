@@ -27,7 +27,7 @@
 Для запуска приложения в папке проекта необходимо выполнить команды 
 ```
 docker build -t product_catalog .
-docker run --name=product-catalog --network docker_default --rm -p 8088:8088 product_catalog
+docker run --name=product-catalog --network docker_default --rm -p 8080:8080 product_catalog
 ```
 
 ## Инструкции по использованию

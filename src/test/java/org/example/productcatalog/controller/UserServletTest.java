@@ -4,42 +4,30 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.dto.UserDto;
-import org.example.productcatalog.entity.User;
-import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.service.CrudService;
-import org.example.productcatalog.service.UserService;
+import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.web.listener.RequestStream;
 import org.example.productcatalog.web.listener.RequestWrapper;
 import org.example.productcatalog.web.listener.ResponseWrapper;
-import org.example.productcatalog.web.controller.UserServlet;
+import org.example.productcatalog.web.servlet.UserServlet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 public class UserServletTest extends AbstractTest {
-    @Mock
-    private CrudService<UserDto, String> userService;
-
-    private static final UserMapper userMapper = Mockito.spy(UserMapper.getInstance());
-
-    @Autowired
-    private UserServlet userServlet;
+    private final UserServlet userServlet = new UserServlet();
 
     @Test
     @DisplayName("Попытка создать нового пользователя")
     public void givenNewUserCredentials_whenTryToCreate_thenReturnCorrectResult() throws IOException {
-        UserDto userDto = new UserDto();
-        userDto.setEmail("new@hostname");
-        userDto.setPassword("111111");
+        UserDto userDto = new UserDto("new@hostname", "111111", RoleType.ROLE_USER);
         String userString = objectMapper.writeValueAsString(userDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
@@ -59,9 +47,9 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Печать пользователей отфильтрованных по шаблону")
     public void givenCurrentUserAndUserTemplate_whenTryToList_thenReturnCorrectResult() throws IOException {
-        var userDto = userService.find("name@hostname");
+        UserDto userDto = new UserDto("name@hostname", "12345", RoleType.ROLE_USER);
         String userString = objectMapper.writeValueAsString(userDto);
-        String userList = objectMapper.writeValueAsString(userService.findFiltered(userDto).stream().toList());
+        String userList = objectMapper.writeValueAsString(List.of(userDto));
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -81,10 +69,8 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка изменить пароль пользователя")
     public void givenUserAndNewPassword_whenTryToUpdate_thenReturnCorrectResult() throws IOException {
-        User newUser = new User();
-        newUser.setEmail("name@hostname");
-        newUser.setPassword("111111");
-        String userString = objectMapper.writeValueAsString(userMapper.toDto(newUser));
+        UserDto newUser = new UserDto("name@hostname", "111111", RoleType.ROLE_USER);
+        String userString = objectMapper.writeValueAsString(newUser);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);
         HttpServletResponse response = Mockito.mock(ResponseWrapper.class);
@@ -104,7 +90,7 @@ public class UserServletTest extends AbstractTest {
     @Test
     @DisplayName("Попытка удалить пользователя")
     public void givenUser_whenTryToDelete_thenReturnCorrectResult() throws IOException {
-        var userDto = userService.find("test@hostname");
+        UserDto userDto = new UserDto("name@hostname", null, null);
         String userString = objectMapper.writeValueAsString(userDto);
 
         final PrintWriter writer = Mockito.mock(PrintWriter.class);

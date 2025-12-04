@@ -15,14 +15,15 @@
         <java.source-target.version>21</java.source-target.version>
         <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
 
-        <spring.version>7.0.1</spring.version>
+        <spring.version>7.0.0</spring.version>
         <lombok.version>1.18.32</lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
         <jakarta-validation.version>3.1.0</jakarta-validation.version>
-        <hibernate-core.version>6.6.37.Final</hibernate-core.version>
-        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
         <jakarta-inject.version>2.0.1</jakarta-inject.version>
+        <jakarta-activation.version>2.1.4</jakarta-activation.version>
+        <hibernate-core.version>7.0.10.Final</hibernate-core.version>
+        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
         <jackson.version>2.18.2</jackson.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
@@ -41,19 +42,19 @@
         <mockito.version>5.16.0</mockito.version>
         <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
 
-        <database.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</database.url>
+        <spring.datasource.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</spring.datasource.url>
     </properties>
 
     <profiles>
         <profile>
-            <id>environment-override</id>
+            <id>tomcat</id>
             <activation>
                 <property>
                     <name>env.POSTGRES_DATASOURCE_URL</name>
                 </property>
             </activation>
             <properties>
-                <database.url>${env.POSTGRES_DATASOURCE_URL}</database.url>
+                <spring.datasource.url>${env.POSTGRES_DATASOURCE_URL}</spring.datasource.url>
             </properties>
         </profile>
     </profiles>
@@ -63,6 +64,18 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>4.0.0</version>
         </dependency>
 
         <dependency>
@@ -85,10 +98,21 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -105,23 +129,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate-core.version}</version>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>${jakarta-inject.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
-            <classifier>sources</classifier>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>${hibernate-validator.version}</version>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>${jakarta-activation.version}</version>
         </dependency>
 
         <dependency>
@@ -131,9 +147,21 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.inject</groupId>
-            <artifactId>jakarta.inject-api</artifactId>
-            <version>${jakarta-inject.version}</version>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <version>${hibernate-validator.version}</version>
         </dependency>
 
         <dependency>
@@ -239,6 +267,17 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -307,7 +346,7 @@
                     <propertyFileWillOverride>true</propertyFileWillOverride>
                     <searchPath>${project.basedir}/src/main/resources</searchPath>
                     <driver>org.postgresql.Driver</driver>
-                    <url>${database.url}</url>
+                    <url>${spring.datasource.url}</url>
                     <username>intern</username>
                     <password>1gjAVnJ</password>
                     <propertyFile>liquibase.yml</propertyFile>

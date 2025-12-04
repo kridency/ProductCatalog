@@ -10,7 +10,9 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Optional;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserService.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = "spring",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 @Named("UserMapper")
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);

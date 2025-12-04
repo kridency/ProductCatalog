@@ -1,11 +1,13 @@
 package org.example.productcatalog.util.cache;
 
 import org.example.productcatalog.entity.Product;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
 
+@Component
 public class ProductCacheManager implements CacheManager<String, Product> {
     private final Map<Map.Entry<Instant, Supplier<String>>, Product> cache;
 

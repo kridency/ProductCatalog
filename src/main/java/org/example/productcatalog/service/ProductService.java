@@ -8,6 +8,7 @@ import org.example.productcatalog.repository.CrudRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.Specification;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,6 +21,7 @@ public class ProductService implements CrudService<ProductDto, String> {
     private final ProductMapper mapper;
     private final ProductCacheManager productCacheManager;
 
+    @Autowired
     public ProductService(CrudRepository<Product> repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
         this.repository = repository;
         this.mapper = mapper;
@@ -42,8 +44,9 @@ public class ProductService implements CrudService<ProductDto, String> {
 
     @Override
     public ProductDto remove(ProductDto data) {
+        Optional.ofNullable(data).ifPresent(x -> productCacheManager.clear(x.getItem()));
         return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
-                .map(x -> productCacheManager.clear(x.getItem())).map(repository::delete).map(mapper::toDto)
+                .map(repository::delete).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 

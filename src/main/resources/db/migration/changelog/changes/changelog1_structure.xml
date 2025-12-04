@@ -102,7 +102,7 @@
             <column name="endpoint" type="varchar">
                 <constraints nullable="false"/>
             </column>
-            <column name="user_id" type="bigint">
+            <column name="email" type="varchar">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -110,7 +110,7 @@
 
     <changeSet id="create_invocation_constraint" author="kridency">
         <addUniqueConstraint
-                columnNames="date, user_id"
+                columnNames="date, email"
                 constraintName="invocation_unique_constraint"
                 tableName="invocation"/>
     </changeSet>
@@ -123,20 +123,8 @@
         </preConditions>
         <createIndex indexName="idx_invocation_date" tableName="invocation" schemaName="${schemaName}">
             <column name="date" type="timestamp"/>
-            <column name="user_id" type="bigint"/>
+            <column name="email" type="varchar"/>
         </createIndex>
-    </changeSet>
-
-    <changeSet id="create_invocation_foreign_key" author="kridency">
-        <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="invocation"
-                                 constraintName="FK_INVOCATION_USER"
-                                 deferrable="false"
-                                 initiallyDeferred="false"
-                                 onDelete="RESTRICT"
-                                 onUpdate="RESTRICT"
-                                 referencedColumnNames="id"
-                                 referencedTableName="user" validate="true"/>
     </changeSet>
 
 </databaseChangeLog>

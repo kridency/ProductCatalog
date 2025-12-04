@@ -1,11 +1,14 @@
 package org.example.productcatalog.web.servlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.annotation.WebServlet;
+import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
-import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
+import org.example.productcatalog.property.ApplicationProperties;
+import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.service.UserService;
 
 import jakarta.servlet.http.Cookie;
@@ -21,28 +24,28 @@ import java.util.stream.Collectors;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-public class UserServlet extends AbstractServlet<User> {
-    private final UserMapper userMapper;
+public class UserServlet extends AbstractServlet<UserDto> {
 
     public UserServlet() {
-        service = new UserService();
-        userMapper = UserMapper.getInstance();
+        this.service = new UserService(
+                new UserRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
+                UserMapper.getInstance());
     }
 
-    private void login(HttpServletResponse response, User user) {
+    private void login(HttpServletResponse response, UserDto data) {
         try (PrintWriter writer = response.getWriter()) {
-            writer.println(Optional.of(service.find(user.getEmail()))
-                    .filter(value -> value.getPassword().equals(user.getPassword()))
+            writer.println(Optional.of(service.find(data.getEmail()))
+                    .filter(value -> value.getPassword().equals(data.getPassword()))
                     .map(value -> {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
+                        Cookie cookie = new Cookie("JSESSIONID", data.getEmail());
                         cookie.setPath("/api/v1");
                         cookie.setMaxAge(2592000);
                         response.addCookie(cookie);
-                        return "Пользователь " + user.getEmail() + " успешно аутентифицирован.";
+                        return "Пользователь " + data.getEmail() + " успешно аутентифицирован.";
                     }).orElseGet(() -> {
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        return "Не удалось аутентифицировать пользователя " + user.getEmail() + ".";
+                        return "Не удалось аутентифицировать пользователя " + data.getEmail() + ".";
                     }));
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -50,14 +53,14 @@ public class UserServlet extends AbstractServlet<User> {
         }
     }
 
-    private void logout(HttpServletResponse response, User user) {
+    private void logout(HttpServletResponse response, UserDto data) {
         try (PrintWriter writer = response.getWriter()) {
             response.setStatus(HttpServletResponse.SC_OK);
-            Cookie cookie = new Cookie("JSESSIONID", user.getEmail());
+            Cookie cookie = new Cookie("JSESSIONID", data.getEmail());
             cookie.setPath("/api/v1");
             cookie.setMaxAge(0);
             response.addCookie(cookie);
-            writer.println("Пользователь " + user.getEmail() + " успешно завершил сеанс.");
+            writer.println("Пользователь " + data.getEmail() + " успешно завершил сеанс.");
         } catch (Exception e) {
             if (!e.getMessage().equals(RETURN)) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -69,7 +72,7 @@ public class UserServlet extends AbstractServlet<User> {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
-        String path = request.getPathInfo();
+        String path = request.getRequestURI();
         try (PrintWriter writer = response.getWriter();
              BufferedReader reader = request.getReader()) {
             Supplier<Void> unauthorized = () -> {
@@ -86,9 +89,8 @@ public class UserServlet extends AbstractServlet<User> {
                                 UserDto userDto = objectMapper.readValue(
                                         reader.lines().collect(Collectors.joining()),
                                         UserDto.class);
-                                User entity = userMapper.fromDto(userDto);
                                 switch (path.substring(path.lastIndexOf('/'))) {
-                                    case "/list" -> list(response, entity);
+                                    case "/list" -> list(response, userDto);
                                     default -> {
                                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                         writer.println(BAD_ENDPOINT);
@@ -117,7 +119,7 @@ public class UserServlet extends AbstractServlet<User> {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/html");
-        String path = request.getPathInfo();
+        String path = request.getRequestURI();
         try (PrintWriter writer = response.getWriter();
              BufferedReader reader = request.getReader()) {
 
@@ -136,10 +138,9 @@ public class UserServlet extends AbstractServlet<User> {
                                 reader.lines().collect(Collectors.joining()),
                                 UserDto.class
                         );
-                        User principal = userMapper.fromDto(userDto);
                         switch (path.substring(path.lastIndexOf('/'))) {
-                            case "/create" -> create(response, principal);
-                            case "/login" -> login(response, principal);
+                            case "/create" -> create(response, userDto);
+                            case "/login" -> login(response, userDto);
                             default -> {
                                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                 writer.println(BAD_ENDPOINT);
@@ -166,7 +167,7 @@ public class UserServlet extends AbstractServlet<User> {
     @Override
     public void doPut(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/html");
-        String path = request.getPathInfo();
+        String path = request.getRequestURI();
         try (PrintWriter writer = response.getWriter();
              BufferedReader reader = request.getReader()) {
             Supplier<Void> unauthorized = () -> {
@@ -181,12 +182,11 @@ public class UserServlet extends AbstractServlet<User> {
                         switch (path.substring(path.lastIndexOf('/'))) {
                             case "/update" -> {
                                 try {
-                                    User newUser = userMapper.fromDto(objectMapper.readValue(
+                                    UserDto userDto = objectMapper.readValue(
                                             reader.lines().collect(Collectors.joining()),
                                             UserDto.class
-                                    ));
-                                    newUser.setId(principal.getId());
-                                    update(response, newUser);
+                                    );
+                                    update(response, userDto);
                                 } catch (JsonProcessingException e) {
                                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                                     writer.println(BAD_REQUEST);
@@ -213,7 +213,7 @@ public class UserServlet extends AbstractServlet<User> {
     @Override
     public void doDelete(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
-        String path = request.getPathInfo();
+        String path = request.getRequestURI();
         try (PrintWriter writer = response.getWriter()) {
             Supplier<Void> unauthorized = () -> {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -226,9 +226,9 @@ public class UserServlet extends AbstractServlet<User> {
                         if (path.contains("/api/v1/administration")) {
                             if (principal.getRole().equals(RoleType.ROLE_ADMIN)) {
                                 String id = request.getParameter("id");
-                                User user = service.findById(id == null ? 0L : Long.parseLong(id));
+                                UserDto userDto = service.findById(id == null ? 0L : Long.parseLong(id));
                                 switch (path.substring(path.lastIndexOf('/'))) {
-                                    case "/delete" -> delete(response, user);
+                                    case "/delete" -> delete(response, userDto);
                                     default -> {
                                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                                         writer.println(BAD_ENDPOINT);
