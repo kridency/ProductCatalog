@@ -30,4 +30,14 @@ public class UserController {
                 .map(value -> "Пользователь " + data.getEmail() + " успешно аутентифицирован.")
                 .orElseGet(() -> "Не удалось аутентифицировать пользователя " + data.getEmail() + "."), data.getEmail());
     }
+
+    @PostMapping(value = "/auth/create",
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.CREATED)
+    public MessageDto register(@RequestBody @Valid UserDto data) {
+        return new MessageDto(Optional.of(service.create(data))
+                .map(value -> "Пользователь " + data.getEmail() + " успешно аутентифицирован.")
+                .orElseGet(() -> "Не удалось аутентифицировать пользователя " + data.getEmail() + "."), data.getEmail());
+    }
 }

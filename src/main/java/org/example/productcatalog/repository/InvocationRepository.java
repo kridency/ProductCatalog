@@ -1,6 +1,5 @@
 package org.example.productcatalog.repository;
 
-import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.entity.Invocation;
 import org.example.productcatalog.exception.ApplicationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,9 +100,9 @@ public class InvocationRepository implements CrudRepository<Invocation> {
             return Stream.generate(() -> {
                 try {
                     if (resultSet.next()) {
-                        var entity = new Invocation(
-                                resultSet.getString("endpoint"),
-                                resultSet.getString("email"));
+                        var entity = new Invocation();
+                        entity.setEndpoint(resultSet.getString("endpoint"));
+                        entity.setEmail(resultSet.getString("email"));
                         entity.setId(resultSet.getLong("id"));
                         return entity;
                     } else {
@@ -129,7 +128,9 @@ public class InvocationRepository implements CrudRepository<Invocation> {
             try (ResultSet resultSet = statement.executeQuery()) {
                 Invocation entity = null;
                 while (resultSet.next()) {
-                    entity = new Invocation(resultSet.getString("endpoint"), email);
+                    entity = new Invocation();
+                    entity.setEndpoint(resultSet.getString("endpoint"));
+                    entity.setEmail(email);
                     entity.setId(resultSet.getLong("id"));
                     entity.setDate(resultSet.getTimestamp("date").toInstant());
                 }
@@ -150,7 +151,9 @@ public class InvocationRepository implements CrudRepository<Invocation> {
                 Invocation entity = null;
                 while (resultSet.next()) {
                     var email = resultSet.getString("email");
-                    entity = new Invocation(resultSet.getString("endpoint"), email);
+                    entity = new Invocation();
+                    entity.setEndpoint(resultSet.getString("endpoint"));
+                    entity.setEmail(email);
                     entity.setId(resultSet.getLong("id"));
                     entity.setDate(resultSet.getTimestamp("date").toInstant());
                 }

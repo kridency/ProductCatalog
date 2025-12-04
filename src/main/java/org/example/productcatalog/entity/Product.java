@@ -9,6 +9,7 @@ import lombok.Getter;
 @Setter
 @Getter
 @Entity
+@Table(schema = "custom", name = "product")
 public class Product {
     @Id
     private long id;

@@ -10,6 +10,6 @@ spring:
         currentSchema: custom
         driver-class-name: org.postgresql.Driver
 
-    security:
-        user: name@hostname
-        roles: ROLE_USER
+logging:
+    level:
+        org.springframework.security: DEBUG

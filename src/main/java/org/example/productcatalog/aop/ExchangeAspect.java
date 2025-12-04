@@ -25,8 +25,11 @@ public class ExchangeAspect {
             "&& args(exchange, ..)", argNames = "exchange")
     public void httpExchangeCheckToHandle(HttpExchange exchange) {
         var endpoint = exchange.getRequestURI().getPath();
-        Optional.ofNullable(exchange.getAttribute("JSESSIONID")).map(Object::toString).ifPresent(sessionId ->
-                invocationRepository.add(new Invocation(endpoint, sessionId)));
+        Optional.ofNullable(exchange.getAttribute("JSESSIONID")).map(Object::toString).ifPresent(sessionId -> {
+            Invocation event = new Invocation();
+            event.setEndpoint(endpoint);
+            event.setEmail(sessionId);
+            invocationRepository.add(event);});
         exchange.close();
     }
 }

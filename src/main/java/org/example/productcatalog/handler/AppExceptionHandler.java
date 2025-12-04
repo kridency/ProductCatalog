@@ -16,7 +16,6 @@ public class AppExceptionHandler {
     }
 
     private ResponseEntity<MessageDto> buildResponse(HttpStatus httpStatus, Exception ex, WebRequest webRequest){
-        System.out.println("DEBUG !!!");
         return ResponseEntity.status(httpStatus)
                 .body(MessageDto.builder()
                         .message(ex.getMessage())
