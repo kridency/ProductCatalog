@@ -19,6 +19,14 @@
             <param-value>
                 org.example.productcatalog.config.AppConfiguration
                 org.example.productcatalog.config.SecConfiguration
+                org.example.productcatalog.config.DocConfiguration
+                org.springdoc.ui.SwaggerConfig.class
+                org.springdoc.core.SwaggerUiConfigProperties.class
+                org.springdoc.core.SwaggerUiOAuthProperties.class
+                org.springdoc.core.SpringDocWebMvcConfiguration.class
+                org.springdoc.core.MultipleOpenApiSupportConfiguration.class
+                org.springdoc.core.SpringDocConfiguration.class
+                org.springdoc.core.SpringDocConfigProperties.class
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

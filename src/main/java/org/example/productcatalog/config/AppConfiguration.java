@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 import java.util.Map;
 
 @Configuration
-@ComponentScan("org.example.productcatalog")
+@ComponentScan(basePackages = {"org.example.productcatalog"})
 @EnableWebMvc
 @EnableJpaRepositories(
         basePackages = "org.example.productcatalog.repository",

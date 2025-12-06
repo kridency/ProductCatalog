@@ -35,9 +35,9 @@ public class SecConfiguration {
     public SecurityFilterChain apiFilterChain(HttpSecurity http, AuthenticationManager manager) {
         http
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/v1/auth/create").hasAuthority("ADMIN")
-                        .requestMatchers("/openapi-docs", "/openapi-docs/**",
-                                "/swagger-ui/**", "/proxy/**", "/favicon.ico", "/error")
+                        .requestMatchers("/auth/create").hasAuthority("ADMIN")
+                        .requestMatchers("/api-docs", "/api-docs/**", "/swagger-ui/**", "/proxy/**",
+                                "/favicon.ico", "/error")
                         .permitAll().anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
