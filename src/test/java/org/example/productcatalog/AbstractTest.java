@@ -5,10 +5,20 @@ import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import org.example.productcatalog.config.AppConfiguration;
+import org.example.productcatalog.config.DocConfiguration;
+import org.example.productcatalog.config.SecConfiguration;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.property.ApplicationProperties;
 import org.example.productcatalog.property.LiquibaseProperties;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
@@ -16,7 +26,14 @@ import org.testcontainers.utility.MountableFile;
 
 import java.sql.DriverManager;
 
+@WebAppConfiguration
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfiguration.class, DocConfiguration.class, SecConfiguration.class})
 public class AbstractTest {
+    @Autowired
+    protected WebApplicationContext webApplicationContext;
+
+    protected MockMvc mockMvc;
     protected static final ApplicationProperties applicationProperties = ApplicationProperties.getInstance();
     protected static final LiquibaseProperties liquibaseProperties = LiquibaseProperties.getInstance();
 

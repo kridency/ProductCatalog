@@ -1,3 +1,11 @@
+app:
+    swagger-ui-version: 5.30.3
+
+server:
+    port: 8080
+    servlet:
+        context-path: /api/v1
+
 spring:
     application:
         name: product-catalog
@@ -8,7 +16,10 @@ spring:
         username: intern
         password: 1gjAVnJ
         currentSchema: custom
-        driver-class-name: org.postgresql.Driver
+    mvc:
+        static-path-pattern: /swagger-ui*
+    resources:
+        static-locations: classpath:/webapp
 
 logging:
     level:

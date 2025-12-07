@@ -1,12 +1,14 @@
 package org.example.productcatalog.aop;
 
-import com.sun.net.httpserver.HttpExchange;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.example.productcatalog.entity.Invocation;
 import org.example.productcatalog.repository.CrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Optional;
 
@@ -21,15 +23,15 @@ public class ExchangeAspect {
 
     }
 
-    @After(value = "execution(* org.example.productcatalog.web.handler.AbstractHandler.handle(com.sun.net.httpserver.HttpExchange, ..))" +
-            "&& args(exchange, ..)", argNames = "exchange")
-    public void httpExchangeCheckToHandle(HttpExchange exchange) {
-        var endpoint = exchange.getRequestURI().getPath();
-        Optional.ofNullable(exchange.getAttribute("JSESSIONID")).map(Object::toString).ifPresent(sessionId -> {
+    @Before(value = "@annotation(mapping)", argNames = "mapping")
+    public void httpExchangeCheckToHandle(RequestMapping mapping) {
+        var endpoints = mapping.value();
+        Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .map(Authentication::getPrincipal)
+                .map(Object::toString).ifPresent(sessionId -> {
             Invocation event = new Invocation();
-            event.setEndpoint(endpoint);
+            event.setEndpoint(endpoints[0]);
             event.setEmail(sessionId);
             invocationRepository.add(event);});
-        exchange.close();
     }
 }

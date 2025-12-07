@@ -1,18 +1,18 @@
 package org.example.productcatalog.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Setter;
 import lombok.Getter;
 
 @Setter
 @Getter
 @Entity
-@Table(schema = "custom", name = "product")
+@Table(name = "product")
 public class Product {
     @Id
-    private long id;
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
+    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    private Long id;
     private String item;
     private String brand;
     private String title;

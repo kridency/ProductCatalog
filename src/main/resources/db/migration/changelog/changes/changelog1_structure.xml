@@ -9,11 +9,11 @@
     <changeSet id="create_sequence" author="kridency">
         <createSequence
                 sequenceName="id_sequence"
+                startValue="1"
                 minValue="1"
                 incrementBy="1"
                 dataType="bigint"
-                schemaName="${schemaName}"
-                startValue="1"/>
+                schemaName="${schemaName}"/>
     </changeSet>
 
     <changeSet id="create_role_type" author="kridency" runOrder="first">

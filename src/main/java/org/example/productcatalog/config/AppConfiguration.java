@@ -7,8 +7,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -23,8 +21,9 @@ import javax.sql.DataSource;
 import java.util.Map;
 
 @Configuration
-@ComponentScan("org.example.productcatalog")
+@ComponentScan(basePackages = {"org.example.productcatalog"})
 @EnableWebMvc
+@EnableAspectJAutoProxy
 @EnableJpaRepositories(
         basePackages = "org.example.productcatalog.repository",
         entityManagerFactoryRef = "entityManager")
@@ -84,10 +83,11 @@ public class AppConfiguration {
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManager(){
         final LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
-        entityManager.setDataSource(dataSource());
         entityManager.setPersistenceUnitName("productcatalog");
+        entityManager.setPackagesToScan("org.example.productcatalog");
+        entityManager.setDataSource(dataSource());
 
-        final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter(){
+        final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter() {
             {
                 setDatabase(Database.POSTGRESQL);
                 setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
@@ -136,10 +136,5 @@ public class AppConfiguration {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource());
         return bean;
-    }
-
-    @Bean
-    public ConversionService conversionService() {
-        return DefaultConversionService.getSharedInstance();
     }
 }

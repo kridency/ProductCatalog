@@ -1,13 +1,10 @@
 package org.example.productcatalog.web.servlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.annotation.WebServlet;
-import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.property.ApplicationProperties;
 import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.service.UserService;
 
@@ -27,9 +24,7 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 public class UserServlet extends AbstractServlet<UserDto> {
 
     public UserServlet() {
-        this.service = new UserService(
-                new UserRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
-                UserMapper.getInstance());
+        this.service = new UserService(new UserRepository(null), UserMapper.getInstance());
     }
 
     private void login(HttpServletResponse response, UserDto data) {

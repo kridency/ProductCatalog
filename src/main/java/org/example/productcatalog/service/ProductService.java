@@ -68,6 +68,6 @@ public class ProductService implements CrudService<ProductDto, String> {
 
     @Override
     public ProductDto findById(long id) {
-        return repository.getById(id).map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        return repository.getById(id).map(mapper::toDto).orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND));
     }
 }

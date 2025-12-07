@@ -12,10 +12,23 @@ services:
     expose:
       - 5432
     networks:
-      - docker_default 
+      - docker_default
     restart: unless-stopped
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  #swagger:
+  #  container_name: swagger-container
+  #  image: swaggerapi/swagger-ui:v5.19.0
+  #  ports:
+  #    - '8080:8080'
+  #  networks:
+  #    - docker_default
+  #  restart: unless-stopped
+  #  environment:
+  #    SWAGGER_JSON: /app/openapi.json
+  #  volumes:
+  #    - ./openapi.json:/app/openapi.json
 
 networks:
       docker_default:
