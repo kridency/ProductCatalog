@@ -1,62 +1,68 @@
 package org.example.productcatalog.service;
 
+import jakarta.transaction.Transactional;
+import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
-import org.example.productcatalog.repository.UserRepository;
+import org.example.productcatalog.mapper.UserMapper;
+import org.example.productcatalog.repository.CrudRepository;
+import org.example.productcatalog.util.specification.Specification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-public class UserService implements CrudService<User, String> {
-    private static final UserService INSTANCE = new UserService();
-    private final UserRepository userRepository;
+@Service
+public class UserService implements CrudService<UserDto, String> {
+    private final UserMapper mapper;
+    private final CrudRepository<User> repository;
 
-    private UserService() {
-        userRepository = UserRepository.getInstance();
+    @Autowired
+    public UserService(CrudRepository<User> repository, UserMapper mapper) {
+        this.mapper = mapper;
+        this.repository = repository;
     }
 
-    public static UserService getInstance() {
-        return INSTANCE;
+    @Transactional
+    @Override
+    public UserDto create(UserDto data) {
+        return Optional.ofNullable(data).map(mapper::fromDto).map(repository::add)
+                .map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
+    }
+
+    @Transactional
+    @Override
+    public UserDto update(UserDto data) {
+        return Optional.ofNullable(data).map(mapper::fromDto).map(repository::update)
+                .map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     @Override
-    public User create(User user) {
-        return Optional.ofNullable(user).map(x -> userRepository.getByEmail(x.getEmail())
-                .orElse(userRepository.add(user))).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
+    public UserDto remove(UserDto data) {
+        return Optional.ofNullable(data).map(mapper::fromDto).map(repository::delete)
+                .map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     @Override
-    public User update(User user) {
-        return Optional.ofNullable(user).map(x -> userRepository.getByEmail(x.getEmail()).map(value -> userRepository.update(x))
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
-                .orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
+    public Collection<UserDto> findAll() { return repository.getAll().stream().map(mapper::toDto).toList(); }
+
+    @Override
+    public Collection<UserDto> findFiltered(UserDto data) {
+        return new Specification<>(mapper.fromDto(data)).apply(repository.getAll()).stream()
+                .map(mapper::toDto).toList();
     }
 
     @Override
-    public User remove(User user) {
-        return Optional.ofNullable(user).map(x -> userRepository.getByEmail(x.getEmail()).map(userRepository::delete)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
-                .orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
+    public UserDto find(String email) {
+        return Optional.ofNullable(email).flatMap(repository::getByKey).map(mapper::toDto)
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
     }
 
     @Override
-    public Collection<User> findAll() { return userRepository.getAll(); }
-
-    public User findByEmail(String email) {
-        return Optional.ofNullable(email).map(value -> userRepository.getByEmail(email)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
-                .orElseThrow(() -> new ApplicationException(EMAIL_ERROR));
+    public UserDto findById(long id) {
+        return repository.getById(id).map(mapper::toDto).orElse(null);
     }
-
-    @Override
-    public User find(String email) {
-        return Optional.ofNullable(email).map(value -> userRepository.getByEmail(email)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
-                .orElseThrow(() -> new ApplicationException(EMAIL_ERROR));
-    }
-
-    @Override
-    public Collection<User> findFiltered(User user) { return null; }
 }

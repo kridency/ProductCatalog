@@ -1,28 +1,21 @@
 package org.example.productcatalog.entity;
 
-import lombok.Getter;
+import jakarta.persistence.*;
 import lombok.Setter;
+import lombok.Getter;
 
 @Setter
 @Getter
+@Entity
+@Table(name = "product")
 public class Product {
-    private long id;
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
+    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    private Long id;
     private String item;
     private String brand;
     private String title;
     private String category;
-    private Double price;
-
-    public Product(String item,
-                   String brand,
-                   String title,
-                   String category,
-                   Double price) {
-        this.item = item;
-        this.brand = brand;
-        this.title = title;
-        this.category = category;
-        this.price = price;
-    }
-
+    private double price;
 }

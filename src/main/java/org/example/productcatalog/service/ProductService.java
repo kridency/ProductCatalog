@@ -1,71 +1,73 @@
 package org.example.productcatalog.service;
 
+import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
-import org.example.productcatalog.repository.ProductRepository;
+import org.example.productcatalog.mapper.ProductMapper;
+import org.example.productcatalog.repository.CrudRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.Specification;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.*;
 
-import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_FOUND;
-import static org.example.productcatalog.preset.ProductCatalogInit.PRODUCT_NOT_SPECIFIED;
+import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-public class ProductService implements CrudService<Product, String> {
-    private static ProductService INSTANCE;
-    private final ProductRepository productRepository;
+@Service
+public class ProductService implements CrudService<ProductDto, String> {
+    private final CrudRepository<Product> repository;
+    private final ProductMapper mapper;
     private final ProductCacheManager productCacheManager;
 
-    private ProductService() {
-        productRepository = ProductRepository.getInstance();
-        productCacheManager = new ProductCacheManager();
-    }
-
-    public static ProductService getInstance() {
-        if(INSTANCE == null) INSTANCE = new ProductService();
-        return INSTANCE;
+    @Autowired
+    public ProductService(CrudRepository<Product> repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
+        this.repository = repository;
+        this.mapper = mapper;
+        this.productCacheManager = productCacheManager;
     }
 
     @Override
-    public Product create(Product product) {
-        return Optional.ofNullable(product).map(x -> productCacheManager.put(productRepository.getByItem(x.getItem())
-                .orElse(productRepository.add(x))))
+    public ProductDto create(ProductDto data) {
+        return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
+                .map(repository::add).map(productCacheManager::put).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
-    public Product update(Product product) {
-        var newProduct = Optional.ofNullable(product).map(x -> productCacheManager.put(productRepository.getByItem(x.getItem())
-                        .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND))))
-                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
-
-        newProduct.setBrand(product.getBrand());
-        newProduct.setTitle(product.getTitle());
-        newProduct.setCategory(product.getCategory());
-        newProduct.setPrice(product.getPrice());
-        return productRepository.update(newProduct);
-    }
-
-    @Override
-    public Product remove(Product product) {
-        return Optional.ofNullable(product).map(x -> productRepository.delete(productCacheManager.clear(x.getItem()).orElseGet(() ->
-                productRepository.getByItem(x.getItem()).orElseThrow(() ->
-                        new ApplicationException(PRODUCT_NOT_FOUND)))))
+    public ProductDto update(ProductDto data) {
+        return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
+                .map(repository::update).map(productCacheManager::put).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
-    public Collection<Product> findFiltered(Product product) {
-        return new Specification<>(product).apply(productRepository.getAll());
+    public ProductDto remove(ProductDto data) {
+        Optional.ofNullable(data).ifPresent(x -> productCacheManager.clear(x.getItem()));
+        return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
+                .map(repository::delete).map(mapper::toDto)
+                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
-    public Collection<Product> findAll() { return productRepository.getAll(); }
+    public Collection<ProductDto> findFiltered(ProductDto data) {
+        return new Specification<>(mapper.fromDto(data, repository)).apply(repository.getAll()).stream()
+                .map(mapper::toDto).toList();
+    }
 
     @Override
-    public Product find(String item) {
-        return Optional.ofNullable(item).map(x -> productCacheManager.get(x).orElse(productRepository.getByItem(x).orElseThrow(() ->
-                new ApplicationException(PRODUCT_NOT_FOUND))))
-                .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
+    public Collection<ProductDto> findAll() { return repository.getAll().stream().map(mapper::toDto).toList(); }
+
+    @Override
+    public ProductDto find(String item) {
+        return Optional.ofNullable(item).map(x -> productCacheManager.get(x)
+                        .orElse(repository.getByKey(x).orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND))))
+                .map(mapper::toDto).orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
+    }
+
+    @Override
+    public ProductDto findById(long id) {
+        return repository.getById(id).map(mapper::toDto).orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND));
     }
 }

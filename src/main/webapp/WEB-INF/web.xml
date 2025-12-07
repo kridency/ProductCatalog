@@ -1,0 +1,51 @@
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <display-name>Product Catalog Web Application</display-name>
+
+    <servlet>
+        <servlet-name>product-catalog</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>
+                org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                org.example.productcatalog.config.AppConfiguration
+                org.example.productcatalog.config.SecConfiguration
+                org.example.productcatalog.config.DocConfiguration
+                org.springdoc.ui.SwaggerConfig.class
+                org.springdoc.core.SwaggerUiConfigProperties.class
+                org.springdoc.core.SwaggerUiOAuthProperties.class
+                org.springdoc.core.SpringDocWebMvcConfiguration.class
+                org.springdoc.core.MultipleOpenApiSupportConfiguration.class
+                org.springdoc.core.SpringDocConfiguration.class
+                org.springdoc.core.SpringDocConfigProperties.class
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>product-catalog</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>
+            org.springframework.web.filter.DelegatingFilterProxy
+        </filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+</web-app>

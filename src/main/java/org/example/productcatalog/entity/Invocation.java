@@ -1,22 +1,20 @@
 package org.example.productcatalog.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 
 @Setter
 @Getter
+@Entity
+@Table(name = "invocation")
 public class Invocation {
-    private long id;
-    private Instant date;
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
+    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    private Long id;
+    private Instant date = Instant.now();
     private String endpoint;
-    private User user;
-
-    public Invocation(String endpoint, User user) {
-        setDate(Instant.now());
-        setEndpoint(endpoint);
-        setUser(user);
-    }
-
+    private String email;
 }

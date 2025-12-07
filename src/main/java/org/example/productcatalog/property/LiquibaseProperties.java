@@ -1,5 +1,7 @@
 package org.example.productcatalog.property;
 
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 public class LiquibaseProperties extends AbstractProperties {

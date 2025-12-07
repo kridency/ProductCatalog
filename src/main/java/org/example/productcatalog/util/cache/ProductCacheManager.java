@@ -1,11 +1,13 @@
 package org.example.productcatalog.util.cache;
 
 import org.example.productcatalog.entity.Product;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
 
+@Component
 public class ProductCacheManager implements CacheManager<String, Product> {
     private final Map<Map.Entry<Instant, Supplier<String>>, Product> cache;
 
@@ -16,8 +18,9 @@ public class ProductCacheManager implements CacheManager<String, Product> {
 
     @Override
     public Product put(Product value) {
-        get(value.getItem()).ifPresent(x -> clear(x.getItem()));
-        cache.put(new AbstractMap.SimpleEntry<>(Instant.now(), value::getItem), value);
+        Optional.ofNullable(value).map(Product::getItem).ifPresent(this::clear);
+        Optional.ofNullable(value)
+                .ifPresent(x -> cache.put(new AbstractMap.SimpleEntry<>(Instant.now(), x::getItem), x));
         return value;
     }
 
@@ -28,7 +31,8 @@ public class ProductCacheManager implements CacheManager<String, Product> {
     }
 
     @Override
-    public Optional<Product> clear(String item) {
-        return cache.keySet().stream().filter(key -> key.getValue().get().equals(item)).findFirst().map(cache::remove);
+    public Product clear(String item) {
+        return cache.keySet().stream().filter(key -> key.getValue().get().equals(item)).findFirst()
+                .map(cache::remove).orElse(null);
     }
 }

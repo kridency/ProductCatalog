@@ -18,6 +18,8 @@ public interface CrudRepository<T> {
 
     Optional<T> getById(long id);
 
+    Optional<T> getByKey(String key);
+
     default T setEntityId(PreparedStatement statement, T entity, Consumer<Long> consumer) throws SQLException {
         if (statement.executeUpdate() == 1) {
             try (var resultSet = statement.getGeneratedKeys()) {

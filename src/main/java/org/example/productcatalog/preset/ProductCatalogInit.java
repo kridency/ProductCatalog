@@ -1,47 +1,45 @@
 package org.example.productcatalog.preset;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class ProductCatalogInit {
-    public static final String UNAUTHORIZED;
-    public static final String RETURN;
-    public static final String INPUT_ERROR;
-    public static final String EMAIL_ERROR;
-    public static final String COMMAND_PROMPT;
-    public static final String FORCED_COMPLETION;
-    public static final String USER_NOT_FOUND;
-    public static final String USER_NOT_SPECIFIED;
-    public static final String EMAIL_NOT_SPECIFIED;
-    public static final String PRODUCT_NOT_FOUND;
-    public static final String PRODUCT_NOT_SPECIFIED;
-    public static final String LIMIT_NOT_FOUND;
-    public static final String FUND_NOT_FOUND;
+    public static final String UNAUTHORIZED = "Необходимо пройти аутентификацию";
+    public static final String RETURN = "return";
+    public static final String SESSION_EXIST = "Для использования сервиса аутентификации следует завершить текущую сессию.";
+    public static final String EMAIL_ERROR = "Неправильный формат email";
+    public static final String PRODUCT_NOT_CREATED = "Не удалось создать товар";
+    public static final String PRODUCT_NOT_UPDATED =  "Не удалось изменить товар";
+    public static final String PRODUCT_NOT_DELETED =  "Не удалось удалить товар";
+    public static final String USER_NOT_CREATED = "Не удалось создать пользователя";
+    public static final String USER_NOT_UPDATED =  "Не удалось изменить пользователя";
+    public static final String USER_NOT_DELETED =  "Не удалось удалить пользователя";
+    public static final String CREATED = "Объект успешно создан";
+    public static final String UPDATED = "Объект успешно изменен";
+    public static final String DELETED = "Объект успешно удален";
+    public static final String USER_NOT_FOUND = "Пользователь не найден";
+    public static final String USER_NOT_SPECIFIED = "Не указан Пользователь";
+    public static final String EMAIL_NOT_SPECIFIED = "Не указан адрес электронной почты пользователя";
+    public static final String PRODUCT_NOT_FOUND = "Товар не найден";
+    public static final String PRODUCT_NOT_SPECIFIED = "Не указан товар";
+    public static final String BAD_REQUEST = "Входящие данные не соответствуют формату";
+    public static final String BAD_ENDPOINT = "Недопустимая операция";
     public static final DateTimeFormatter DATE_FORMAT;
     public static final DateTimeFormatter DATETIME_FORMATTER;
-    public static final String BAD_REQUEST;
-    public static final String BAD_ENDPOINT;
     public static final Scanner SCANNER;
-
+    public static final ObjectMapper objectMapper;
 
     static {
-        UNAUTHORIZED = "Необходимо пройти аутентификацию";
-        RETURN = "return";
-        INPUT_ERROR = "Неопознанная команда";
-        EMAIL_ERROR = "Неправильный формат email";
-        COMMAND_PROMPT = System.lineSeparator() + "Введите команду :> ";
-        FORCED_COMPLETION =  "Принудительное завершение" + System.lineSeparator();
-        USER_NOT_FOUND = "Пользователь не найден";
-        USER_NOT_SPECIFIED = "Не указан Пользователь";
-        EMAIL_NOT_SPECIFIED = "Не указан адрес электронной почты пользователя";
-        PRODUCT_NOT_FOUND = "Товар не найден";
-        PRODUCT_NOT_SPECIFIED = "Не указан товар";
-        LIMIT_NOT_FOUND = "Лимит не найден";
-        FUND_NOT_FOUND = "Фонд накоплений не найден";
-        DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        BAD_ENDPOINT = "Недопустимая операция";
-        BAD_REQUEST = "Входящие данные не соответствуют формату";
         SCANNER = new Scanner(System.in);
+        DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSSSSS");
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new ParameterNamesModule());
+        //objectMapper.registerModule(new BeanValidationModule(Validation.byDefaultProvider().configure().buildValidatorFactory()));
     }
 }

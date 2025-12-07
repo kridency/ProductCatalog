@@ -1,5 +1,6 @@
 package org.example.productcatalog.property;
 
+import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 public class ApplicationProperties extends AbstractProperties {
