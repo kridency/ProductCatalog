@@ -19,7 +19,7 @@ spring:
     mvc:
         static-path-pattern: /swagger-ui*
     resources:
-        static-locations: classpath:/webapp/
+        static-locations: classpath:/webapp
 
 logging:
     level:

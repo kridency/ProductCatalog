@@ -1,8 +1,6 @@
 package org.example.productcatalog.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
@@ -10,10 +8,12 @@ import java.time.Instant;
 @Setter
 @Getter
 @Entity
-@Table(schema = "custom", name = "invocation")
+@Table(name = "invocation")
 public class Invocation {
     @Id
-    private long id;
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
+    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    private Long id;
     private Instant date = Instant.now();
     private String endpoint;
     private String email;

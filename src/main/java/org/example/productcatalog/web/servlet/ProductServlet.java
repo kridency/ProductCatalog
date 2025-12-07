@@ -1,14 +1,11 @@
 package org.example.productcatalog.web.servlet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.annotation.WebServlet;
-import org.example.productcatalog.client.PostgreSQLClient;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.ProductMapper;
 import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.property.ApplicationProperties;
 import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.service.CrudService;
@@ -31,15 +28,9 @@ public class ProductServlet extends AbstractServlet<ProductDto> {
     private final CrudService<UserDto, String> userService;
 
     public ProductServlet() {
-        this.userService = new UserService(
-                new UserRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
-                UserMapper.getInstance()
-        );
+        this.userService = new UserService(new UserRepository(null), UserMapper.getInstance());
         this.service = new ProductService(
-                new ProductRepository(new PostgreSQLClient(ApplicationProperties.getInstance()).getDataSource()),
-                ProductMapper.getInstance(),
-                new ProductCacheManager()
-        );
+                new ProductRepository(null), ProductMapper.getInstance(), new ProductCacheManager());
     }
 
     @Override

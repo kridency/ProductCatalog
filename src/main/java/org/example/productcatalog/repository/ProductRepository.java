@@ -1,172 +1,64 @@
 package org.example.productcatalog.repository;
 
-import lombok.NonNull;
-import org.example.productcatalog.client.PostgreSQLClient;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import org.example.productcatalog.entity.Product;
-import org.example.productcatalog.exception.ApplicationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Repository
 public class ProductRepository implements CrudRepository<Product> {
-    private final DataSource datasource;
-    private static final String INSERT_QUERY = "INSERT INTO \"product\" (item, brand, title, category, price) " + "VALUES (?,?,?,?,?)";
-    private static final String UPDATE_QUERY = "UPDATE \"product\" SET item=?, brand=?, title=?, category=?, price=? WHERE id=?";
-    private static final String DELETE_QUERY = "DELETE FROM \"product\" WHERE item=?";
-    private static final String GET_ALL_QUERY = "SELECT * FROM \"product\"";
-    private static final String GET_BY_ID_QUERY = "SELECT * FROM \"product\" WHERE id=?";
-    private static final String GET_BY_ITEM_QUERY = "SELECT * FROM \"product\" WHERE item=?";
+    private final EntityManager entityManager;
 
     @Autowired
-    public ProductRepository(DataSource datasource) {
-        this.datasource = datasource;
+    public ProductRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public Product add(Product product) {
-        try(var connection = datasource.getConnection();
-            var statement = connection.prepareStatement(INSERT_QUERY, new String[] {"id"})) {
-            try {
-                statement.setString(1, product.getItem());
-                statement.setString(2, product.getBrand());
-                statement.setString(3, product.getTitle());
-                statement.setString(4, product.getCategory());
-                statement.setDouble(5, product.getPrice());
-                return setEntityId(statement, product, product::setId);
-            } catch (SQLException e) {
-                throw new ApplicationException(e.getMessage());
-            }
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
+        entityManager.persist(product);
+        entityManager.flush();
+        entityManager.refresh(product);
+        return product;
     }
 
     @Override
     public Product update(Product product) {
-        try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(UPDATE_QUERY, new String[] {"id"})) {
-            try {
-                statement.setString(1, product.getItem());
-                statement.setString(2, product.getBrand());
-                statement.setString(3, product.getTitle());
-                statement.setString(4, product.getCategory());
-                statement.setDouble(5, product.getPrice());
-                statement.setLong(6, product.getId());
-                return setEntityId(statement, product, product::setId);
-            } catch (SQLException e) {
-                throw new ApplicationException(e.getMessage());
-            }
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
+        return getByKey(product.getItem())
+                .map(x -> {
+                    x.setItem(product.getItem());
+                    x.setBrand(product.getBrand());
+                    x.setTitle(product.getTitle());
+                    x.setCategory(product.getCategory());
+                    x.setPrice(product.getPrice());
+                    return x;
+                }).orElse(null);
     }
 
     @Override
     public Product delete(Product product) {
-        try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(DELETE_QUERY,
-                     new String[] {"id", "item", "brand", "title", "category", "price"})) {
-            try {
-                statement.setString(1, product.getItem());
-                if (statement.executeUpdate() == 1) {
-                    try (var resultSet = statement.getGeneratedKeys()) {
-                        while (resultSet.next()) {
-                            product.setId(resultSet.getLong(1));
-                            product.setItem(resultSet.getString("item"));
-                            product.setBrand(resultSet.getString("brand"));
-                            product.setTitle(resultSet.getString("title"));
-                            product.setCategory(resultSet.getString("category"));
-                            product.setPrice(resultSet.getDouble("price"));
-                        }
-                        return product;
-                    } catch (Exception e) {
-                        throw new ApplicationException(e.getMessage());
-                    }
-                } else {
-                    return null;
-                }
-            } catch (SQLException e) {
-                throw new ApplicationException(e.getMessage());
-            }
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
+        entityManager.remove(product);
+        return product;
     }
 
     public Collection<Product> getAll() {
-        try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(GET_ALL_QUERY);
-             var resultSet = statement.executeQuery()) {
-            return Stream.generate(() -> {
-                try {
-                    if (resultSet.next()) {
-                        var entity = new Product();
-                        entity.setItem(resultSet.getString("item"));
-                        entity.setBrand(resultSet.getString("brand"));
-                        entity.setTitle(resultSet.getString("title"));
-                        entity.setCategory(resultSet.getString("category"));
-                        entity.setPrice(resultSet.getDouble("price"));
-                        entity.setId(resultSet.getLong("id"));
-                        return entity;
-                    } else {
-                        return null;
-                    }
-                } catch (SQLException e) {
-                    throw new ApplicationException(e.getMessage());
-                }
-            }).takeWhile(Objects::nonNull).toList();
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
+        return entityManager.createQuery("FROM Product", Product.class).getResultList();
     }
 
     @Override
     public Optional<Product> getByKey(String item) {
-        try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(GET_BY_ITEM_QUERY)) {
-            statement.setString(1, item);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                return getProduct(resultSet);
-            } catch (Exception e) {
-                throw new ApplicationException(e.getMessage());
-            }
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
+        try {
+            return Optional.of(entityManager.createQuery("FROM Product WHERE item=?1", Product.class)
+                    .setParameter(1, item).getSingleResult());
+        } catch(NoResultException noresult) {
+            return Optional.empty();
         }
-    }
-
-    @NonNull
-    private Optional<Product> getProduct(ResultSet resultSet) throws SQLException {
-        Product entity = null;
-        while (resultSet.next()) {
-            entity = new Product();
-            entity.setItem(resultSet.getString("item"));
-            entity.setBrand(resultSet.getString("brand"));
-            entity.setTitle(resultSet.getString("title"));
-            entity.setCategory(resultSet.getString("category"));
-            entity.setPrice(resultSet.getDouble("price"));
-            entity.setId(resultSet.getLong("id"));
-        }
-        return Optional.ofNullable(entity);
     }
 
     public synchronized Optional<Product> getById(long id) {
-        try (var connection = datasource.getConnection();
-             var statement = connection.prepareStatement(GET_BY_ID_QUERY)) {
-            statement.setLong(1, id);
-            try (var resultSet = statement.executeQuery()) {
-                return getProduct(resultSet);
-            } catch (Exception e) {
-                throw new ApplicationException(e.getMessage());
-            }
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
+        return Optional.of(entityManager.find(Product.class, id));
     }
 }

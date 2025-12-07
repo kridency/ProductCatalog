@@ -28,10 +28,11 @@
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
         <jakarta-validation.version>3.1.0</jakarta-validation.version>
         <jakarta-inject.version>2.0.1</jakarta-inject.version>
+        <atomikos.version>6.0.0</atomikos.version>
         <jakarta-ws.version>4.0.0</jakarta-ws.version>
         <jakarta-activation.version>2.1.4</jakarta-activation.version>
         <hibernate-core.version>7.0.10.Final</hibernate-core.version>
-        <hibernate-validator.version>8.0.3.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
         <jackson.version>2.18.2</jackson.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
@@ -51,6 +52,8 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito.version>5.16.0</mockito.version>
         <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
+        <junit.version>6.0.0</junit.version>
+        <json-path.version>2.10.0</json-path.version>
 
         <spring.datasource.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</spring.datasource.url>
     </properties>
@@ -109,6 +112,13 @@
 
         <dependency>
             <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
@@ -154,6 +164,19 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>${jakarta-validation.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
+            <version>${jakarta-inject.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.narayana.jta</groupId>
+            <artifactId>narayana-jta</artifactId>
+            <version>7.3.3.Final</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -251,6 +274,10 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -268,10 +295,39 @@
             <scope>test</scope>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${json-path.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>5.0.0-M1</version>
             <scope>test</scope>
         </dependency>
 
@@ -390,6 +446,7 @@
                     <url>${spring.datasource.url}</url>
                     <username>intern</username>
                     <password>1gjAVnJ</password>
+                    <dropFirst>true</dropFirst>
                     <propertyFile>liquibase.yml</propertyFile>
                 </configuration>
                 <executions>
@@ -467,7 +524,7 @@
                 <version>${swagger-maven-plugin.version}</version>
                 <configuration>
                     <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.basedir}/src/main/webapp</outputPath>
+                    <outputPath>${project.basedir}/src/main/webapp/webjars/swagger-ui</outputPath>
                     <resourcePackages>
                         <resourcePackage>org.example.productcatalog</resourcePackage>
                     </resourcePackages>

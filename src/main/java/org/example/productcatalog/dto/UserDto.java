@@ -1,5 +1,6 @@
 package org.example.productcatalog.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
@@ -22,9 +23,12 @@ import static org.example.productcatalog.preset.ProductCatalogInit.EMAIL_NOT_SPE
 public class UserDto implements Serializable, UserDetails {
     @Email(message = EMAIL_ERROR)
     @NotEmpty(message = EMAIL_NOT_SPECIFIED)
+    @JsonProperty("email")
     private String email;
     @NotEmpty(message = "Password cannot be blank")
+    @JsonProperty("password")
     private String password;
+    @JsonProperty("role")
     private RoleType role;
 
     @Override

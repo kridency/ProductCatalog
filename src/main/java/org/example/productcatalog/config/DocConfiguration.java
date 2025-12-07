@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -59,6 +61,9 @@ public class DocConfiguration implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry
+                .addViewController("/swagger-ui/openapi.json")
+                .setViewName("forward:/webjars/swagger-ui/openapi.json");
+        registry
                 .addViewController("/swagger-ui/swagger-initializer.js")
                 .setViewName("forward:/webjars/swagger-ui/swagger-initializer.js");
     }
@@ -66,5 +71,10 @@ public class DocConfiguration implements WebMvcConfigurer {
     @Override
     public void configureDefaultServletHandling(final DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
+    }
+
+    @Bean
+    OpenAPI getOpenApi() {
+        return new OpenAPI();
     }
 }

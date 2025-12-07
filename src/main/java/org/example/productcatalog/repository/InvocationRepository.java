@@ -73,7 +73,7 @@ public class InvocationRepository implements CrudRepository<Invocation> {
                 if (statement.executeUpdate() == 1) {
                     try (var resultSet = statement.getGeneratedKeys()) {
                         while (resultSet.next()) {
-                            invocation.setId(resultSet.getInt(1));
+                            invocation.setId(resultSet.getLong(1));
                         }
                         invocation.setDate(resultSet.getTimestamp("date").toInstant());
                         invocation.setEndpoint(resultSet.getString("endpoint"));
