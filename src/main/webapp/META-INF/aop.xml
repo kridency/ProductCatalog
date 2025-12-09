@@ -1,5 +1,0 @@
-<aspectj>
-    <weaver options="-Xset:overWeaving=true">
-        <dump within="org.example.productcatalog..*" />
-    </weaver>
-</aspectj>

@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y netcat-traditional
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Копирование WAP-файла приложения в контейнер
-COPY ./target/ProductCatalog-1.0.0-SNAPSHOT.war '/usr/local/tomcat/webapps/api#v1.war'
+COPY ./target/ProductApplication-1.0.0-SNAPSHOT.war '/usr/local/tomcat/webapps/api#v1.war'
 
 # Выставление порта Tomcat
 EXPOSE 8080

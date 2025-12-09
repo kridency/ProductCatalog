@@ -1,0 +1,66 @@
+app:
+    swagger-ui-version: 5.30.3
+
+server:
+    port: 8080
+    servlet:
+        context-path: /api/v1
+
+spring:
+    profiles:
+        active: dev, test
+    application:
+        name: product-catalog
+    datasource:
+        url: jdbc:postgresql://localhost:5432/product_db
+        username: intern
+        password: 1gjAVnJ
+        port: 5432
+        database: product_db
+        hikari:
+            schema: custom
+            driver-class-name: org.postgresql.Driver
+    mvc:
+        static-path-pattern: /swagger-ui*
+    main:
+        web-application-type: servlet
+
+    liquibase:
+        changeLogFile: db/migration/changelog/dbChangeLog.xml
+        liquibaseSchemaName: auxiliary
+
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: update
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        generate-ddl: true
+        show-sql: true
+        properties:
+            hibernate:
+                globally_quoted_identifiers: true
+                connection:
+                    url: jdbc:postgresql://postgres-container.docker_default:5432/product_db?createDatabaseIfNotExist=true;DB_CLOSE_DELAY=-1
+                    username: intern
+                    password: 1gjAVnJ
+                    driver_class: org.postgresql.Driver
+                jakarta:
+                    persistence:
+                        schema-generation:
+                            create-database-schemas: true
+                format_sql: true
+                default_schema: custom
+                transaction:
+                    jta:
+                        platform: org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+    level:
+        org.springframework.security: INFO
+
+springdoc:
+    swagger-ui:
+        enable: true
+        path: /swagger-ui/index.html
