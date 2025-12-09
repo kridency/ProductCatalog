@@ -1,7 +1,0 @@
-changeLogFile: db/migration/changelog/dbChangeLog.xml
-defaultSchemaName: custom
-liquibaseSchemaName: auxiliary
-contexts: production
-verbose: true
-dropFirst: true
-parameter.schemaName: custom
