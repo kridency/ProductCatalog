@@ -3,13 +3,14 @@ package org.example.productcatalog.mapper;
 import javax.annotation.processing.Generated;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.User;
-import org.example.productcatalog.repository.CrudRepository;
+import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-12-02T22:51:35+0300",
+    date = "2025-12-09T04:24:45+0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.9 (Red Hat, Inc.)"
 )
+@Component
 public class UserMapperImpl implements UserMapper {
 
     @Override
@@ -28,14 +29,13 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public User fromDto(UserDto data, CrudRepository<User> repository) {
+    public User fromDto(UserDto data) {
         if ( data == null ) {
             return null;
         }
 
         User user = new User();
 
-        user.setId( getUserId( data.getEmail(), repository ) );
         user.setEmail( data.getEmail() );
         user.setPassword( data.getPassword() );
         user.setRole( getRole( data.getRole() ) );

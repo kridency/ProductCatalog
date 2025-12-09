@@ -19,11 +19,11 @@ import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
 @Repository
 public class InvocationRepository implements CrudRepository<Invocation> {
     private final DataSource datasource;
-    private static final String INSERT_QUERY = "INSERT INTO \"invocation\" (date, endpoint, user_id) VALUES (?,?,?)";
+    private static final String INSERT_QUERY = "INSERT INTO \"invocation\" (date, endpoint, email) VALUES (?,?,?)";
     private static final String UPDATE_QUERY = "UPDATE \"invocation\" SET endpoint=? WHERE id=?";
     private static final String DELETE_QUERY = "DELETE FROM \"invocation\" WHERE id=?";
     private static final String GET_ALL_QUERY = "SELECT * FROM \"invocation\"";
-    private static final String GET_BY_KEY_QUERY = "SELECT * FROM \"invocation\" WHERE date=? AND user_id=?";
+    private static final String GET_BY_KEY_QUERY = "SELECT * FROM \"invocation\" WHERE date=? AND email=?";
     private static final String GET_BY_ID_QUERY = "SELECT * FROM \"invokation\" WHERE id=?";
 
     @Autowired

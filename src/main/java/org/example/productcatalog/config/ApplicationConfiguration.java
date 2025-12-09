@@ -5,6 +5,7 @@ import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Configuration
 @ComponentScan(basePackages = {"org.example.productcatalog"})
 @EnableWebMvc
-@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableJpaRepositories(
         basePackages = "org.example.productcatalog.repository",
         entityManagerFactoryRef = "entityManager")
@@ -34,7 +35,8 @@ import java.util.Map;
                 @PropertySource(value = "classpath:liquibase.yml", factory = YamlPropertySourceFactory.class)
         }
 )
-public class AppConfiguration {
+@EnableSpringConfigured
+public class ApplicationConfiguration {
     @Value("${spring.datasource.url}")
     private String dataUrl;
 

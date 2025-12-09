@@ -1,5 +1,6 @@
 package org.example.productcatalog.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,6 +21,7 @@ import static org.example.productcatalog.preset.ProductCatalogInit.EMAIL_NOT_SPE
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(value = {"authorities", "username"})
 public class UserDto implements Serializable, UserDetails {
     @Email(message = EMAIL_ERROR)
     @NotEmpty(message = EMAIL_NOT_SPECIFIED)
@@ -34,7 +36,7 @@ public class UserDto implements Serializable, UserDetails {
     @Override
     @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(role == null ? RoleType.ROLE_USER.name() : role.name()));
     }
     @Override
     @NonNull

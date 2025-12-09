@@ -20,14 +20,6 @@
             <column name="role" value="ROLE_USER"/>
         </insert>
 
-        <!--
-        <insert tableName="user">
-            <column name="email" value="test@hostname"/>
-            <column name="password" value="test"/>
-            <column name="role" value="ROLE_USER"/>
-        </insert>
-        -->
-
     </changeSet>
 
     <changeSet  author="kridency" id="create_products">

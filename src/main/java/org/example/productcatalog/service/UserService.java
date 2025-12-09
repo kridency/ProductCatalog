@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@Service
+@Service("UserService")
 public class UserService implements CrudService<UserDto, String> {
     private final UserMapper mapper;
     private final CrudRepository<User> repository;
@@ -40,6 +40,7 @@ public class UserService implements CrudService<UserDto, String> {
                 .map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
+    @Transactional
     @Override
     public UserDto remove(UserDto data) {
         return Optional.ofNullable(data).map(mapper::fromDto).map(repository::delete)

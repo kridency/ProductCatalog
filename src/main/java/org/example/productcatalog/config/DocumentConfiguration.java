@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -35,10 +35,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         ),
         servers = {
                 @Server(url = "http://localhost:8080/api/v1", description = "Development Server"),
-        },
-        tags = {
-                @Tag(name = "Users", description = "Operations related to user management"),
-                @Tag(name = "Products", description = "Operations related to product catalog")
         }
 )
 @SecurityScheme(
@@ -46,7 +42,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         type = SecuritySchemeType.HTTP,
         scheme = "basic"
 )
-public class DocConfiguration implements WebMvcConfigurer {
+public class DocumentConfiguration implements WebMvcConfigurer {
     @Value("${app.swagger-ui-version}")
     private String swaggerUiVersion;
 
@@ -74,7 +70,5 @@ public class DocConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    OpenAPI getOpenApi() {
-        return new OpenAPI();
-    }
+    OpenAPI getOpenApi() { return new OpenAPI().components(new Components()); }
 }

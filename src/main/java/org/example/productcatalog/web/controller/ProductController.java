@@ -2,11 +2,14 @@ package org.example.productcatalog.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.*;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.service.CrudService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,20 +18,20 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
-import static org.example.productcatalog.preset.ProductCatalogInit.USER_NOT_FOUND;
 
 @RestController
+@Path("/product")
+@Tag(name = "Product Controller", description = "APIs for managing products")
 public class ProductController {
     private final CrudService<ProductDto, String> service;
 
-    @Autowired
-    public ProductController(CrudService<ProductDto, String> service) {
-        this.service = service;
-    }
+    @Inject
+    public ProductController(@Qualifier("ProductService") CrudService<ProductDto, String> service) { this.service = service; }
 
+    @POST
     @Operation(summary = "Register product",
             description = "Register new product.")
-    @PostMapping(value = "/product/create")
+    @RequestMapping(method = RequestMethod.POST, path = "/product")
     @ResponseStatus(HttpStatus.CREATED)
     public MessageDto register(@RequestBody @Valid ProductDto data) {
         return new MessageDto(Optional.of(service.create(data))
@@ -36,9 +39,10 @@ public class ProductController {
                 .orElse(PRODUCT_NOT_CREATED), data.getItem());
     }
 
+    @PUT
     @Operation(summary = "Update product details",
             description = "Updates product details.")
-    @PutMapping(value = "/product/update")
+    @RequestMapping(method = RequestMethod.PUT, path = "/product")
     @ResponseStatus(HttpStatus.OK)
     public MessageDto update(@RequestBody @Valid ProductDto data) {
         return new MessageDto(Optional.of(service.update(data))
@@ -46,20 +50,22 @@ public class ProductController {
                 .orElse(PRODUCT_NOT_UPDATED), data.getItem());
     }
 
+    @DELETE
     @Operation(summary = "Delete product",
             description = "Deletes product.")
+    @RequestMapping(method = RequestMethod.DELETE, path = "/product")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/product/delete")
     public MessageDto delete(@RequestBody ProductDto data) {
         return new MessageDto(Optional.of(service.remove(data))
                 .map(value -> DELETED)
-                .orElse(USER_NOT_DELETED), data.getItem());
+                .orElse(PRODUCT_NOT_DELETED), data.getItem());
     }
 
+    @GET
     @Operation(summary = "List products",
             description = "List products according to template.")
+    @RequestMapping(method = RequestMethod.GET, path = "/product")
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = "/product/list")
     public MessageDto list(@RequestBody ProductDto data) {
         return new MessageDto(Optional.of(service.findFiltered(data))
                 .filter(Predicate.not(Collection::isEmpty))
@@ -69,6 +75,6 @@ public class ProductController {
                     } catch (JsonProcessingException e) {
                         return e.getMessage();
                     }
-                }).orElse(USER_NOT_FOUND), data.getItem());
+                }).orElse(PRODUCT_NOT_FOUND), data.getItem());
     }
 }

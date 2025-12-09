@@ -1,5 +1,6 @@
 package org.example.productcatalog.service;
 
+import jakarta.transaction.Transactional;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
@@ -15,7 +16,7 @@ import java.util.*;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@Service
+@Service("ProductService")
 public class ProductService implements CrudService<ProductDto, String> {
     private final CrudRepository<Product> repository;
     private final ProductMapper mapper;
@@ -28,31 +29,33 @@ public class ProductService implements CrudService<ProductDto, String> {
         this.productCacheManager = productCacheManager;
     }
 
+    @Transactional
     @Override
     public ProductDto create(ProductDto data) {
-        return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
+        return Optional.ofNullable(data).map(mapper::fromDto)
                 .map(repository::add).map(productCacheManager::put).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
     public ProductDto update(ProductDto data) {
-        return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
+        return Optional.ofNullable(data).map(mapper::fromDto)
                 .map(repository::update).map(productCacheManager::put).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
+    @Transactional
     @Override
     public ProductDto remove(ProductDto data) {
         Optional.ofNullable(data).ifPresent(x -> productCacheManager.clear(x.getItem()));
-        return Optional.ofNullable(data).map(x -> mapper.fromDto(x, repository))
+        return Optional.ofNullable(data).map(mapper::fromDto)
                 .map(repository::delete).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
     @Override
     public Collection<ProductDto> findFiltered(ProductDto data) {
-        return new Specification<>(mapper.fromDto(data, repository)).apply(repository.getAll()).stream()
+        return new Specification<>(mapper.fromDto(data)).apply(repository.getAll()).stream()
                 .map(mapper::toDto).toList();
     }
 

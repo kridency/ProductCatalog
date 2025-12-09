@@ -16,10 +16,12 @@
         <maven.compiler.release>21</maven.compiler.release>
         <java.source-target.version>21</java.source-target.version>
         <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
 
         <spring.version>7.0.0</spring.version>
+        <spring-data.version>4.0.0</spring-data.version>
         <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
-        <swagger-core.version>2.2.41</swagger-core.version>
+        <swagger.version>2.2.41</swagger.version>
         <swagger-ui.version>5.30.3</swagger-ui.version>
         <webjars-locator-lite.version>1.1.2</webjars-locator-lite.version>
         <classgraph.version>4.8.184</classgraph.version>
@@ -27,13 +29,15 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
         <jakarta-validation.version>3.1.0</jakarta-validation.version>
+        <jakarta-annotation.version>3.0.0</jakarta-annotation.version>
         <jakarta-inject.version>2.0.1</jakarta-inject.version>
+        <jakarta-persistence.version>3.2.0</jakarta-persistence.version>
         <atomikos.version>6.0.0</atomikos.version>
         <jakarta-ws.version>4.0.0</jakarta-ws.version>
-        <jakarta-activation.version>2.1.4</jakarta-activation.version>
         <hibernate-core.version>7.0.10.Final</hibernate-core.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
-        <jackson.version>2.18.2</jackson.version>
+        <jackson.version>3.0.3</jackson.version>
+        <jackson-datatype.version>3.0.0-rc2</jackson-datatype.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
         <assertj-core.version>3.27.3</assertj-core.version>
@@ -47,7 +51,10 @@
         <liquibase.version>4.31.1</liquibase.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-compress.version>1.28.0</commons-compress.version>
-        <logback.version>1.5.21</logback.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <jspecify.version>1.0.0</jspecify.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
+        <byte-buddy.version>1.18.2</byte-buddy.version>
 
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito.version>5.16.0</mockito.version>
@@ -75,6 +82,24 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>${spring-data.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
         </dependency>
@@ -86,9 +111,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-jpa</artifactId>
-            <version>4.0.0</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -105,9 +136,33 @@
 
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -126,12 +181,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
             <version>${spring.version}</version>
         </dependency>
 
@@ -155,9 +204,15 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-            <version>${jakarta-activation.version}</version>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta-persistence.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${jakarta-annotation.version}</version>
         </dependency>
 
         <dependency>
@@ -170,6 +225,12 @@
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
             <version>${jakarta-inject.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta-ws.version}</version>
         </dependency>
 
         <dependency>
@@ -198,34 +259,27 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <groupId>tools.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-parameter-names</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson-datatype.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -266,6 +320,13 @@
 
         <dependency>
             <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
@@ -295,15 +356,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
@@ -313,6 +365,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
@@ -334,7 +393,25 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-core-jakarta</artifactId>
-            <version>${swagger-core.version}</version>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-models-jakarta</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2-jakarta</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <version>${swagger.version}</version>
         </dependency>
 
         <dependency>
@@ -350,16 +427,33 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>${jakarta-ws.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>compile</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>${jspecify.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byte-buddy.version}</version>
         </dependency>
     </dependencies>
 
@@ -395,6 +489,12 @@
                     </excludes>
                     <weaveMainSourceFolder>true</weaveMainSourceFolder>
                     <verbose>true</verbose>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-aspects</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
                 </configuration>
                 <executions>
                     <execution>
@@ -426,11 +526,6 @@
                     <dependency>
                         <groupId>org.aspectj</groupId>
                         <artifactId>aspectjtools</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjweaver</artifactId>
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
@@ -523,11 +618,15 @@
                 <artifactId>swagger-maven-plugin-jakarta</artifactId>
                 <version>${swagger-maven-plugin.version}</version>
                 <configuration>
+                    <contextId>ProductCatalog</contextId>
                     <outputFileName>openapi</outputFileName>
                     <outputPath>${project.basedir}/src/main/webapp/webjars/swagger-ui</outputPath>
+                    <scannerClass>io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner</scannerClass>
                     <resourcePackages>
-                        <resourcePackage>org.example.productcatalog</resourcePackage>
+                        <package>org.example.productcatalog</package>
                     </resourcePackages>
+                    <openapi31>true</openapi31>
+                    <sortOutput>true</sortOutput>
                     <outputFormat>JSONANDYAML</outputFormat>
                     <prettyPrint>true</prettyPrint>
                 </configuration>

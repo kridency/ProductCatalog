@@ -1,8 +1,8 @@
 package org.example.productcatalog.preset;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -39,7 +39,6 @@ public class ProductCatalogInit {
         DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss.SSSSSS");
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new ParameterNamesModule());
-        //objectMapper.registerModule(new BeanValidationModule(Validation.byDefaultProvider().configure().buildValidatorFactory()));
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 }
