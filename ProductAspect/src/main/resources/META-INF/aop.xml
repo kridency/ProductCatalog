@@ -1,4 +1,9 @@
 <aspectj>
+    <aspects>
+        <aspect name="org.example.productcatalog.aop.ExchangeAspect"/>
+        <aspect name="org.example.productcatalog.aop.StopWatchAspect"/>
+    </aspects>
+
     <weaver options="-warn:none -Xlint:ignore -Xlint:cantFindType=ignore -Xset:overWeaving=false">
         <dump within="org.example.productcatalog..*" />
     </weaver>
