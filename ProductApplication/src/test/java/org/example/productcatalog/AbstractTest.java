@@ -38,41 +38,6 @@ public class AbstractTest {
     protected static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(
             DockerImageName.parse("postgres:12.20"));
 
-    /*
-    static {
-        postgreSQLContainer
-                .withDatabaseName(applicationProperties.getProperty("spring.datasource.database"))
-                .withUsername(applicationProperties.getProperty("spring.datasource.username"))
-                .withPassword(applicationProperties.getProperty("spring.datasource.password"))
-                .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("🐳 " + "postgres")))
-                .withCopyFileToContainer(MountableFile.forClasspathResource("init.sql"),
-                        "/docker-entrypoint-initdb.d/init.sql")
-                .withExposedPorts(Integer.parseInt(applicationProperties.getProperty("spring.datasource.port")))
-                .withReuse(true).start();
-
-        try(var connection = DriverManager.getConnection(
-                postgreSQLContainer.getJdbcUrl(),
-                postgreSQLContainer.getUsername(),
-                postgreSQLContainer.getPassword()
-                )) {
-            var database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            database.setDefaultSchemaName(liquibaseProperties.getProperty("defaultSchemaName"));
-            database.setLiquibaseSchemaName(liquibaseProperties.getProperty("liquibaseSchemaName"));
-
-            var liquibase  = new Liquibase(liquibaseProperties.getProperty("changeLogFile"), new ClassLoaderResourceAccessor(), database);
-            liquibase.setChangeLogParameter("schemaName", liquibaseProperties.getProperty("defaultSchemaName"));
-            liquibase.update(new Contexts("test"));
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
-    }
-    */
-
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
     @DynamicPropertySource
     public static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
@@ -108,5 +73,10 @@ public class AbstractTest {
         } catch (Exception e) {
             throw new ApplicationException(e.getMessage());
         }
+    }
+
+    @BeforeEach
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 }

@@ -23,7 +23,7 @@
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
         <spring-boot.version>4.0.0</spring-boot.version>
-        <spring.version>7.0.0</spring.version>
+        <spring.version>7.0.1</spring.version>
         <spring-data.version>4.0.0</spring-data.version>
         <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
         <swagger.version>2.2.41</swagger.version>
@@ -436,7 +436,7 @@
                 <configuration>
                     <contextId>ProductCatalog</contextId>
                     <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.basedir}/src/main/webapp/webjars/swagger-ui</outputPath>
+                    <outputPath>${project.basedir}/src/main/webapp/META-INF/webjars/swagger-ui</outputPath>
                     <scannerClass>io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner</scannerClass>
                     <resourcePackages>
                         <package>org.example.productcatalog</package>

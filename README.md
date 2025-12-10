@@ -26,7 +26,7 @@
 
 Для запуска приложения в папке проекта необходимо выполнить команды 
 ```
-docker build -t product_catalog .
+docker build -t product_catalog --build-arg SPRING_VERSION=7.0.1 .
 docker run --name=product-catalog --network docker_default --rm -p 8080:8080 product_catalog
 ```
 

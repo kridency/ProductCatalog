@@ -1,7 +1,6 @@
 package org.example.productcatalog.aop;
 
 import jakarta.transaction.Transactional;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.example.productcatalog.entity.Invocation;

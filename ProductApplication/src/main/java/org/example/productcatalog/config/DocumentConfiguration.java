@@ -11,6 +11,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -45,7 +46,7 @@ public class DocumentConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
                 .addResourceHandler("/swagger-ui/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.30.3")
                 .resourceChain(false);
     }
 
@@ -53,18 +54,16 @@ public class DocumentConfiguration implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry
                 .addViewController("/swagger-ui/openapi.json")
-                .setViewName("forward:/webjars/swagger-ui/openapi.json");
+                .setViewName("forward: /webjars/swagger-ui/openapi.json");
         registry
                 .addViewController("/swagger-ui/swagger-initializer.js")
-                .setViewName("forward:/webjars/swagger-ui/swagger-initializer.js");
+                .setViewName("forward: /webjars/swagger-ui/swagger-initializer.js");
     }
 
-    /*
     @Override
     public void configureDefaultServletHandling(final DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
     }
-    */
 
     @Bean
     OpenAPI getOpenApi() { return new OpenAPI().components(new Components()); }
