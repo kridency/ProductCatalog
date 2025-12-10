@@ -9,17 +9,22 @@ import org.springframework.beans.factory.annotation.Configurable;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Aspect
 @Configurable
 @Slf4j
 public class StopWatchAspect {
-    @Around("@annotation(stopWatch)")
+    private static final Logger LOGGER = Logger.getLogger(StopWatchAspect.class.getName());
+
+    @Around(value = "execution(@org.example.productcatalog.annotation.StopWatch * *(..)) && @annotation(stopWatch)",
+            argNames = "joinPoint, stopWatch")
     public Object logExecutionDuration(ProceedingJoinPoint joinPoint, StopWatch stopWatch) throws Throwable {
         String methodName = joinPoint.getSignature().toShortString();
 
         if (stopWatch.logArgs()) {
-            log.info("Entering {} with args: {}", methodName, Arrays.toString(joinPoint.getArgs()));
+            LOGGER.log(Level.INFO, "Entering " + methodName + " with args: " + Arrays.toString(joinPoint.getArgs()) + "," );
         }
 
         long startTime = Instant.now().toEpochMilli();
@@ -27,11 +32,11 @@ public class StopWatchAspect {
         try {
             return joinPoint.proceed();
         } catch (Exception e) {
-            log.error("Exception in {}: {}", methodName, e.getMessage());
+            LOGGER.log(Level.SEVERE, "Exception in " + methodName +": " + e.getMessage() +",");
             throw e;
         } finally {
             if (stopWatch.logExecutionTime()) {
-                log.info("{} -> {} ms", joinPoint, (Instant.now().toEpochMilli() - startTime) / 1_000_000);
+                LOGGER.log(Level.INFO, joinPoint + " -> " + (Instant.now().toEpochMilli() - startTime) / 1_000_000 + " ms");
             }
         }
     }

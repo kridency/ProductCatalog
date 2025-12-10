@@ -268,12 +268,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.example.productcatalog</groupId>
-            <artifactId>ProductAspect</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-instrument</artifactId>
             <version>${spring.version}</version>
@@ -283,7 +277,6 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${aspectj.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -303,6 +296,12 @@
             <artifactId>querydsl-core</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.example.productcatalog</groupId>
+            <artifactId>ProductAspect</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -318,6 +317,74 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>${aspect-maven-plugin.version}</version>
+                <configuration>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                        <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                    </weaveDirectories>
+                    <source>${java.source-target.version}</source>
+                    <target>${java.source-target.version}</target>
+                    <Xlint>ignore</Xlint>
+                    <complianceLevel>${java.source-target.version}</complianceLevel>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <excludes>
+                        <exclude>**/*.java</exclude>
+                    </excludes>
+                    <weaveMainSourceFolder>true</weaveMainSourceFolder>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-aspects</artifactId>
+                        </aspectLibrary>
+                        <aspectLibrary>
+                            <groupId>org.example.productcatalog</groupId>
+                            <artifactId>ProductAspect</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test-compile</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.example.productcatalog</groupId>
+                        <artifactId>ProductAspect</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
