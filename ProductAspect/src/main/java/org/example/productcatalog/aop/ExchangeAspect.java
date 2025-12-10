@@ -1,5 +1,6 @@
 package org.example.productcatalog.aop;
 
+import jakarta.transaction.Transactional;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.example.productcatalog.entity.Invocation;
@@ -19,6 +20,7 @@ public class ExchangeAspect {
     @Autowired
     private InvocationRepository invocationRepository;
 
+    @Transactional
     @After(value = "@annotation(mapping)", argNames = "mapping")
     public void httpExchangeCheckToHandle(RequestMapping mapping) {
         var endpoints = mapping.path();

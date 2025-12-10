@@ -10,7 +10,7 @@ import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 @Setter
 @Getter
 @Entity
-@Table(name = "user")
+@Table(name = "user", schema = "custom")
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")

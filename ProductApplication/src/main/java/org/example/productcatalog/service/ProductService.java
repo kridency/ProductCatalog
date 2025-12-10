@@ -55,8 +55,7 @@ public class ProductService implements CrudService<ProductDto, String> {
 
     @Override
     public Collection<ProductDto> findFiltered(ProductDto data) {
-        return new Specification<>(mapper.fromDto(data)).apply(repository.getAll()).stream()
-                .map(mapper::toDto).toList();
+        return new Specification<>(data).apply(findAll()).stream().toList();
     }
 
     @Override

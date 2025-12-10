@@ -80,7 +80,7 @@ public class ProductControllerTest extends AbstractTest {
     @WithUserDetails(value = "name@hostname")
     @DisplayName("List products.")
     void givenProductTemplate_whenTryToList_thenReturnCorrectResult() throws Exception {
-        String productString = "{ \"item\": \"I11\" }";
+        String productString = "{ \"item\": \"I21\" }";
         String result = objectMapper.readValue(mockMvc.perform(MockMvcRequestBuilders
                         .get("/product")
                         .content(productString)
@@ -90,6 +90,6 @@ public class ProductControllerTest extends AbstractTest {
                 .getContentAsByteArray(), MessageDto.class).getMessage();
 
         Assertions.assertTrue(objectMapper.readValue(result, new TypeReference<Collection<ProductDto>>() {})
-                .stream().filter(x -> !x.getItem().equals("I11")).toList().isEmpty());
+                .stream().filter(x -> !x.getItem().equals("I21")).toList().isEmpty());
     }
 }

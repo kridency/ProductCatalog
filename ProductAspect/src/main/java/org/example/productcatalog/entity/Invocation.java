@@ -8,7 +8,7 @@ import java.time.Instant;
 @Setter
 @Getter
 @Entity
-@Table(name = "invocation")
+@Table(name = "invocation", schema = "custom")
 public class Invocation {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")

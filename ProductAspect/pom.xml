@@ -36,5 +36,17 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/model.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>
