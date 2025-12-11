@@ -64,7 +64,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain apiFilterChain(HttpSecurity http, AuthenticationManager manager) {
         http.authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api-docs", "/api-docs/**", "/swagger-ui/**", "/proxy/**",
+                        .requestMatchers("/api-docs", "/api-docs/**", "/openapi/**", "/proxy/**",
                                 "/favicon.ico", "/error").permitAll().anyRequest().authenticated())
                 .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)

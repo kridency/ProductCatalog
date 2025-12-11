@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface StopWatch {
+public @interface EnableXXX {
     boolean logArgs() default true;
     boolean logResult() default true;
     boolean logExecutionTime() default true;

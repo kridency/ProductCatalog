@@ -53,11 +53,11 @@ public class DocumentConfiguration implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry
-                .addViewController("/swagger-ui/openapi.json")
-                .setViewName("forward:/openapi.json");
-        registry
                 .addViewController("/swagger-ui/swagger-initializer.js")
-                .setViewName("forward:/swagger-initializer.js");
+                .setViewName("forward:/openapi/swagger-initializer.js");
+        registry
+                .addViewController("/swagger-ui/openapi.json")
+                .setViewName("forward:/openapi/openapi.json");
     }
 
     @Override

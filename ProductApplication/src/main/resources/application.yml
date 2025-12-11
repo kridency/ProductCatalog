@@ -17,7 +17,7 @@ spring:
         web-application-type: servlet
     web:
         resources:
-            static-locations: classpath:/webapp
+            static-locations: classpath:/webapp/openapi
 
     jpa:
         open-in-view: false

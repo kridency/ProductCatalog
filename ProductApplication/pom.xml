@@ -214,33 +214,9 @@
         </dependency>
 
         <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-core-jakarta</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-models-jakarta</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-jaxrs2-jakarta</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations-jakarta</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>swagger-ui</artifactId>
-            <version>${swagger-ui.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <dependency>
@@ -436,7 +412,7 @@
                 <configuration>
                     <contextId>ProductCatalog</contextId>
                     <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.basedir}/src/main/webapp</outputPath>
+                    <outputPath>${project.basedir}/src/main/webapp/openapi</outputPath>
                     <scannerClass>io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner</scannerClass>
                     <resourcePackages>
                         <package>org.example.productcatalog</package>
