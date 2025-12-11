@@ -3,6 +3,7 @@ package org.example.productcatalog.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.UserDto;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.http.MediaType;
 import org.example.productcatalog.AbstractTest;
@@ -16,13 +17,18 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.Collection;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
+import static org.instancio.Select.field;
 
 public class UserControllerTest extends AbstractTest {
     @Test
     @WithUserDetails(value = "admin@hostname")
     @DisplayName("User account creation.")
     void givenNewUserCredentials_whenTryToCreateUser_thenReturnCorrectResult() throws Exception {
-        String userString = "{ \"email\": \"test@hostname\", \"password\": \"test\" }";
+        UserDto userDto = Instancio.of(UserDto.class)
+                .set(field(UserDto::getEmail), "test@hostname")
+                .set(field(UserDto::getPassword), "test")
+                .create();
+        String userString = objectMapper.writeValueAsString(userDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/identity")
                         .content(userString)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)

@@ -67,6 +67,7 @@
         <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
         <junit.version>6.0.0</junit.version>
         <json-path.version>2.10.0</json-path.version>
+        <intencio.version>5.5.1</intencio.version>
 
         <ucp.version>23.9.0.25.07</ucp.version>
         <c3p0.version>0.11.2</c3p0.version>
@@ -210,6 +211,13 @@
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.el</artifactId>
             <version>5.0.0-M1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
+            <version>${intencio.version}</version>
             <scope>test</scope>
         </dependency>
 

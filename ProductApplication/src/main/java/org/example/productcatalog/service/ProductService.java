@@ -29,6 +29,13 @@ public class ProductService implements CrudService<ProductDto, String> {
         this.productCacheManager = productCacheManager;
     }
 
+    /**
+     * Requests product details database for new record creation.
+     * Main product details database record creation.
+     * @param data   product details data transfer object
+     *
+     * @return  product details data transfer object
+     */
     @Transactional
     @Override
     public ProductDto create(ProductDto data) {
@@ -37,6 +44,13 @@ public class ProductService implements CrudService<ProductDto, String> {
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
+    /**
+     * Requests product details database to update existing record.
+     * Main product details database record update method.
+     * @param data   product details data transfer object
+     *
+     * @return  product details data transfer object
+     */
     @Override
     public ProductDto update(ProductDto data) {
         return Optional.ofNullable(data).map(mapper::fromDto)
@@ -44,6 +58,13 @@ public class ProductService implements CrudService<ProductDto, String> {
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
+    /**
+     * Requests product details database to delete existing record.
+     * Main product details database record delete method.
+     * @param data  product details data transfer object
+     *
+     * @return  product details data transfer object
+     */
     @Transactional
     @Override
     public ProductDto remove(ProductDto data) {
@@ -53,14 +74,34 @@ public class ProductService implements CrudService<ProductDto, String> {
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
+    /**
+     * Requests product details database for the record matching specified template dto.
+     * Main product details database record receiving method.
+     * @param data  sought product details email address
+     *
+     * @return  set of product details data transfer objects those have matched criteria
+     */
     @Override
     public Collection<ProductDto> findFiltered(ProductDto data) {
         return new Specification<>(data).apply(findAll()).stream().toList();
     }
 
+    /**
+     * Requests product details database for all records.
+     * Supplementary product details database record receiving method.
+     *
+     * @return  set of details data transfer objects
+     */
     @Override
     public Collection<ProductDto> findAll() { return repository.getAll().stream().map(mapper::toDto).toList(); }
 
+    /**
+     * Requests product details database for the record matching specified product item number.
+     * Supplementary product details database record receiving method.
+     * @param item  sought product details product item number
+     *
+     * @return  product details data transfer object
+     */
     @Override
     public ProductDto find(String item) {
         return Optional.ofNullable(item).map(x -> productCacheManager.get(x)
@@ -68,6 +109,13 @@ public class ProductService implements CrudService<ProductDto, String> {
                 .map(mapper::toDto).orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
     }
 
+    /**
+     * Requests product details database for the record matching specified record id.
+     * Supplementary product details database record receiving method.
+     * @param id  sought product details id
+     *
+     * @return  product details data transfer object
+     */
     @Override
     public ProductDto findById(long id) {
         return repository.getById(id).map(mapper::toDto).orElseThrow(() -> new ApplicationException(PRODUCT_NOT_FOUND));
