@@ -436,14 +436,14 @@
                 <configuration>
                     <contextId>ProductCatalog</contextId>
                     <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.basedir}/src/main/webapp/META-INF/webjars/swagger-ui</outputPath>
+                    <outputPath>${project.basedir}/src/main/webapp</outputPath>
                     <scannerClass>io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner</scannerClass>
                     <resourcePackages>
                         <package>org.example.productcatalog</package>
                     </resourcePackages>
                     <openapi31>true</openapi31>
                     <sortOutput>true</sortOutput>
-                    <outputFormat>JSONANDYAML</outputFormat>
+                    <outputFormat>JSON</outputFormat>
                     <prettyPrint>true</prettyPrint>
                 </configuration>
                 <executions>

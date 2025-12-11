@@ -13,10 +13,11 @@ spring:
         hikari:
             schema: custom
             driver-class-name: org.postgresql.Driver
-    mvc:
-        static-path-pattern: /swagger-ui*
     main:
         web-application-type: servlet
+    web:
+        resources:
+            static-locations: classpath:/webapp
 
     jpa:
         open-in-view: false
@@ -48,8 +49,3 @@ spring:
 logging:
     level:
         org.springframework.security: INFO
-
-springdoc:
-    swagger-ui:
-        enable: true
-        path: /swagger-ui/index.html
