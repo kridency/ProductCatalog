@@ -1,18 +1,13 @@
 package org.example.productcatalog;
 
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import org.example.productcatalog.config.ApplicationConfiguration;
 import org.example.productcatalog.config.DocumentConfiguration;
 import org.example.productcatalog.config.SecurityConfiguration;
-import org.example.productcatalog.exception.ApplicationException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -52,27 +47,9 @@ public class AbstractTest {
     @BeforeAll
     public static void start() {
         postgreSQLContainer
-                .withUsername("intern")
-                .withPassword("1gjAVnJ")
                 .withCopyFileToContainer(MountableFile.forClasspathResource("init.sql"),
                         "/docker-entrypoint-initdb.d/init.sql")
                 .withReuse(true).start();
-
-        try(var connection = DriverManager.getConnection(
-                postgreSQLContainer.getJdbcUrl(),
-                postgreSQLContainer.getUsername(),
-                postgreSQLContainer.getPassword()
-        )) {
-            var database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-            database.setDefaultSchemaName("custom");
-            database.setLiquibaseSchemaName("auxiliary");
-
-            var liquibase  = new Liquibase("db/changelog/dbChangeLog.xml", new ClassLoaderResourceAccessor(), database);
-            liquibase.setChangeLogParameter("schemaName", "custom");
-            liquibase.update(new Contexts("test"));
-        } catch (Exception e) {
-            throw new ApplicationException(e.getMessage());
-        }
     }
 
     @BeforeEach

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "invocation", schema = "custom")
+@Table(name = "invocation")
 public class Invocation {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
