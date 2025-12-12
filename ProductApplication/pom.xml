@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>ProductApplication</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>product-application</name>
@@ -368,32 +367,6 @@
                         <version>${project.version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>${liquibase-maven-plugin.version}</version>
-                <configuration>
-                    <propertyFileWillOverride>true</propertyFileWillOverride>
-                    <searchPath>${project.basedir}/src/main/resources</searchPath>
-                    <driver>org.postgresql.Driver</driver>
-                    <url>${spring.datasource.url}</url>
-                    <username>intern</username>
-                    <password>1gjAVnJ</password>
-                    <defaultSchemaName>custom</defaultSchemaName>
-                    <changeLogFile>db/migration/changelog/dbChangeLog.xml</changeLogFile>
-                    <contexts>dev,test</contexts>
-                    <dropFirst>true</dropFirst>
-                    <propertyFile>liquibase.yml</propertyFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>update</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
