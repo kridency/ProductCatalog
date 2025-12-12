@@ -67,7 +67,7 @@ public class AbstractTest {
             database.setDefaultSchemaName("custom");
             database.setLiquibaseSchemaName("auxiliary");
 
-            var liquibase  = new Liquibase("db/migration/changelog/dbChangeLog.xml", new ClassLoaderResourceAccessor(), database);
+            var liquibase  = new Liquibase("db/changelog/dbChangeLog.xml", new ClassLoaderResourceAccessor(), database);
             liquibase.setChangeLogParameter("schemaName", "custom");
             liquibase.update(new Contexts("test"));
         } catch (Exception e) {

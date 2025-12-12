@@ -19,7 +19,7 @@
     <changeSet id="create_role_type" author="kridency" runOrder="first">
         <sqlFile
                 dbms="postgresql"
-                path="../../../createRoleType.sql"
+                path="../../createRoleType.sql"
                 relativeToChangelogFile="true"
                 endDelimiter=";"
                 splitStatements="true"
@@ -70,14 +70,10 @@
 
     <changeSet id="create_product_constraint" author="kridency">
 	    <preConditions onFail="MARK_RAN">
-        <not>
-            <uniqueConstraintExists constraintName="uq_product_item" tableName="product"/>
-        </not>
-    </preConditions>
-        <addUniqueConstraint
-                columnNames="item"
-                constraintName="product_unique_constraint"
-                tableName="product"/>
+		    <not>
+			    <uniqueConstraintExists constraintName="uq_product_item" tableName="product"/>
+		    </not>
+	    </preConditions>
     </changeSet>
 
     <changeSet id="create_product_index" author="kridency">
@@ -111,7 +107,7 @@
     <changeSet id="create_invocation_constraint" author="kridency">
         <addUniqueConstraint
                 columnNames="date, email"
-                constraintName="invocation_unique_constraint"
+                constraintName="invocation_key_unique_constraint"
                 tableName="invocation"/>
     </changeSet>
 

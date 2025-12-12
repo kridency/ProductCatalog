@@ -37,26 +37,30 @@ import java.util.Map;
 @ConfigurationPropertiesScan
 @PropertySources(
         value = {
-                @PropertySource(value = "classpath:application.yml", factory = YamlPropertySourceFactory.class),
-                @PropertySource(value = "classpath:liquibase.yml", factory = YamlPropertySourceFactory.class)
+                @PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
         }
 )
 public class ApplicationConfiguration {
     @Value("${spring.datasource.url}")
     private String dataUrl;
 
-    private final String url = System.getenv("POSTGRES_DATASOURCE_URL");
+    @Value("${spring.datasource.hikari.schema}")
+    private String dataSchema;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
     @Bean
     public DataSource dataSource() {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
-        dataSource.setURL(url == null ? dataUrl : url);
-        dataSource.setPortNumbers(new int[]{Integer.parseInt("5432")});
-        dataSource.setDatabaseName("product_db");
+        dataSource.setURL(dataUrl);
         dataSource.setStringType("unspecified");
-        dataSource.setUser("intern");
-        dataSource.setPassword("1gjAVnJ");
-        dataSource.setCurrentSchema("custom");
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+        dataSource.setCurrentSchema(dataSchema);
         return dataSource;
     }
 
@@ -89,10 +93,10 @@ public class ApplicationConfiguration {
     public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:" + "db/migration/changelog/dbChangeLog.xml");
-        liquibase.setDefaultSchema("custom");
+        liquibase.setChangeLog("classpath:" + "db/changelog/dbChangeLog.xml");
+        liquibase.setDefaultSchema(dataSchema);
         liquibase.setLiquibaseSchema("auxiliary");
-        liquibase.setChangeLogParameters(Map.of("schemaName", "custom"));
+        liquibase.setChangeLogParameters(Map.of("schemaName", dataSchema));
         liquibase.setDropFirst(true);
         return liquibase;
     }

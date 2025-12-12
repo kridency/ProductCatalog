@@ -2,10 +2,22 @@ server:
     port: 8080
     servlet:
         context-path: /api/v1
+        register-default-servlet: true
 
 spring:
     application:
         name: product-catalog
+
+    main:
+        web-application-type: servlet
+
+    config:
+        location: application.yml
+
+    web:
+        resources:
+            static-locations: classpath:/webapp/openapi
+
     datasource:
         url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true;DB_CLOSE_DELAY=-1}
         username: intern
@@ -13,11 +25,7 @@ spring:
         hikari:
             schema: custom
             driver-class-name: org.postgresql.Driver
-    main:
-        web-application-type: servlet
-    web:
-        resources:
-            static-locations: classpath:/webapp/openapi
+        name: product_db
 
     jpa:
         open-in-view: false

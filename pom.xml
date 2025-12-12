@@ -54,7 +54,7 @@
         <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
         <postgresql.version>42.7.8</postgresql.version>
         <narayana-jta.version>7.3.3.Final</narayana-jta.version>
-        <liquibase.version>4.31.1</liquibase.version>
+        <liquibase.version>5.0.1</liquibase.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-compress.version>1.28.0</commons-compress.version>
         <slf4j.version>2.0.17</slf4j.version>
@@ -64,7 +64,6 @@
 
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito.version>5.16.0</mockito.version>
-        <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
         <junit.version>6.0.0</junit.version>
         <json-path.version>2.10.0</json-path.version>
 

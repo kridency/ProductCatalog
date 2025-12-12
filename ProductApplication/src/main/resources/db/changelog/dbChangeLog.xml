@@ -9,7 +9,7 @@
 	<changeSet id="custom_schema" author="kridency" runOrder="first">
 		<sqlFile
 				dbms="postgresql"
-				path="../../createCustomSchema.sql"
+				path="../createCustomSchema.sql"
 				relativeToChangelogFile="true"
 				endDelimiter=";"
 				splitStatements="true"
