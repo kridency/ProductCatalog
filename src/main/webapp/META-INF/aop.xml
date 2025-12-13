@@ -1,1 +1,0 @@
-<aspectj> <weaver options=""> <dump within="org.example.productcatalog..*" /> </weaver> </aspectj>

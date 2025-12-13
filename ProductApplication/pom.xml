@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.example.productcatalog</groupId>
+        <artifactId>ProductCatalog</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ProductApplication</artifactId>
+    <packaging>war</packaging>
+
+    <name>product-application</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+        <java.source-target.version>21</java.source-target.version>
+        <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+
+        <spring-boot.version>4.0.0</spring-boot.version>
+        <spring.version>7.0.1</spring.version>
+        <spring-data.version>4.0.0</spring-data.version>
+        <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
+        <swagger.version>2.2.41</swagger.version>
+        <swagger-ui.version>5.30.3</swagger-ui.version>
+        <webjars-locator-lite.version>1.1.2</webjars-locator-lite.version>
+        <classgraph.version>4.8.184</classgraph.version>
+        <lombok.version>1.18.32</lombok.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
+        <jakarta-validation.version>3.1.0</jakarta-validation.version>
+        <jakarta-annotation.version>3.0.0</jakarta-annotation.version>
+        <jakarta-inject.version>2.0.1</jakarta-inject.version>
+        <jakarta-persistence.version>3.2.0</jakarta-persistence.version>
+        <atomikos.version>6.0.0</atomikos.version>
+        <jakarta-ws.version>4.0.0</jakarta-ws.version>
+        <hibernate-core.version>7.0.10.Final</hibernate-core.version>
+        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
+        <jackson.version>3.0.3</jackson.version>
+        <jackson-datatype.version>3.0.0-rc2</jackson-datatype.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <aspectj.version>1.9.23</aspectj.version>
+        <assertj-core.version>3.27.3</assertj-core.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
+        <swagger-maven-plugin.version>2.2.41</swagger-maven-plugin.version>
+        <aspect-maven-plugin.version>1.15.0</aspect-maven-plugin.version>
+        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+        <postgresql.version>42.7.8</postgresql.version>
+        <narayana-jta.version>7.3.3.Final</narayana-jta.version>
+        <liquibase.version>4.31.1</liquibase.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <jspecify.version>1.0.0</jspecify.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
+        <byte-buddy.version>1.18.2</byte-buddy.version>
+
+        <testcontainers.version>1.21.3</testcontainers.version>
+        <mockito.version>5.16.0</mockito.version>
+        <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
+        <junit.version>6.0.0</junit.version>
+        <json-path.version>2.10.0</json-path.version>
+        <intencio.version>5.5.1</intencio.version>
+
+        <ucp.version>23.9.0.25.07</ucp.version>
+        <c3p0.version>0.11.2</c3p0.version>
+        <querydsl.version>5.1.0</querydsl.version>
+
+        <spring.datasource.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</spring.datasource.url>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>tomcat</id>
+            <activation>
+                <property>
+                    <name>env.POSTGRES_DATASOURCE_URL</name>
+                </property>
+            </activation>
+            <properties>
+                <spring.datasource.url>${env.POSTGRES_DATASOURCE_URL}</spring.datasource.url>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta-servlet.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>${jakarta-inject.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta-persistence.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>${jakarta-ws.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>${json-path.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>5.0.0-M1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
+            <version>${intencio.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>webjars-locator-lite</artifactId>
+            <version>${webjars-locator-lite.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>${jspecify.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byte-buddy.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-instrument</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ucp</artifactId>
+            <version>${ucp.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>${c3p0.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-core</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.example.productcatalog</groupId>
+            <artifactId>ProductAspect</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>${aspect-maven-plugin.version}</version>
+                <configuration>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                        <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                    </weaveDirectories>
+                    <source>${java.source-target.version}</source>
+                    <target>${java.source-target.version}</target>
+                    <Xlint>ignore</Xlint>
+                    <complianceLevel>${java.source-target.version}</complianceLevel>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <excludes>
+                        <exclude>**/*.java</exclude>
+                    </excludes>
+                    <weaveMainSourceFolder>true</weaveMainSourceFolder>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-aspects</artifactId>
+                        </aspectLibrary>
+                        <aspectLibrary>
+                            <groupId>org.example.productcatalog</groupId>
+                            <artifactId>ProductAspect</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-test-compile</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.example.productcatalog</groupId>
+                        <artifactId>ProductAspect</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <testSourceDirectory>src/test/java</testSourceDirectory>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <argLine>
+                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                        -javaagent:${settings.localRepository}/org/springframework/spring-instrument/${spring.version}/spring-instrument-${spring.version}.jar
+                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
+                        -Xshare:off
+                    </argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-maven-plugin-jakarta</artifactId>
+                <version>${swagger-maven-plugin.version}</version>
+                <configuration>
+                    <contextId>ProductCatalog</contextId>
+                    <outputFileName>openapi</outputFileName>
+                    <outputPath>${project.basedir}/src/main/webapp/openapi</outputPath>
+                    <scannerClass>io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner</scannerClass>
+                    <resourcePackages>
+                        <package>org.example.productcatalog</package>
+                    </resourcePackages>
+                    <openapi31>true</openapi31>
+                    <sortOutput>true</sortOutput>
+                    <outputFormat>JSON</outputFormat>
+                    <prettyPrint>true</prettyPrint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>resolve</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin.version}</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/model.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

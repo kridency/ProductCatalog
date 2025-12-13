@@ -1,0 +1,59 @@
+server:
+    port: 8080
+    servlet:
+        context-path: /api/v1
+        register-default-servlet: true
+
+spring:
+    application:
+        name: product-catalog
+
+    main:
+        web-application-type: servlet
+
+    config:
+        location: application.yml
+
+    web:
+        resources:
+            static-locations: classpath:/webapp/openapi
+
+    datasource:
+        url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true;DB_CLOSE_DELAY=-1}
+        username: intern
+        password: 1gjAVnJ
+        hikari:
+            schema: custom
+            driver-class-name: org.postgresql.Driver
+        name: product_db
+
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: update
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        generate-ddl: true
+        show-sql: true
+        properties:
+            hibernate:
+                globally_quoted_identifiers: true
+                connection:
+                    url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true;DB_CLOSE_DELAY=-1}
+                    username: intern
+                    password: 1gjAVnJ
+                    driver_class: org.postgresql.Driver
+                jakarta:
+                    persistence:
+                        schema-generation:
+                            create-database-schemas: true
+                format_sql: true
+                default_schema: custom
+                transaction:
+                    jta:
+                        platform: org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+    level:
+        org.springframework.security: INFO
