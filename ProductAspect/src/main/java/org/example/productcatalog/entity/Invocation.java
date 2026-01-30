@@ -1,9 +1,11 @@
 package org.example.productcatalog.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 import java.time.Instant;
 
+@Setter
 @Entity
 @Table(name = "invocation")
 public class Invocation {
@@ -14,12 +16,4 @@ public class Invocation {
     private Instant date = Instant.now();
     private String endpoint;
     private String email;
-
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

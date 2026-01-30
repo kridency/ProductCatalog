@@ -151,8 +151,9 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
+                <optional>true</optional>
                 <version>${lombok.version}</version>
-                <scope>compile</scope>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -409,6 +410,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
+                    <source>${java.source-target.version}</source>
                     <release>${java.source-target.version}</release>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                     <encoding>${project.build.sourceEncoding}</encoding>
@@ -430,11 +432,11 @@
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
                         </path>
-                        <annotationProcessorPath>
+                        <path>
                             <groupId>org.hibernate</groupId>
                             <artifactId>hibernate-jpamodelgen</artifactId>
                             <version>${hibernate-core.version}</version>
-                        </annotationProcessorPath>
+                        </path>
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
