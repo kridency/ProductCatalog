@@ -3,11 +3,11 @@ package org.example.productcatalog;
 import org.example.productcatalog.config.ApplicationConfiguration;
 import org.example.productcatalog.config.DocumentConfiguration;
 import org.example.productcatalog.config.SecurityConfiguration;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -20,11 +20,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
-import java.sql.DriverManager;
-
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ApplicationConfiguration.class, DocumentConfiguration.class, SecurityConfiguration.class})
+@ContextConfiguration(classes = {ApplicationConfiguration.class,
+        DocumentConfiguration.class,
+        SecurityConfiguration.class})
 public class AbstractTest {
     @Autowired
     protected WebApplicationContext webApplicationContext;
@@ -38,10 +38,6 @@ public class AbstractTest {
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.hikari.schema",() -> "custom");
-        registry.add("spring.jpa.properties.hibernate.jakarta.persistence.create-database-schemas",() -> "true");
-        registry.add("spring.jpa.properties.hibernate.globally_quoted_identifiers",() -> "true");
-        registry.add("spring.jpa.properties.hibernate.default_schema",() -> "custom");
     }
 
     @BeforeAll

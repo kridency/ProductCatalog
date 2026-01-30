@@ -33,7 +33,7 @@ import java.util.Map;
         basePackages = "org.example.productcatalog.repository",
         entityManagerFactoryRef = "entityManager")
 @EnableAutoConfiguration
-@EnableTransactionManagement
+@EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
 @ConfigurationPropertiesScan
 @PropertySources(
         value = {

@@ -19,5 +19,4 @@ public class MessageDto {
     @JsonProperty("description")
     @Schema(description = "Response content description.")
     private String description;
-
 }

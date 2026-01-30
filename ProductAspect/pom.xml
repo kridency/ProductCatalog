@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>ProductAspect</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>product-aspect</name>
@@ -19,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.source-target.version>21</java.source-target.version>
     </properties>
 
     <dependencies>
@@ -70,11 +69,11 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>${aspect-maven-plugin.version}</version>
                 <configuration>
+                    <source>${java.source-target.version}</source>
                     <complianceLevel>${java.source-target.version}</complianceLevel>
-                    <includes>
-                        <include>**/*.java</include>
-                        <include>**/*.aj</include>
-                    </includes>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <verbose>true</verbose>
+                    <sources/>
                 </configuration>
                 <executions>
                     <execution>
@@ -82,12 +81,22 @@
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.outputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>test-compile_with_aspectj</id>
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
+                        <configuration>
+                            <weaveDirectories>
+                                <weaveDirectory>${project.build.testOutputDirectory}</weaveDirectory>
+                            </weaveDirectories>
+                        </configuration>
                     </execution>
                 </executions>
                 <dependencies>
