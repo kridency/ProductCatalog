@@ -2,6 +2,7 @@ package org.example.productcatalog.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.example.productcatalog.util.converter.PasswordConverter;
 import org.hibernate.annotations.JdbcType;
@@ -19,7 +20,8 @@ public class User {
     private String email;
     @Convert(converter = PasswordConverter.class)
     private String password;
-    @Column(name = "role", columnDefinition = "role_type", nullable = false)
+    @NonNull
+    @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private RoleType role;
 }

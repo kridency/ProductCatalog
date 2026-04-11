@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y netcat-traditional
 
 RUN rm -rf $CATALINA_HOME/webapps/*
 
-# Копирование WAP-файла приложения в контейнер
+# Копирование WAR-файла приложения в контейнер
 COPY ./ProductApplication/target/ProductApplication-1.0.0-SNAPSHOT.war $CATALINA_HOME/webapps/'api#v1.war'
 
 COPY ./ProductApplication/target/ProductApplication-1.0.0-SNAPSHOT/WEB-INF/lib/spring-instrument-${SPRING_VERSION}.jar $CATALINA_HOME/javaagent/

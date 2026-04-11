@@ -1,3 +1,7 @@
+app:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true
+
 server:
     port: 8080
     servlet:
@@ -19,7 +23,7 @@ spring:
             static-locations: classpath:/webapp/openapi
 
     datasource:
-        url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true;DB_CLOSE_DELAY=-1}
+        url: ${POSTGRES_DATASOURCE_URL:${app.datasource.url};DB_CLOSE_DELAY=-1}
         username: intern
         password: 1gjAVnJ
         hikari:
@@ -39,7 +43,7 @@ spring:
             hibernate:
                 globally_quoted_identifiers: true
                 connection:
-                    url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true;DB_CLOSE_DELAY=-1}
+                    url: ${POSTGRES_DATASOURCE_URL:${app.datasource.url};DB_CLOSE_DELAY=-1}
                     username: intern
                     password: 1gjAVnJ
                     driver_class: org.postgresql.Driver

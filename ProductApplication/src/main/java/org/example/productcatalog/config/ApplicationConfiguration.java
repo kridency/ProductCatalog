@@ -23,6 +23,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.sql.DataSource;
 import java.util.Map;
+import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = {"org.example.productcatalog"})
@@ -69,11 +70,16 @@ public class ApplicationConfiguration {
         final LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setPackagesToScan("org.example.productcatalog");
         entityManager.setDataSource(dataSource());
+        entityManager.setJpaProperties(new Properties() {
+            {
+                put ("hibernate.hbm2ddl.auto", "update");
+                put ("globally_quoted_identifiers", "true");
+            }
+        });
 
         final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter() {
             {
                 setDatabase(Database.POSTGRESQL);
-                setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
                 setShowSql(true);
                 setGenerateDdl(true);
             }

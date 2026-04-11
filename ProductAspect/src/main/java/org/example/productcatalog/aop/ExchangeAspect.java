@@ -26,11 +26,7 @@ public class ExchangeAspect {
         var endpoints = mapping.path();
         Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
-                .map(Object::toString).ifPresent(sessionId -> {
-                    Invocation event = new Invocation();
-                    event.setEndpoint(endpoints[0]);
-                    event.setEmail(sessionId);
-                    invocationRepository.save(event);
-                });
+                .map(Object::toString).ifPresent(sessionId ->
+                    invocationRepository.save(new Invocation(endpoints[0], sessionId)));
     }
 }

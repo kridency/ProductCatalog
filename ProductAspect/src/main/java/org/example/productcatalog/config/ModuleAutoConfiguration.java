@@ -7,6 +7,7 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 
@@ -15,6 +16,7 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 @EnableConfigurationProperties(ModuleProperties.class)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.AUTODETECT)
+@EnableJpaAuditing
 @EntityScan("org.example.productcatalog.entity")
 public class ModuleAutoConfiguration implements LoadTimeWeavingConfigurer {
     @Override

@@ -35,7 +35,7 @@
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="password" type="varchar"/>
-            <column name="role" type="role_type"/>
+            <column name="role" type="RoleType"/>
         </createTable>
     </changeSet>
 

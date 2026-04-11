@@ -48,7 +48,7 @@ public class DocumentConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
                 .addResourceHandler("/swagger-ui/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.30.3")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.30.3/")
                 .resourceChain(false);
     }
 
