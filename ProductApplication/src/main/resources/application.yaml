@@ -20,7 +20,7 @@ spring:
 
     web:
         resources:
-            static-locations: classpath:/webapp/openapi
+            static-locations: classpath:/openapi
 
     datasource:
         url: ${POSTGRES_DATASOURCE_URL:${app.datasource.url};DB_CLOSE_DELAY=-1}

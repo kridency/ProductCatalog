@@ -13,12 +13,6 @@ import java.util.Optional;
         injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 @Named("UserMapper")
 public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
-    @Named("getUserMapper")
-    static UserMapper getInstance() {
-        return INSTANCE;
-    }
 
     @Named("getRole")
     default RoleType getRole(RoleType role) {

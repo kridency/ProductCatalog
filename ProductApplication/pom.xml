@@ -395,7 +395,7 @@
                 <configuration>
                     <contextId>ProductCatalog</contextId>
                     <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.basedir}/src/main/webapp/openapi</outputPath>
+                    <outputPath>${project.basedir}/src/main/resources/openapi</outputPath>
                     <scannerClass>io.swagger.v3.jaxrs2.integration.JaxrsApplicationAndAnnotationScanner</scannerClass>
                     <resourcePackages>
                         <package>org.example.productcatalog</package>

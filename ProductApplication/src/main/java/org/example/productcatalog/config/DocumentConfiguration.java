@@ -48,7 +48,7 @@ public class DocumentConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
                 .addResourceHandler("/swagger-ui/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.30.3/")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/5.30.1/")
                 .resourceChain(false);
     }
 
@@ -56,10 +56,10 @@ public class DocumentConfiguration implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry
                 .addViewController("/swagger-ui/swagger-initializer.js")
-                .setViewName("forward:/openapi/swagger-initializer.js");
+                .setViewName("forward:/swagger-initializer.js");
         registry
                 .addViewController("/swagger-ui/openapi.json")
-                .setViewName("forward:/openapi/openapi.json");
+                .setViewName("forward:/openapi.json");
     }
 
     @Bean
