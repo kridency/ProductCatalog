@@ -46,7 +46,7 @@ public class AbstractTest {
                 .withCopyFileToContainer(MountableFile.forClasspathResource("init.sql"),
                         "/docker-entrypoint-initdb.d/init.sql")
                 .withUrlParam("stringtype", "unspecified")
-                .withReuse(true).start();
+                .start();
     }
 
     @BeforeEach

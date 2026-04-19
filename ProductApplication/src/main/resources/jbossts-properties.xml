@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<run-time-properties>
+    <entry key="ObjectStoreEnvironmentBean.objectStoreDir">target/ObjectStore</entry>
+</run-time-properties>

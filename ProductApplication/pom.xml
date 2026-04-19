@@ -14,67 +14,6 @@
 
     <name>product-application</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
-        <java.source-target.version>21</java.source-target.version>
-        <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
-        <maven.compiler.parameters>true</maven.compiler.parameters>
-
-        <spring-boot.version>4.0.0</spring-boot.version>
-        <spring.version>7.0.1</spring.version>
-        <spring-data.version>4.0.0</spring-data.version>
-        <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
-        <swagger.version>2.2.41</swagger.version>
-        <swagger-ui.version>5.30.3</swagger-ui.version>
-        <webjars-locator-lite.version>1.1.2</webjars-locator-lite.version>
-        <classgraph.version>4.8.184</classgraph.version>
-        <lombok.version>1.18.32</lombok.version>
-        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
-        <jakarta-validation.version>3.1.0</jakarta-validation.version>
-        <jakarta-annotation.version>3.0.0</jakarta-annotation.version>
-        <jakarta-inject.version>2.0.1</jakarta-inject.version>
-        <jakarta-persistence.version>3.2.0</jakarta-persistence.version>
-        <atomikos.version>6.0.0</atomikos.version>
-        <jakarta-ws.version>4.0.0</jakarta-ws.version>
-        <hibernate-core.version>7.0.10.Final</hibernate-core.version>
-        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
-        <jackson.version>3.0.3</jackson.version>
-        <jackson-datatype.version>3.0.0-rc2</jackson-datatype.version>
-        <mapstruct.version>1.6.3</mapstruct.version>
-        <aspectj.version>1.9.23</aspectj.version>
-        <assertj-core.version>3.27.3</assertj-core.version>
-        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
-        <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
-        <swagger-maven-plugin.version>2.2.41</swagger-maven-plugin.version>
-        <aspect-maven-plugin.version>1.15.0</aspect-maven-plugin.version>
-        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
-        <postgresql.version>42.7.8</postgresql.version>
-        <narayana-jta.version>7.3.3.Final</narayana-jta.version>
-        <liquibase.version>4.31.1</liquibase.version>
-        <commons-lang3.version>3.19.0</commons-lang3.version>
-        <commons-compress.version>1.28.0</commons-compress.version>
-        <slf4j.version>2.0.17</slf4j.version>
-        <jspecify.version>1.0.0</jspecify.version>
-        <snakeyaml.version>2.5</snakeyaml.version>
-        <byte-buddy.version>1.18.2</byte-buddy.version>
-
-        <testcontainers.version>1.21.3</testcontainers.version>
-        <mockito.version>5.16.0</mockito.version>
-        <liquibase-maven-plugin.version>4.31.1</liquibase-maven-plugin.version>
-        <junit.version>6.0.0</junit.version>
-        <json-path.version>2.10.0</json-path.version>
-        <intencio.version>5.5.1</intencio.version>
-
-        <ucp.version>23.9.0.25.07</ucp.version>
-        <c3p0.version>0.11.2</c3p0.version>
-        <querydsl.version>5.1.0</querydsl.version>
-
-        <spring.datasource.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</spring.datasource.url>
-    </properties>
-
     <profiles>
         <profile>
             <id>tomcat</id>
@@ -283,7 +222,6 @@
         <dependency>
             <groupId>org.example.productcatalog</groupId>
             <artifactId>ProductAspect</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -300,6 +238,21 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.example.productcatalog.ProductApplication</mainClass>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>

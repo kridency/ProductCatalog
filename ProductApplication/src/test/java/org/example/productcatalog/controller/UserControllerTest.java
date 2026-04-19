@@ -24,7 +24,7 @@ public class UserControllerTest extends AbstractTest {
     @WithUserDetails(value = "admin@hostname")
     @DisplayName("User account creation.")
     void givenNewUserCredentials_whenTryToCreateUser_thenReturnCorrectResult() throws Exception {
-        UserDto userDto = Instancio.of(UserDto.class)
+        var userDto = Instancio.of(UserDto.class)
                 .set(field(UserDto::getEmail), "test@hostname")
                 .set(field(UserDto::getPassword), "test")
                 .create();

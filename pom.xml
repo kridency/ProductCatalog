@@ -19,11 +19,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <java.source-target.version>21</java.source-target.version>
-        <start-class>org.example.productcatalog.ProductCatalogApplication</start-class>
+        <start-class>org.example.productcatalog.ProductApplication</start-class>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
-        <spring-boot.version>4.0.0</spring-boot.version>
-        <spring.version>7.0.1</spring.version>
+        <spring-boot.version>4.0.3</spring-boot.version>
+        <spring.version>7.0.3</spring.version>
         <spring-data.version>4.0.0</spring-data.version>
         <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
         <swagger.version>2.2.41</swagger.version>
@@ -41,7 +41,7 @@
         <jakarta-ws.version>4.0.0</jakarta-ws.version>
         <hibernate-core.version>7.0.10.Final</hibernate-core.version>
         <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
-        <jackson.version>3.0.3</jackson.version>
+        <jackson.version>3.0.4</jackson.version>
         <jackson-datatype.version>3.0.0-rc2</jackson-datatype.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
@@ -51,7 +51,6 @@
         <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
         <swagger-maven-plugin.version>2.2.41</swagger-maven-plugin.version>
         <aspect-maven-plugin.version>1.15.0</aspect-maven-plugin.version>
-        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
         <postgresql.version>42.7.8</postgresql.version>
         <narayana-jta.version>7.3.3.Final</narayana-jta.version>
         <liquibase.version>5.0.1</liquibase.version>
@@ -64,8 +63,13 @@
 
         <testcontainers.version>1.21.3</testcontainers.version>
         <mockito.version>5.16.0</mockito.version>
-        <junit.version>6.0.0</junit.version>
+        <junit.version>6.0.3</junit.version>
         <json-path.version>2.10.0</json-path.version>
+        <intencio.version>5.5.1</intencio.version>
+
+        <ucp.version>23.9.0.25.07</ucp.version>
+        <c3p0.version>0.11.2</c3p0.version>
+        <querydsl.version>5.1.0</querydsl.version>
 
         <spring.datasource.url>jdbc:postgresql://localhost:5432/product_db?useUnicode=true</spring.datasource.url>
     </properties>
@@ -108,6 +112,12 @@
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-persistence</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
@@ -128,24 +138,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
                 <version>${spring-boot.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate.orm</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>${hibernate-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate.validator</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate-validator.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate.validator</groupId>
-                <artifactId>hibernate-validator-annotation-processor</artifactId>
-                <version>${hibernate-validator.version}</version>
             </dependency>
 
             <dependency>
@@ -252,19 +244,31 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.example.productcatalog</groupId>
+                <artifactId>ProductAspect</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-persistence</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
 
@@ -322,24 +326,6 @@
             <artifactId>narayana-jta</artifactId>
             <version>${narayana-jta.version}</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate-core.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>${hibernate-validator.version}</version>
         </dependency>
 
         <dependency>
@@ -405,6 +391,11 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
