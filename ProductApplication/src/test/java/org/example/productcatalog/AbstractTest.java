@@ -1,6 +1,7 @@
 package org.example.productcatalog;
 
 import org.example.productcatalog.config.ApplicationConfiguration;
+import org.example.productcatalog.config.AspectModuleConfiguration;
 import org.example.productcatalog.config.DocumentConfiguration;
 import org.example.productcatalog.config.SecurityConfiguration;
 
@@ -24,7 +25,8 @@ import org.testcontainers.utility.MountableFile;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ApplicationConfiguration.class,
         DocumentConfiguration.class,
-        SecurityConfiguration.class})
+        SecurityConfiguration.class,
+        AspectModuleConfiguration.class})
 public class AbstractTest {
     @Autowired
     protected WebApplicationContext webApplicationContext;

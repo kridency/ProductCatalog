@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Optional;
 
 @Aspect
-@Configurable(autowire= Autowire.BY_TYPE, dependencyCheck = true)
+@Configurable(autowire = Autowire.BY_TYPE, dependencyCheck = true)
 public class ExchangeAspect {
     @Autowired
     private InvocationRepository invocationRepository;

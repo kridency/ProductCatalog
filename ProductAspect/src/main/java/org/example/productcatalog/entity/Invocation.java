@@ -12,6 +12,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "invocation")
 @EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
 @RequiredArgsConstructor
 public class Invocation {
     @Id

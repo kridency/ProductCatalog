@@ -17,8 +17,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
-        <java.source-target.version>21</java.source-target.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <java.source-target.version>17</java.source-target.version>
         <start-class>org.example.productcatalog.ProductApplication</start-class>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
@@ -30,30 +30,34 @@
         <swagger-ui.version>5.30.3</swagger-ui.version>
         <webjars-locator-lite.version>1.1.2</webjars-locator-lite.version>
         <classgraph.version>4.8.184</classgraph.version>
-        <lombok.version>1.18.32</lombok.version>
+        <lombok.version>1.18.44</lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
         <jakarta-validation.version>3.1.0</jakarta-validation.version>
         <jakarta-annotation.version>3.0.0</jakarta-annotation.version>
         <jakarta-inject.version>2.0.1</jakarta-inject.version>
         <jakarta-persistence.version>3.2.0</jakarta-persistence.version>
-        <atomikos.version>6.0.0</atomikos.version>
         <jakarta-ws.version>4.0.0</jakarta-ws.version>
-        <hibernate-core.version>7.0.10.Final</hibernate-core.version>
-        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
+        <expressly.version>5.0.0</expressly.version>
+
         <jackson.version>3.0.4</jackson.version>
         <jackson-datatype.version>3.0.0-rc2</jackson-datatype.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <aspectj.version>1.9.23</aspectj.version>
-        <assertj-core.version>3.27.3</assertj-core.version>
+
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
         <swagger-maven-plugin.version>2.2.41</swagger-maven-plugin.version>
-        <aspect-maven-plugin.version>1.15.0</aspect-maven-plugin.version>
+        <aspectj-maven-plugin.version>1.15.0</aspectj-maven-plugin.version>
+
         <postgresql.version>42.7.8</postgresql.version>
         <narayana-jta.version>7.3.3.Final</narayana-jta.version>
         <liquibase.version>5.0.1</liquibase.version>
+        <hibernate-core.version>7.0.10.Final</hibernate-core.version>
+        <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
+
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-compress.version>1.28.0</commons-compress.version>
         <slf4j.version>2.0.17</slf4j.version>
@@ -62,7 +66,6 @@
         <byte-buddy.version>1.18.2</byte-buddy.version>
 
         <testcontainers.version>1.21.3</testcontainers.version>
-        <mockito.version>5.16.0</mockito.version>
         <junit.version>6.0.3</junit.version>
         <json-path.version>2.10.0</json-path.version>
         <intencio.version>5.5.1</intencio.version>
@@ -300,7 +303,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>

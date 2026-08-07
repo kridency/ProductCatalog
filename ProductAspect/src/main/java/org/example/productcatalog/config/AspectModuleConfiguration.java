@@ -18,15 +18,15 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 @EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.AUTODETECT)
 @EnableJpaAuditing
 @EntityScan("org.example.productcatalog.entity")
-public class ModuleAutoConfiguration implements LoadTimeWeavingConfigurer {
-    @Override
-    @Nonnull
-    public LoadTimeWeaver getLoadTimeWeaver() {
-        return new InstrumentationLoadTimeWeaver();
+public class AspectModuleConfiguration implements LoadTimeWeavingConfigurer {
+    private final InstrumentationLoadTimeWeaver loadTimeWeaver;
+
+    public AspectModuleConfiguration(ApplicationContext applicationContext) {
+        this.loadTimeWeaver =
+                new InstrumentationLoadTimeWeaver(applicationContext.getClassLoader());
     }
 
-    @Bean
-    public InstrumentationLoadTimeWeaver instrumentationLoadTimeWeaver(ApplicationContext applicationContext) {
-        return new InstrumentationLoadTimeWeaver(applicationContext.getClassLoader());
-    }
+    @Override
+    @Nonnull
+    public LoadTimeWeaver getLoadTimeWeaver() { return loadTimeWeaver; }
 }
