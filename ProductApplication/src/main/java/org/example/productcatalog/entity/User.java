@@ -14,8 +14,8 @@ import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 @Table(name = "user", schema = "custom")
 public class User {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
     private String email;
     @Convert(converter = PasswordConverter.class)

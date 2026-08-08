@@ -80,14 +80,13 @@ public class ApplicationConfiguration {
             }
         });
 
-        final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter() {
+        entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter() {
             {
                 setDatabase(Database.POSTGRESQL);
                 setShowSql(true);
                 setGenerateDdl(true);
             }
-        };
-        entityManager.setJpaVendorAdapter(vendorAdapter);
+        });
         return entityManager;
     }
 

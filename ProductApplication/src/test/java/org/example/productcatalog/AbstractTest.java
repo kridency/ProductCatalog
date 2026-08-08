@@ -44,11 +44,8 @@ public class AbstractTest {
 
     @BeforeAll
     public static void start() {
-        postgreSQLContainer
-                .withCopyFileToContainer(MountableFile.forClasspathResource("init.sql"),
-                        "/docker-entrypoint-initdb.d/init.sql")
-                .withUrlParam("stringtype", "unspecified")
-                .start();
+        postgreSQLContainer.withCopyFileToContainer(MountableFile.forHostPath("../docker/init.sql"),
+                        "/docker-entrypoint-initdb.d/init.sql").start();
     }
 
     @BeforeEach

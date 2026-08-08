@@ -10,8 +10,8 @@ import lombok.Getter;
 @Table(name = "product")
 public class Product {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
     private String item;
     private String brand;
