@@ -16,8 +16,8 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class Invocation {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
     @CreatedDate
     @Column(name = "date", updatable = false)

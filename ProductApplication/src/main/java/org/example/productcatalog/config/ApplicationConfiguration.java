@@ -13,7 +13,6 @@ import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.hibernate.SpringBeanContainer;
 import org.springframework.orm.jpa.vendor.Database;
@@ -105,7 +104,6 @@ public class ApplicationConfiguration {
         liquibase.setDefaultSchema(dataSchema);
         liquibase.setLiquibaseSchema("auxiliary");
         liquibase.setChangeLogParameters(Map.of("schemaName", dataSchema));
-        liquibase.setDropFirst(true);
         return liquibase;
     }
 

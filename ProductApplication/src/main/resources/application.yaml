@@ -35,8 +35,6 @@ spring:
         open-in-view: false
         hibernate:
             ddl-auto: update
-            naming:
-                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
         generate-ddl: true
         show-sql: true
         properties:
@@ -47,16 +45,16 @@ spring:
                     username: intern
                     password: 1gjAVnJ
                     driver_class: org.postgresql.Driver
-                jakarta:
-                    persistence:
-                        schema-generation:
-                            create-database-schemas: true
                 format_sql: true
                 default_schema: custom
                 transaction:
                     jta:
                         platform: org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
                 dialect: org.hibernate.dialect.PostgreSQLDialect
+            jakarta:
+                persistence:
+                    schema-generation:
+                        create-database-schemas: true
 
 logging:
     level:
