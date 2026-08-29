@@ -9,14 +9,11 @@ services:
       - POSTGRES_PASSWORD=1gjAVnJ
       - POSTGRES_DB=product_db
       - POSTGRES_SCHEMA=custom
-      - LIQUIBASE_SCHEMA=auxiliary
     expose:
       - 5432
     networks:
       - docker_default
     restart: unless-stopped
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   #swagger:
   #  container_name: swagger-container

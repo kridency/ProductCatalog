@@ -296,23 +296,11 @@
         "type" : "object",
         "description" : "Data transfer object with user details.",
         "properties" : {
-          "accountNonExpired" : {
-            "type" : "boolean"
-          },
-          "accountNonLocked" : {
-            "type" : "boolean"
-          },
-          "credentialsNonExpired" : {
-            "type" : "boolean"
-          },
           "email" : {
             "type" : "string",
             "format" : "email",
             "description" : "User email.",
             "minLength" : 1
-          },
-          "enabled" : {
-            "type" : "boolean"
           },
           "password" : {
             "type" : "string",

@@ -4,13 +4,12 @@ import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.entity.RoleType;
 import org.example.productcatalog.entity.User;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Optional;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = "spring",
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+        injectionStrategy = InjectionStrategy.FIELD)
 @Named("UserMapper")
 public interface UserMapper {
 

@@ -10,11 +10,14 @@ import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.service.CrudService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -25,9 +28,11 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 @Tag(name = "Product Controller", description = "APIs for managing products")
 public class ProductController {
     private final CrudService<ProductDto, String> service;
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int pageSize;
 
     @Inject
-    public ProductController(CrudService<ProductDto, String> service) { this.service = service; }
+    public ProductController(@Qualifier("ProductService") CrudService<ProductDto, String> service) { this.service = service; }
 
     @POST
     @Operation(summary = "Register product",
@@ -68,8 +73,9 @@ public class ProductController {
     @RequestMapping(method = RequestMethod.GET, path = "/product", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public MessageDto list(@RequestBody(required = false) ProductDto data) {
-        return new MessageDto(Optional.of(service.findFiltered(Optional.ofNullable(data).orElse(new ProductDto())))
-                .filter(Predicate.not(Collection::isEmpty))
+        return new MessageDto(Optional.of(service.findFiltered(Optional.ofNullable(data)
+                .map(x -> Map.of("item", data.getItem())).orElse(Map.of()), PageRequest.of(0, pageSize)))
+                .filter(Predicate.not(Slice::isEmpty))
                 .map(list -> {
                     try {
                         return objectMapper.writeValueAsString(list);

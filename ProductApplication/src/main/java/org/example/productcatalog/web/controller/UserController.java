@@ -4,18 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import org.springframework.beans.factory.annotation.Qualifier;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.service.CrudService;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -26,9 +29,11 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 @Tag(name = "User Controller", description = "APIs for managing users")
 public class UserController {
     private final CrudService<UserDto, String> service;
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int pageSize;
 
     @Inject
-    public UserController(CrudService<UserDto, String> service) {
+    public UserController(@Qualifier("UserService") CrudService<UserDto, String> service) {
         this.service = service;
     }
 
@@ -74,8 +79,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     public MessageDto list(@RequestBody(required = false) UserDto data) {
-        return new MessageDto(Optional.of(service.findFiltered(Optional.ofNullable(data).orElse(new UserDto())))
-                .filter(Predicate.not(Collection::isEmpty))
+        return new MessageDto(Optional.of(service.findFiltered(Optional.ofNullable(data)
+                        .map(x -> Map.of("email", data.getEmail())).orElse(Map.of()), PageRequest.of(0, pageSize)))
+                .filter(Predicate.not(Slice::isEmpty))
                 .map(list -> {
                     try {
                         return objectMapper.writeValueAsString(list);

@@ -46,8 +46,11 @@ public class ApplicationConfiguration {
     @Value("${spring.datasource.url}")
     private String dataUrl;
 
-    @Value("${spring.datasource.hikari.schema}")
+    @Value("${app.datasource.data-schema}")
     private String dataSchema;
+
+    @Value("${app.datasource.liquibase-schema}")
+    private String liquibaseSchema;
 
     @Value("${spring.datasource.username}")
     private String username;
@@ -73,8 +76,6 @@ public class ApplicationConfiguration {
         entityManager.setDataSource(dataSource());
         entityManager.setJpaProperties(new Properties() {
             {
-                put ("hibernate.hbm2ddl.auto", "update");
-                put ("globally_quoted_identifiers", "true");
                 put ("hibernate.resource.beans.container", new SpringBeanContainer(beanFactory));
             }
         });
@@ -97,12 +98,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
+    @DependsOn("entityManager")
     public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:" + "db/changelog/dbChangeLog.xml");
         liquibase.setDefaultSchema(dataSchema);
-        liquibase.setLiquibaseSchema("auxiliary");
+        liquibase.setLiquibaseSchema(liquibaseSchema);
         liquibase.setChangeLogParameters(Map.of("schemaName", dataSchema));
         return liquibase;
     }

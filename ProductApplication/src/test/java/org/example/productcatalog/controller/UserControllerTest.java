@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collection;
+import java.util.Map;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 import static org.instancio.Select.field;
@@ -44,7 +45,11 @@ public class UserControllerTest extends AbstractTest {
     @WithUserDetails(value = "name@hostname")
     @DisplayName("User account update.")
     void givenNewUserCredentials_whenTryToUpdateUser_thenReturnCorrectResult() throws Exception {
-        String userString = "{ \"email\": \"name@hostname\", \"password\": \"test\" }";
+        var userDto = Instancio.of(UserDto.class)
+                .set(field(UserDto::getEmail), "name@hostname")
+                .set(field(UserDto::getPassword), "test")
+                .create();
+        String userString = objectMapper.writeValueAsString(userDto);
         mockMvc.perform(MockMvcRequestBuilders.put("/identity")
                         .content(userString)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -60,7 +65,10 @@ public class UserControllerTest extends AbstractTest {
     @WithUserDetails(value = "admin@hostname")
     @DisplayName("User account delete.")
     void givenNewUserCredentials_whenTryToDeleteUser_thenReturnCorrectResult() throws Exception {
-        String userString = "{ \"email\": \"name@hostname\", \"password\": \"test\" }";
+        var userDto = Instancio.of(UserDto.class)
+                .set(field(UserDto::getEmail), "name@hostname")
+                .create();
+        String userString = objectMapper.writeValueAsString(userDto);
         mockMvc.perform(MockMvcRequestBuilders.delete("/identity")
                         .content(userString)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -76,7 +84,12 @@ public class UserControllerTest extends AbstractTest {
     @WithUserDetails(value = "admin@hostname")
     @DisplayName("List users.")
     void givenNewUserTemplate_whenTryToListUsers_thenReturnCorrectResult() throws Exception {
-        String userString = "{ \"email\": \"name@hostname\" }";
+        var userDto = Instancio.of(UserDto.class)
+                .set(field(UserDto::getEmail), "name@hostname")
+                .ignore(field(UserDto::getPassword))
+                .ignore(field(UserDto::getRole))
+                .create();
+        String userString = objectMapper.writeValueAsString(userDto);
         String result = objectMapper.readValue(mockMvc.perform(MockMvcRequestBuilders
                         .get("/identity")
                         .content(userString)
@@ -85,7 +98,9 @@ public class UserControllerTest extends AbstractTest {
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn().getResponse()
                 .getContentAsByteArray(), MessageDto.class).getMessage();
 
-        Assertions.assertTrue(objectMapper.readValue(result, new TypeReference<Collection<UserDto>>() {})
+        var content = objectMapper.readValue(result, new TypeReference<Map<String, Object>>() {}).get("content");
+
+        Assertions.assertTrue(objectMapper.convertValue(content, new TypeReference<Collection<UserDto>>() {})
                         .stream().filter(x -> !x.getEmail().equals("name@hostname")).toList().isEmpty());
     }
 }

@@ -1,6 +1,9 @@
 app:
     datasource:
-        url: jdbc:postgresql://localhost:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true
+        database-name: ${POSTGRES_DB:product_db}
+        data-schema: ${POSTGRES_SCHEMA:custom}
+        liquibase-schema: ${LIQUIBASE_SCHEMA:auxiliary}
+        url: jdbc:postgresql://localhost:5432/${app.datasource.database-name}?createDatabaseIfNotExist=true
 
 server:
     port: 8080
@@ -22,14 +25,24 @@ spring:
         resources:
             static-locations: classpath:/openapi
 
+    data:
+        web:
+            pageable:
+                default-page-size: 20
+
+    sql:
+        init:
+            mode: always
+
     datasource:
+        name: postgres
         url: ${POSTGRES_DATASOURCE_URL:${app.datasource.url};DB_CLOSE_DELAY=-1}
         username: intern
         password: 1gjAVnJ
         hikari:
-            schema: custom
+            connection-init-sql: SET search_path TO ${app.datasource.data-schema}, ${app.datasource.liquibase-schema};
             driver-class-name: org.postgresql.Driver
-        name: product_db
+            schema: ${app.datasource.data-schema}
 
     jpa:
         open-in-view: false
@@ -41,20 +54,25 @@ spring:
             hibernate:
                 globally_quoted_identifiers: true
                 connection:
-                    url: ${POSTGRES_DATASOURCE_URL:${app.datasource.url};DB_CLOSE_DELAY=-1}
-                    username: intern
-                    password: 1gjAVnJ
+                    url: ${spring.datasource.url}
+                    username: ${spring.datasource.username}
+                    password: ${spring.datasource.password}
                     driver_class: org.postgresql.Driver
                 format_sql: true
-                default_schema: custom
+                default_schema: ${spring.datasource.hikari.schema}
                 transaction:
                     jta:
                         platform: org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
                 dialect: org.hibernate.dialect.PostgreSQLDialect
-            jakarta:
-                persistence:
-                    schema-generation:
-                        create-database-schemas: true
+                jakarta:
+                    persistence:
+                        schema-generation:
+                            database:
+                                action: none
+                            create-database-schemas: false
+
+    jackson:
+        default-property-inclusion: non_null
 
 logging:
     level:

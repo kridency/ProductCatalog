@@ -6,11 +6,14 @@ import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
 import org.example.productcatalog.repository.CrudRepository;
-import org.example.productcatalog.util.specification.Specification;
+import org.example.productcatalog.util.specification.GetSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
@@ -50,8 +53,12 @@ public class UserService implements CrudService<UserDto, String> {
     @Transactional
     @Override
     public UserDto update(UserDto data) {
-        return Optional.ofNullable(data).map(mapper::fromDto).map(repository::update)
-                .map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
+        return Optional.ofNullable(data).map(UserDto::getEmail).flatMap(repository::getByKey)
+                .map(x -> {
+                    x.setPassword(Optional.ofNullable(data.getPassword()).orElse(x.getPassword()));
+                    x.setRole(Optional.ofNullable(data.getRole()).orElse(x.getRole()));
+                    return repository.update(x);
+                }).map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     /**
@@ -64,20 +71,23 @@ public class UserService implements CrudService<UserDto, String> {
     @Transactional
     @Override
     public UserDto remove(UserDto data) {
-        return Optional.ofNullable(data).map(mapper::fromDto).map(repository::delete)
+        return Optional.ofNullable(data).map(UserDto::getEmail).flatMap(repository::getByKey).map(repository::delete)
                 .map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
 
     /**
      * Requests user account database for the record matching specified template dto.
      * Main user account database record receiving method.
-     * @param data  sought user account email address
+     * @param criteria   set of sought values for filter attributes
+     * @param pageable  product list pagination criteria object
      *
      * @return  set of user account data transfer objects those have matched criteria
      */
     @Override
-    public Collection<UserDto> findFiltered(UserDto data) {
-        return new Specification<>(data).apply(findAll()).stream().toList();
+    public Slice<UserDto> findFiltered(Map<String, ? extends Comparable<?>> criteria, Pageable pageable) {
+        List<UserDto> result = repository.get(new GetSpecification<>(criteria), pageable).stream()
+                .map(mapper::toDto).toList();
+        return new SliceImpl<>(result, pageable, result.iterator().hasNext());
     }
 
     /**
@@ -87,7 +97,10 @@ public class UserService implements CrudService<UserDto, String> {
      * @return  set of user account data transfer objects
      */
     @Override
-    public Collection<UserDto> findAll() { return repository.getAll().stream().map(mapper::toDto).toList(); }
+    public Collection<UserDto> findAll() {
+        return repository.get(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+                .map(mapper::toDto).toList();
+    }
 
     /**
      * Requests user account database for the record matching specified email address.
