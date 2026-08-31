@@ -36,7 +36,6 @@ import java.util.Properties;
         entityManagerFactoryRef = "entityManager")
 @EnableAutoConfiguration
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
-@ConfigurationPropertiesScan
 @PropertySources(
         value = {
                 @PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)
