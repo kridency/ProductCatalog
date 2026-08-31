@@ -1,10 +1,10 @@
 package org.example.productcatalog.repository;
 
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.*;
 import org.example.productcatalog.entity.Product;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class ProductRepository implements CrudRepository<Product> {
     private final EntityManager entityManager;
 
-    @Autowired
+    @Inject
     public ProductRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }

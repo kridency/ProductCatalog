@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import org.springframework.beans.factory.annotation.Qualifier;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import org.example.productcatalog.dto.MessageDto;
@@ -33,7 +32,7 @@ public class UserController {
     private int pageSize;
 
     @Inject
-    public UserController(@Qualifier("UserService") CrudService<UserDto, String> service) {
+    public UserController(CrudService<UserDto, String> service) {
         this.service = service;
     }
 

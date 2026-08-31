@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@Service("UserService")
+@Service
 public class UserService implements CrudService<UserDto, String> {
     private final UserMapper mapper;
     private final CrudRepository<User> repository;
