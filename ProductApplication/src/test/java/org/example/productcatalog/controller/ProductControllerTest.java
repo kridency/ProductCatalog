@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collection;
+import java.util.Map;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 import static org.example.productcatalog.preset.ProductCatalogInit.objectMapper;
@@ -89,7 +90,9 @@ public class ProductControllerTest extends AbstractTest {
                 .andExpect(MockMvcResultMatchers.status().isOk()).andReturn().getResponse()
                 .getContentAsByteArray(), MessageDto.class).getMessage();
 
-        Assertions.assertTrue(objectMapper.readValue(result, new TypeReference<Collection<ProductDto>>() {})
+        var content = objectMapper.readValue(result, new TypeReference<Map<String, Object>>() {}).get("content");
+
+        Assertions.assertTrue(objectMapper.convertValue(content, new TypeReference<Collection<ProductDto>>() {})
                 .stream().filter(x -> !x.getItem().equals("I21")).toList().isEmpty());
     }
 }

@@ -1,6 +1,10 @@
 package org.example.productcatalog.repository;
 
-import java.util.Collection;
+import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.util.Optional;
 
 public interface CrudRepository<T> {
@@ -9,7 +13,7 @@ public interface CrudRepository<T> {
 
     T delete(T entity);
 
-    Collection<T> getAll();
+    Page<T> get(@Nullable Specification<T> spec, @Nullable Pageable pageable);
 
     Optional<T> getById(long id);
 

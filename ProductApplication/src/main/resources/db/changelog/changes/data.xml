@@ -6,15 +6,24 @@
 		https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
 
-    <changeSet author="kridency" id="create_users">
+    <changeSet author="kridency" id="clear_old_records" runAlways="true" runOrder="first">
+        <sql>
+            TRUNCATE TABLE custom."user" RESTART IDENTITY CASCADE;
+            TRUNCATE TABLE custom."product" RESTART IDENTITY CASCADE;
+        </sql>
+    </changeSet>
+
+    <changeSet author="kridency" id="create_users" runAlways="true">
 
         <insert tableName="user">
+            <column name="id" valueSequenceNext="id_sequence"/>
             <column name="email" value="admin@hostname"/>
             <column name="password" value="$2a$10$IAHJNUoXff9bS6nfWn5gpukjIFnOaKwn8m4WHcoQ5KT5JL9EmXD4q"/>
             <column name="role" value="ROLE_ADMIN"/>
         </insert>
 
         <insert tableName="user">
+            <column name="id" valueSequenceNext="id_sequence"/>
             <column name="email" value="name@hostname"/>
             <column name="password" value="$2a$10$.Eh4uZMxW4gsJ3lFh9nnWO5lXJoC3MJ6ZJA894yKq43qoG6vB2Mt6"/>
             <column name="role" value="ROLE_USER"/>
@@ -22,9 +31,10 @@
 
     </changeSet>
 
-    <changeSet  author="kridency" id="create_products">
+    <changeSet  author="kridency" id="create_products" runAlways="true">
 
         <insert tableName="product">
+            <column name="id" valueSequenceNext="id_sequence"/>
             <column name="item" value="I11"/>
             <column name="brand" value="Adidas"/>
             <column name="title" value="Sneakers"/>
@@ -33,6 +43,7 @@
         </insert>
 
         <insert tableName="product">
+            <column name="id" valueSequenceNext="id_sequence"/>
             <column name="item" value="I21"/>
             <column name="brand" value="Nike"/>
             <column name="title" value="Sneakers"/>

@@ -1,0 +1,326 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "contact" : {
+      "email" : "support@example.com",
+      "name" : "API Support",
+      "url" : "http://www.example.com/support"
+    },
+    "description" : "This is a sample API for demonstrating OpenAPI documentation.",
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "title" : "Product Catalog API",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "description" : "Development Server",
+    "url" : "http://localhost:8080/api/v1"
+  } ],
+  "tags" : [ {
+    "description" : "APIs for managing products",
+    "name" : "Product Controller"
+  }, {
+    "description" : "APIs for managing users",
+    "name" : "User Controller"
+  } ],
+  "paths" : {
+    "/identity" : {
+      "delete" : {
+        "description" : "Deletes user credentials.",
+        "operationId" : "delete_1",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "Delete user credentials",
+        "tags" : [ "User Controller" ]
+      },
+      "get" : {
+        "description" : "List users according to template.",
+        "operationId" : "list_1",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "List users",
+        "tags" : [ "User Controller" ]
+      },
+      "post" : {
+        "description" : "Register new user.",
+        "operationId" : "register_1",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "Register user",
+        "tags" : [ "User Controller" ]
+      },
+      "put" : {
+        "description" : "Updates password and role.",
+        "operationId" : "update_1",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "Update user credentials",
+        "tags" : [ "User Controller" ]
+      }
+    },
+    "/product" : {
+      "delete" : {
+        "description" : "Deletes product.",
+        "operationId" : "delete",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProductDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "Delete product",
+        "tags" : [ "Product Controller" ]
+      },
+      "get" : {
+        "description" : "List products according to template.",
+        "operationId" : "list",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProductDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "List products",
+        "tags" : [ "Product Controller" ]
+      },
+      "post" : {
+        "description" : "Register new product.",
+        "operationId" : "register",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProductDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "Register product",
+        "tags" : [ "Product Controller" ]
+      },
+      "put" : {
+        "description" : "Updates product details.",
+        "operationId" : "update",
+        "requestBody" : {
+          "content" : {
+            "*/*" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ProductDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "default" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MessageDto"
+                }
+              }
+            },
+            "description" : "default response"
+          }
+        },
+        "summary" : "Update product details",
+        "tags" : [ "Product Controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "MessageDto" : {
+        "type" : "object",
+        "description" : "Data transfer object with request respone.",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "Response content description."
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Response content body."
+          }
+        }
+      },
+      "ProductDto" : {
+        "type" : "object",
+        "description" : "Data transfer object with product details.",
+        "properties" : {
+          "brand" : {
+            "type" : "string",
+            "description" : "Product brand."
+          },
+          "category" : {
+            "type" : "string",
+            "description" : "Product category."
+          },
+          "item" : {
+            "type" : "string",
+            "description" : "Product item number.",
+            "minLength" : 1
+          },
+          "price" : {
+            "type" : "number",
+            "format" : "double",
+            "description" : "Product Price."
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Product name."
+          }
+        },
+        "required" : [ "item" ]
+      },
+      "UserDto" : {
+        "type" : "object",
+        "description" : "Data transfer object with user details.",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "description" : "User email.",
+            "minLength" : 1
+          },
+          "password" : {
+            "type" : "string",
+            "description" : "User password.",
+            "minLength" : 1
+          },
+          "role" : {
+            "type" : "string",
+            "description" : "User role.",
+            "enum" : [ "ROLE_USER", "ROLE_ADMIN" ]
+          }
+        },
+        "required" : [ "email", "password" ]
+      }
+    },
+    "securitySchemes" : {
+      "basicScheme" : {
+        "scheme" : "basic",
+        "type" : "http"
+      }
+    }
+  }
+}

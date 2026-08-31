@@ -1,19 +1,29 @@
 package org.example.productcatalog.entity;
 
 import jakarta.persistence.*;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
-@Setter
 @Entity
 @Table(name = "invocation")
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class Invocation {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
-    private Instant date = Instant.now();
+    @CreatedDate
+    @Column(name = "date", updatable = false)
+    private Instant date;
+    @NonNull
     private String endpoint;
+    @NonNull
     private String email;
 }

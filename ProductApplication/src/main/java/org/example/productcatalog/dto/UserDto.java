@@ -22,7 +22,9 @@ import static org.example.productcatalog.preset.ProductCatalogInit.EMAIL_NOT_SPE
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(value = {"authorities", "username"})
+@JsonIgnoreProperties(value = {
+        "authorities", "username", "enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"
+})
 @Schema(description = "Data transfer object with user details.")
 public class UserDto implements Serializable, UserDetails {
     @Email(message = EMAIL_ERROR)

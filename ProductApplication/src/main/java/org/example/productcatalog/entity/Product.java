@@ -4,15 +4,16 @@ import jakarta.persistence.*;
 import lombok.Setter;
 import lombok.Getter;
 
-@Setter
 @Getter
+@Setter
 @Entity
 @Table(name = "product")
 public class Product {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
+    @Column(name = "item", unique = true)
     private String item;
     private String brand;
     private String title;

@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 import liquibase.integration.spring.SpringLiquibase;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.MessageSource;
@@ -12,8 +13,8 @@ import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.hibernate.SpringBeanContainer;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -23,6 +24,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.sql.DataSource;
 import java.util.Map;
+import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = {"org.example.productcatalog"})
@@ -44,8 +46,11 @@ public class ApplicationConfiguration {
     @Value("${spring.datasource.url}")
     private String dataUrl;
 
-    @Value("${spring.datasource.hikari.schema}")
+    @Value("${app.datasource.data-schema}")
     private String dataSchema;
+
+    @Value("${app.datasource.liquibase-schema}")
+    private String liquibaseSchema;
 
     @Value("${spring.datasource.username}")
     private String username;
@@ -65,20 +70,23 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManager(){
+    public LocalContainerEntityManagerFactoryBean entityManager(ConfigurableListableBeanFactory beanFactory){
         final LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setPackagesToScan("org.example.productcatalog");
         entityManager.setDataSource(dataSource());
+        entityManager.setJpaProperties(new Properties() {
+            {
+                put ("hibernate.resource.beans.container", new SpringBeanContainer(beanFactory));
+            }
+        });
 
-        final JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter() {
+        entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter() {
             {
                 setDatabase(Database.POSTGRESQL);
-                setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
                 setShowSql(true);
                 setGenerateDdl(true);
             }
-        };
-        entityManager.setJpaVendorAdapter(vendorAdapter);
+        });
         return entityManager;
     }
 
@@ -90,14 +98,14 @@ public class ApplicationConfiguration {
     }
 
     @Bean
+    @DependsOn("entityManager")
     public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:" + "db/changelog/dbChangeLog.xml");
         liquibase.setDefaultSchema(dataSchema);
-        liquibase.setLiquibaseSchema("auxiliary");
+        liquibase.setLiquibaseSchema(liquibaseSchema);
         liquibase.setChangeLogParameters(Map.of("schemaName", dataSchema));
-        liquibase.setDropFirst(true);
         return liquibase;
     }
 

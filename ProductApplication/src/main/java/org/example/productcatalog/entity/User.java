@@ -7,19 +7,21 @@ import org.example.productcatalog.util.converter.PasswordConverter;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name = "user", schema = "custom")
+@Table(name = "`user`")
 public class User {
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
+    @Column(name = "email", unique = true)
     private String email;
     @Convert(converter = PasswordConverter.class)
     private String password;
-    @Column(name = "role", columnDefinition = "role_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "role")
     private RoleType role;
 }

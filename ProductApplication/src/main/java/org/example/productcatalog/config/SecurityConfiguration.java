@@ -46,9 +46,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(CrudRepository<User> userRepository, UserMapper userMapper) {
-        DaoAuthenticationProvider authenticationProvider =
-                new DaoAuthenticationProvider(userDetailsService(userRepository, userMapper));
+    public AuthenticationManager authenticationManager(UserDetailsService service) {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(service);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }
@@ -75,6 +74,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain apiFilterChain(HttpSecurity http, AuthenticationManager manager, UserDetailsService service) {
         http.authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api-docs", "/api-docs/**", "/openapi/**", "/proxy/**",
+                                "/swagger-ui/**", "/swagger-initializer.js", "/openapi.json",
                                 "/favicon.ico", "/error").permitAll().anyRequest().authenticated())
                 .cors(configurer -> configurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -90,11 +90,13 @@ public class SecurityConfiguration {
                     String login = Optional.ofNullable(credentials)
                             .map(x -> x.substring(0, credentials.indexOf(':'))).orElse("");
                     String password = Optional.ofNullable(credentials)
-                            .map(x -> x.substring(credentials.indexOf(':'))).orElse("");
-                    var authentication = new UsernamePasswordAuthenticationToken(login, password,
-                            service.loadUserByUsername(login).getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                            .map(x -> x.substring(credentials.indexOf(':') + 1)).orElse("");
+                    if (!login.isEmpty() && !password.isEmpty()) {
+                        var authentication = new UsernamePasswordAuthenticationToken(login, password,
+                                service.loadUserByUsername(login).getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                     filterChain.doFilter(request, response);
                 }, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());

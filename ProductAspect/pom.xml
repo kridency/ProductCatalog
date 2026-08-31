@@ -14,20 +14,7 @@
 
     <name>product-aspect</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <java.source-target.version>21</java.source-target.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring-boot.version}-M2</version>
-        </dependency>
-
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
@@ -67,7 +54,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
-                <version>${aspect-maven-plugin.version}</version>
+                <version>${aspectj-maven-plugin.version}</version>
                 <configuration>
                     <source>${java.source-target.version}</source>
                     <complianceLevel>${java.source-target.version}</complianceLevel>
