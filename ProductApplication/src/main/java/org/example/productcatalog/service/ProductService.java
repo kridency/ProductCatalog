@@ -1,5 +1,6 @@
 package org.example.productcatalog.service;
 
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.entity.Product;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +20,13 @@ import java.util.*;
 
 import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
-@Service("ProductService")
+@Service
 public class ProductService implements CrudService<ProductDto, String> {
     private final CrudRepository<Product> repository;
     private final ProductMapper mapper;
     private final ProductCacheManager productCacheManager;
 
-    @Autowired
+    @Inject
     public ProductService(CrudRepository<Product> repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
         this.repository = repository;
         this.mapper = mapper;
