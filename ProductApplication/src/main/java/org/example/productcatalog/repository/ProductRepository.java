@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class ProductRepository implements CrudRepository<Product> {
@@ -44,6 +43,7 @@ public class ProductRepository implements CrudRepository<Product> {
 
     @Override
     public Page<Product> get(Specification<Product> spec, Pageable pageable) {
+        Predicate predicate;
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -51,12 +51,13 @@ public class ProductRepository implements CrudRepository<Product> {
         countQuery.select(cb.count(countRoot));
 
         if (spec != null) {
-            Predicate countPredicate = spec.toPredicate(countRoot, countQuery, cb);
-            if (countPredicate != null) {
-                countQuery.where(countPredicate);
-            }
+            predicate = spec.toPredicate(countRoot, countQuery, cb);
+        } else {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
-        Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+        countQuery = Optional.ofNullable(predicate).map(countQuery::where).orElse(countQuery);
+        long total = entityManager.createQuery(countQuery).getSingleResult();
 
         if (total == 0) {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
@@ -65,20 +66,10 @@ public class ProductRepository implements CrudRepository<Product> {
         CriteriaQuery<Product> dataQuery = cb.createQuery(Product.class);
         Root<Product> dataRoot = dataQuery.from(Product.class);
 
-        if (spec != null) {
-            Predicate dataPredicate = spec.toPredicate(dataRoot, dataQuery, cb);
-            if (dataPredicate != null) {
-                dataQuery.where(dataPredicate);
-            }
-        }
+        dataQuery = Optional.ofNullable(predicate).map(dataQuery::where).orElse(dataQuery);
 
-        if (pageable.getSort().isSorted()) {
-            List<Order> orders = pageable.getSort().stream()
-                    .map(order -> order.isAscending() ? cb.asc(dataRoot.get(order.getProperty()))
-                            : cb.desc(dataRoot.get(order.getProperty())))
-                    .collect(Collectors.toList());
-            dataQuery.orderBy(orders);
-        }
+        List<Order> orders = orderBy(cb, dataRoot, pageable);
+        dataQuery = orders.isEmpty() ? dataQuery : dataQuery.orderBy(orders);
 
         List<Product> content = entityManager.createQuery(dataQuery)
                 .setFirstResult((int) pageable.getOffset())
