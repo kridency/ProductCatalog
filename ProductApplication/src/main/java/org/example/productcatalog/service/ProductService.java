@@ -78,7 +78,7 @@ public class ProductService implements CrudService<ProductDto, String> {
     @Transactional
     @Override
     public ProductDto remove(ProductDto data) {
-        Optional.ofNullable(data).ifPresent(x -> productCacheManager.clear(x.getItem()));
+        Optional.ofNullable(data).map(ProductDto::getItem).ifPresent(productCacheManager::clear);
         return Optional.ofNullable(data).map(mapper::fromDto)
                 .map(repository::delete).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
