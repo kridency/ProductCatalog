@@ -2,7 +2,6 @@ package org.example.productcatalog.repository;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.domain.Page;
@@ -11,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public interface CrudRepository<T> {
