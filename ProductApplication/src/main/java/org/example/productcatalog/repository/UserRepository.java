@@ -1,84 +1,28 @@
 package org.example.productcatalog.repository;
 
+import jakarta.inject.Inject;
 import jakarta.persistence.*;
 import jakarta.persistence.criteria.*;
 import org.example.productcatalog.entity.User;
 
 import java.util.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepository implements CrudRepository<User> {
-    private final EntityManager entityManager;
+public class UserRepository extends AbstractRepository<User> {
 
-    @Autowired
+    @Inject
     public UserRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
-    public User add(User user) {
-        entityManager.persist(user);
-        entityManager.flush();
-        entityManager.refresh(user);
-        return user;
-    }
-
-    @Override
-    public User update(User user) {
-        entityManager.persist(user);
-        entityManager.flush();
-        return user;
-    }
-
-    @Override
-    public User delete(User user) {
-        entityManager.remove(user);
-        return user;
-    }
-
-    @Override
     public Page<User> get(Specification<User> spec, Pageable pageable) {
-        Predicate predicate;
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        Root<User> countRoot = countQuery.from(User.class);
-        countQuery.select(cb.count(countRoot));
-
-        if (spec != null) {
-            predicate = spec.toPredicate(countRoot, countQuery, cb);
-        } else {
-            return new PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
-
-        countQuery = Optional.ofNullable(predicate).map(countQuery::where).orElse(countQuery);
-        long total = entityManager.createQuery(countQuery).getSingleResult();
-
-        if (total == 0) {
-            return new PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
-
-        CriteriaQuery<User> dataQuery = cb.createQuery(User.class);
-        Root<User> dataRoot = dataQuery.from(User.class);
-
-        dataQuery = Optional.ofNullable(predicate).map(dataQuery::where).orElse(dataQuery);
-
-        List<Order> orders = orderBy(cb, dataRoot, pageable);
-        dataQuery = orders.isEmpty() ? dataQuery : dataQuery.orderBy(orders);
-
-        List<User> content = entityManager.createQuery(dataQuery)
-                .setFirstResult((int) pageable.getOffset())
-                .setMaxResults(pageable.getPageSize())
-                .getResultList();
-
-        return new PageImpl<>(content, pageable, total);
+        return findAll(spec, pageable, User.class);
     }
 
     @Override
@@ -91,6 +35,7 @@ public class UserRepository implements CrudRepository<User> {
         }
     }
 
+    @Override
     public synchronized Optional<User> getById(long id) {
         return Optional.of(entityManager.find(User.class, id));
     }

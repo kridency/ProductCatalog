@@ -3,10 +3,9 @@ package org.example.productcatalog.service;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.example.productcatalog.dto.ProductDto;
-import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.ProductMapper;
-import org.example.productcatalog.repository.CrudRepository;
+import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.GetSpecification;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +21,12 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 @Service
 public class ProductService implements CrudService<ProductDto, String> {
-    private final CrudRepository<Product> repository;
+    private final ProductRepository repository;
     private final ProductMapper mapper;
     private final ProductCacheManager productCacheManager;
 
     @Inject
-    public ProductService(CrudRepository<Product> repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
+    public ProductService(ProductRepository repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
         this.repository = repository;
         this.mapper = mapper;
         this.productCacheManager = productCacheManager;

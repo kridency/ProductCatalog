@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.UserDto;
 import org.example.productcatalog.service.CrudService;
+import org.example.productcatalog.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -32,9 +33,7 @@ public class UserController {
     private int pageSize;
 
     @Inject
-    public UserController(CrudService<UserDto, String> service) {
-        this.service = service;
-    }
+    public UserController(UserService service) { this.service = service; }
 
     @POST
     @Operation(summary = "Register user",

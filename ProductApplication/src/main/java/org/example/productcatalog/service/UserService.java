@@ -1,13 +1,12 @@
 package org.example.productcatalog.service;
 
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.example.productcatalog.dto.UserDto;
-import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.repository.CrudRepository;
+import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.util.specification.GetSpecification;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,10 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 @Service
 public class UserService implements CrudService<UserDto, String> {
     private final UserMapper mapper;
-    private final CrudRepository<User> repository;
+    private final UserRepository repository;
 
-    @Autowired
-    public UserService(CrudRepository<User> repository, UserMapper mapper) {
+    @Inject
+    public UserService(UserRepository repository, UserMapper mapper) {
         this.mapper = mapper;
         this.repository = repository;
     }

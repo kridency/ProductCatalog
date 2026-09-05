@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.service.CrudService;
+import org.example.productcatalog.service.ProductService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -31,7 +32,7 @@ public class ProductController {
     private int pageSize;
 
     @Inject
-    public ProductController(CrudService<ProductDto, String> service) { this.service = service; }
+    public ProductController(ProductService service) { this.service = service; }
 
     @POST
     @Operation(summary = "Register product",

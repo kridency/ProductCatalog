@@ -5,8 +5,8 @@ import org.example.productcatalog.entity.Product;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "spring",
-        injectionStrategy = InjectionStrategy.FIELD)
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 @Named("ProductMapper")
 public interface ProductMapper {
     @Mappings({

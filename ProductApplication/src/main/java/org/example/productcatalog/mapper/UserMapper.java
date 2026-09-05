@@ -8,8 +8,8 @@ import org.mapstruct.*;
 import java.util.Optional;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "spring",
-        injectionStrategy = InjectionStrategy.FIELD)
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 @Named("UserMapper")
 public interface UserMapper {
 
