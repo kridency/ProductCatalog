@@ -78,13 +78,15 @@
 
     <profiles>
         <profile>
-            <id>tomcat</id>
+            <id>prod</id>
             <activation>
                 <property>
-                    <name>env.POSTGRES_DATASOURCE_URL</name>
+                    <name>${env.RUN_PROFILE}</name>
+                    <value>docker</value>
                 </property>
             </activation>
             <properties>
+                <spring.version>${env.SPRING_VERSION}</spring.version>
                 <spring.datasource.url>${env.POSTGRES_DATASOURCE_URL}</spring.datasource.url>
             </properties>
         </profile>
