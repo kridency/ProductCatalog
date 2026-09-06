@@ -14,20 +14,6 @@
 
     <name>product-application</name>
 
-    <profiles>
-        <profile>
-            <id>tomcat</id>
-            <activation>
-                <property>
-                    <name>env.POSTGRES_DATASOURCE_URL</name>
-                </property>
-            </activation>
-            <properties>
-                <spring.datasource.url>${env.POSTGRES_DATASOURCE_URL}</spring.datasource.url>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -328,6 +314,7 @@
                     </includes>
                     <argLine>
                         -javaagent:${settings.localRepository}/org/springframework/spring-instrument/${spring.version}/spring-instrument-${spring.version}.jar
+                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
                         -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
                         -Xshare:off
                     </argLine>

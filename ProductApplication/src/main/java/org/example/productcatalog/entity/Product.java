@@ -1,12 +1,12 @@
 package org.example.productcatalog.entity;
 
 import jakarta.persistence.*;
-import lombok.Setter;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
-@Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "product")
 public class Product {
     @Id

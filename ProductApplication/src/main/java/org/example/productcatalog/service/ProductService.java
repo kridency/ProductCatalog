@@ -3,13 +3,11 @@ package org.example.productcatalog.service;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.example.productcatalog.dto.ProductDto;
-import org.example.productcatalog.entity.Product;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.ProductMapper;
-import org.example.productcatalog.repository.CrudRepository;
+import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.GetSpecification;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 
@@ -22,12 +20,12 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 
 @Service
 public class ProductService implements CrudService<ProductDto, String> {
-    private final CrudRepository<Product> repository;
+    private final ProductRepository repository;
     private final ProductMapper mapper;
     private final ProductCacheManager productCacheManager;
 
     @Inject
-    public ProductService(CrudRepository<Product> repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
+    public ProductService(ProductRepository repository, ProductMapper mapper, ProductCacheManager productCacheManager) {
         this.repository = repository;
         this.mapper = mapper;
         this.productCacheManager = productCacheManager;
@@ -55,14 +53,12 @@ public class ProductService implements CrudService<ProductDto, String> {
      *
      * @return  product details data transfer object
      */
+    @Transactional
     @Override
     public ProductDto update(ProductDto data) {
         return Optional.ofNullable(data).map(ProductDto::getItem).flatMap(repository::getByKey)
                 .map(x -> {
-                    x.setBrand(Optional.ofNullable(data.getBrand()).orElse(x.getBrand()));
-                    x.setTitle(Optional.ofNullable(data.getTitle()).orElse(x.getTitle()));
-                    x.setCategory(Optional.ofNullable(data.getCategory()).orElse(x.getCategory()));
-                    x.setPrice(Optional.ofNullable(data.getPrice()).orElse(x.getPrice()));
+                    mapper.updateEntityFromDto(data, x);
                     return repository.update(x);
                 }).map(productCacheManager::put).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
@@ -78,7 +74,7 @@ public class ProductService implements CrudService<ProductDto, String> {
     @Transactional
     @Override
     public ProductDto remove(ProductDto data) {
-        Optional.ofNullable(data).ifPresent(x -> productCacheManager.clear(x.getItem()));
+        Optional.ofNullable(data).map(ProductDto::getItem).ifPresent(productCacheManager::clear);
         return Optional.ofNullable(data).map(mapper::fromDto)
                 .map(repository::delete).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));
@@ -94,7 +90,7 @@ public class ProductService implements CrudService<ProductDto, String> {
      */
     @Override
     public Slice<ProductDto> findFiltered(Map<String, ? extends Comparable<?>> criteria, Pageable pageable) {
-        List<ProductDto> result = repository.get(new GetSpecification<>(criteria), pageable).stream()
+        List<ProductDto> result = repository.findAll(new GetSpecification<>(criteria), pageable).stream()
                 .map(mapper::toDto).toList();
         return new SliceImpl<>(result, pageable, result.iterator().hasNext());
     }
@@ -107,7 +103,7 @@ public class ProductService implements CrudService<ProductDto, String> {
      */
     @Override
     public Collection<ProductDto> findAll() {
-        return repository.get(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+        return repository.findAll(new GetSpecification<>(Map.of()), Pageable.unpaged()).stream()
                 .map(mapper::toDto).toList();
     }
 

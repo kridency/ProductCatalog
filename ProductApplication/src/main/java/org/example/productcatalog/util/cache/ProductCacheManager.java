@@ -31,8 +31,8 @@ public class ProductCacheManager implements CacheManager<String, Product> {
     }
 
     @Override
-    public Product clear(String item) {
-        return cache.keySet().stream().filter(key -> key.getValue().get().equals(item)).findFirst()
-                .map(cache::remove).orElse(null);
+    public void clear(String item) {
+        cache.keySet().stream().filter(key -> key.getValue().get().equals(item)).findFirst()
+                .ifPresent(cache::remove);
     }
 }

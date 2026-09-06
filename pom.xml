@@ -17,8 +17,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <java.source-target.version>17</java.source-target.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <java.source-target.version>21</java.source-target.version>
         <start-class>org.example.productcatalog.ProductApplication</start-class>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
@@ -30,7 +30,7 @@
         <swagger-ui.version>5.30.3</swagger-ui.version>
         <webjars-locator-lite.version>1.1.2</webjars-locator-lite.version>
         <classgraph.version>4.8.184</classgraph.version>
-        <lombok.version>1.18.44</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         
         <jakarta-servlet.version>6.1.0</jakarta-servlet.version>
@@ -43,7 +43,7 @@
         <jackson.version>3.0.4</jackson.version>
         <jackson-datatype.version>3.0.0-rc2</jackson-datatype.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <aspectj.version>1.9.23</aspectj.version>
+        <aspectj.version>1.9.25</aspectj.version>
 
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
@@ -65,6 +65,7 @@
         <byte-buddy.version>1.18.2</byte-buddy.version>
 
         <testcontainers.version>1.21.3</testcontainers.version>
+        <mockito.version>5.20.0</mockito.version>
         <junit.version>6.0.3</junit.version>
         <json-path.version>2.10.0</json-path.version>
         <intencio.version>5.5.1</intencio.version>
@@ -78,13 +79,15 @@
 
     <profiles>
         <profile>
-            <id>tomcat</id>
+            <id>prod</id>
             <activation>
                 <property>
-                    <name>env.POSTGRES_DATASOURCE_URL</name>
+                    <name>${env.RUN_PROFILE}</name>
+                    <value>docker</value>
                 </property>
             </activation>
             <properties>
+                <spring.version>${env.SPRING_VERSION}</spring.version>
                 <spring.datasource.url>${env.POSTGRES_DATASOURCE_URL}</spring.datasource.url>
             </properties>
         </profile>

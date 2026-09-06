@@ -5,25 +5,14 @@ import org.example.productcatalog.entity.Product;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "spring",
-        injectionStrategy = InjectionStrategy.FIELD)
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 @Named("ProductMapper")
 public interface ProductMapper {
-    @Mappings({
-            @Mapping(source = "item", target = "item"),
-            @Mapping(source = "brand", target = "brand"),
-            @Mapping(source = "title", target = "title"),
-            @Mapping(source = "category", target = "category"),
-            @Mapping(source = "price", target = "price"),
-    })
     ProductDto toDto(Product data);
 
-    @Mappings({
-            @Mapping(source = "item", target = "item"),
-            @Mapping(source = "brand", target = "brand"),
-            @Mapping(source = "title", target = "title"),
-            @Mapping(source = "category", target = "category"),
-            @Mapping(source = "price", target = "price")
-    })
+    @Mapping(target = "id", ignore = true)
     Product fromDto(ProductDto data);
+
+    void updateEntityFromDto(ProductDto data, @MappingTarget Product entity);
 }

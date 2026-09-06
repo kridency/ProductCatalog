@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Configuration
+@ConfigurationPropertiesScan
 @ComponentScan(basePackages = {"org.example.productcatalog"})
 @EnableSpringConfigured
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -36,7 +37,6 @@ import java.util.Properties;
         entityManagerFactoryRef = "entityManager")
 @EnableAutoConfiguration
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
-@ConfigurationPropertiesScan
 @PropertySources(
         value = {
                 @PropertySource(value = "classpath:application.yaml", factory = YamlPropertySourceFactory.class)

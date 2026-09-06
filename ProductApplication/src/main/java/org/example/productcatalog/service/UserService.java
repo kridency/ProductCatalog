@@ -1,13 +1,12 @@
 package org.example.productcatalog.service;
 
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.example.productcatalog.dto.UserDto;
-import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.repository.CrudRepository;
+import org.example.productcatalog.repository.UserRepository;
 import org.example.productcatalog.util.specification.GetSpecification;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,10 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 @Service
 public class UserService implements CrudService<UserDto, String> {
     private final UserMapper mapper;
-    private final CrudRepository<User> repository;
+    private final UserRepository repository;
 
-    @Autowired
-    public UserService(CrudRepository<User> repository, UserMapper mapper) {
+    @Inject
+    public UserService(UserRepository repository, UserMapper mapper) {
         this.mapper = mapper;
         this.repository = repository;
     }
@@ -55,8 +54,7 @@ public class UserService implements CrudService<UserDto, String> {
     public UserDto update(UserDto data) {
         return Optional.ofNullable(data).map(UserDto::getEmail).flatMap(repository::getByKey)
                 .map(x -> {
-                    x.setPassword(Optional.ofNullable(data.getPassword()).orElse(x.getPassword()));
-                    x.setRole(Optional.ofNullable(data.getRole()).orElse(x.getRole()));
+                    mapper.updateEntityFromDto(data, x);
                     return repository.update(x);
                 }).map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }
@@ -85,7 +83,7 @@ public class UserService implements CrudService<UserDto, String> {
      */
     @Override
     public Slice<UserDto> findFiltered(Map<String, ? extends Comparable<?>> criteria, Pageable pageable) {
-        List<UserDto> result = repository.get(new GetSpecification<>(criteria), pageable).stream()
+        List<UserDto> result = repository.findAll(new GetSpecification<>(criteria), pageable).stream()
                 .map(mapper::toDto).toList();
         return new SliceImpl<>(result, pageable, result.iterator().hasNext());
     }
@@ -98,7 +96,7 @@ public class UserService implements CrudService<UserDto, String> {
      */
     @Override
     public Collection<UserDto> findAll() {
-        return repository.get(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+        return repository.findAll(new GetSpecification<>(Map.of()), Pageable.unpaged()).stream()
                 .map(mapper::toDto).toList();
     }
 

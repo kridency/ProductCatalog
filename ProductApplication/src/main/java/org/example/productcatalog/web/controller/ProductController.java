@@ -9,6 +9,7 @@ import jakarta.ws.rs.*;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.ProductDto;
 import org.example.productcatalog.service.CrudService;
+import org.example.productcatalog.service.ProductService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -28,10 +29,10 @@ import static org.example.productcatalog.preset.ProductCatalogInit.*;
 public class ProductController {
     private final CrudService<ProductDto, String> service;
     @Value("${spring.data.web.pageable.default-page-size}")
-    private int pageSize;
+    private int defaultPageSize;
 
     @Inject
-    public ProductController(CrudService<ProductDto, String> service) { this.service = service; }
+    public ProductController(ProductService service) { this.service = service; }
 
     @POST
     @Operation(summary = "Register product",
@@ -71,10 +72,13 @@ public class ProductController {
             description = "List products according to template.")
     @RequestMapping(method = RequestMethod.GET, path = "/product", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public MessageDto list(@RequestBody(required = false) ProductDto data) {
-        return new MessageDto(Optional.of(service.findFiltered(Optional.ofNullable(data)
-                .map(x -> Map.of("item", data.getItem())).orElse(Map.of()), PageRequest.of(0, pageSize)))
-                .filter(Predicate.not(Slice::isEmpty))
+    public MessageDto list(@RequestParam(value = "offset", required = false) Integer offset,
+                           @RequestParam(value = "limit", required = false) Integer pageSize,
+                           @RequestBody(required = false) ProductDto data) {
+        var spec = Optional.ofNullable(data).map(ProductDto::getItem).map(x -> Map.of("item", x)).orElse(Map.of());
+        var pageable = PageRequest.of(Optional.ofNullable(offset).orElse(0),
+                Optional.ofNullable(pageSize).orElse(defaultPageSize));
+        return new MessageDto(Optional.of(service.findFiltered(spec, pageable)).filter(Predicate.not(Slice::isEmpty))
                 .map(list -> {
                     try {
                         return objectMapper.writeValueAsString(list);
