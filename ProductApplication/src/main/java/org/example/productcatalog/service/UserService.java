@@ -54,8 +54,7 @@ public class UserService implements CrudService<UserDto, String> {
     public UserDto update(UserDto data) {
         return Optional.ofNullable(data).map(UserDto::getEmail).flatMap(repository::getByKey)
                 .map(x -> {
-                    x.setPassword(Optional.ofNullable(data.getPassword()).orElse(x.getPassword()));
-                    x.setRole(Optional.ofNullable(data.getRole()).orElse(x.getRole()));
+                    mapper.updateEntityFromDto(data, x);
                     return repository.update(x);
                 }).map(mapper::toDto).orElseThrow(() -> new ApplicationException(USER_NOT_SPECIFIED));
     }

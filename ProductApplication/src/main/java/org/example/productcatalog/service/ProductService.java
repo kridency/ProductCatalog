@@ -58,10 +58,7 @@ public class ProductService implements CrudService<ProductDto, String> {
     public ProductDto update(ProductDto data) {
         return Optional.ofNullable(data).map(ProductDto::getItem).flatMap(repository::getByKey)
                 .map(x -> {
-                    x.setBrand(Optional.ofNullable(data.getBrand()).orElse(x.getBrand()));
-                    x.setTitle(Optional.ofNullable(data.getTitle()).orElse(x.getTitle()));
-                    x.setCategory(Optional.ofNullable(data.getCategory()).orElse(x.getCategory()));
-                    x.setPrice(Optional.ofNullable(data.getPrice()).orElse(x.getPrice()));
+                    mapper.updateEntityFromDto(data, x);
                     return repository.update(x);
                 }).map(productCacheManager::put).map(mapper::toDto)
                 .orElseThrow(() -> new ApplicationException(PRODUCT_NOT_SPECIFIED));

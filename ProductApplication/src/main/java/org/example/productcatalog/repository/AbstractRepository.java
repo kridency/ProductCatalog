@@ -35,7 +35,7 @@ public abstract class AbstractRepository<T> {
     }
 
     public T update(T entity) {
-        entityManager.persist(entity);
+        entityManager.merge(entity);
         entityManager.flush();
         return entity;
     }
@@ -60,7 +60,7 @@ public abstract class AbstractRepository<T> {
         }
     }
 
-    public synchronized Optional<T> getById(long id) {
+    public synchronized Optional<T> getById(Long id) {
         return Optional.of(entityManager.find(entityClass, id));
     }
 
