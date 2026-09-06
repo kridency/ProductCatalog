@@ -6,6 +6,7 @@ import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Configuration
+@ConfigurationPropertiesScan
 @ComponentScan(basePackages = {"org.example.productcatalog"})
 @EnableSpringConfigured
 @EnableAspectJAutoProxy(proxyTargetClass = true)

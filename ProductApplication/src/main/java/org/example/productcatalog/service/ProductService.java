@@ -8,7 +8,6 @@ import org.example.productcatalog.mapper.ProductMapper;
 import org.example.productcatalog.repository.ProductRepository;
 import org.example.productcatalog.util.cache.ProductCacheManager;
 import org.example.productcatalog.util.specification.GetSpecification;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 
@@ -54,6 +53,7 @@ public class ProductService implements CrudService<ProductDto, String> {
      *
      * @return  product details data transfer object
      */
+    @Transactional
     @Override
     public ProductDto update(ProductDto data) {
         return Optional.ofNullable(data).map(ProductDto::getItem).flatMap(repository::getByKey)
@@ -103,7 +103,7 @@ public class ProductService implements CrudService<ProductDto, String> {
      */
     @Override
     public Collection<ProductDto> findAll() {
-        return repository.findAll(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+        return repository.findAll(new GetSpecification<>(Map.of()), Pageable.unpaged()).stream()
                 .map(mapper::toDto).toList();
     }
 

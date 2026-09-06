@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,33 +65,42 @@ public abstract class AbstractRepository<T> {
 
     public Page<T> findAll(@Nullable Specification<T> spec, @Nullable Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        Pageable actualPageable = pageable != null ? pageable : Pageable.unpaged();
 
         final CriteriaQuery<T> query = cb.createQuery(entityClass);
-
         Root<T> root = query.from(entityClass);
-
         Optional.ofNullable(spec).map(x -> x.toPredicate(root, query, cb)).ifPresent(query::where);
 
-        List<Order> orders = Optional.ofNullable(pageable).map(x -> orderBy(cb, root, x)).orElse(List.of());
+        List<Order> orders = Optional.of(actualPageable).filter(Pageable::isPaged)
+                .map(x -> orderBy(cb, root, x)).orElse(List.of());
 
         TypedQuery<T> typedQuery = entityManager.createQuery(query.orderBy(orders));
-
-        typedQuery = Optional.ofNullable(pageable).map(Pageable::getOffset).map(Number::intValue)
-                .map(typedQuery::setFirstResult)
+        typedQuery = Optional.of(actualPageable).filter(Pageable::isPaged)
+                .map(Pageable::getOffset).map(Number::intValue).map(typedQuery::setFirstResult)
+                .orElse(typedQuery);
+        typedQuery = Optional.of(actualPageable).filter(Pageable::isPaged)
+                .map(Pageable::getPageSize).map(Number::intValue).map(typedQuery::setMaxResults)
                 .orElse(typedQuery);
 
-        typedQuery = Optional.ofNullable(pageable).map(Pageable::getPageSize).map(Number::intValue)
-                .map(typedQuery::setMaxResults)
-                .orElse(typedQuery);
+        List<T> content = typedQuery.getResultList();
 
-        pageable = Optional.ofNullable(pageable).orElseGet(Pageable::unpaged);
-
-        List<T> content = Optional.of(typedQuery.getResultList()).orElseGet(Collections::emptyList);
-
-        return new PageImpl<>(content, pageable, content.size());
+        return new PageImpl<>(content, actualPageable, actualPageable.isUnpaged() ? content.size() : count(spec));
     }
 
-    protected List<Order> orderBy(CriteriaBuilder cb, Root<T> dataRoot, Pageable pageable) {
+    private long count(@Nullable Specification<T> spec) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<T> countRoot = countQuery.from(entityClass);
+        countQuery.select(cb.count(countRoot));
+
+        Optional.ofNullable(spec).map(x -> x.toPredicate(countRoot, countQuery, cb))
+                .ifPresent(countQuery::where);
+
+        return entityManager.createQuery(countQuery).getSingleResult();
+    }
+
+    private List<Order> orderBy(CriteriaBuilder cb, Root<T> dataRoot, Pageable pageable) {
         if (pageable.getSort().isSorted()) {
             return pageable.getSort().stream()
                     .map(order -> order.isAscending() ? cb.asc(dataRoot.get(order.getProperty()))

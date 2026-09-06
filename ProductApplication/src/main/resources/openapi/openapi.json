@@ -61,7 +61,8 @@
           "content" : {
             "*/*" : {
               "schema" : {
-                "$ref" : "#/components/schemas/UserDto"
+                "type" : "integer",
+                "format" : "int32"
               }
             }
           }
@@ -171,7 +172,8 @@
           "content" : {
             "*/*" : {
               "schema" : {
-                "$ref" : "#/components/schemas/ProductDto"
+                "type" : "integer",
+                "format" : "int32"
               }
             }
           }

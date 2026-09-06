@@ -96,7 +96,7 @@ public class UserService implements CrudService<UserDto, String> {
      */
     @Override
     public Collection<UserDto> findAll() {
-        return repository.findAll(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+        return repository.findAll(new GetSpecification<>(Map.of()), Pageable.unpaged()).stream()
                 .map(mapper::toDto).toList();
     }
 
