@@ -93,7 +93,7 @@ public class ProductService implements CrudService<ProductDto, String> {
      */
     @Override
     public Slice<ProductDto> findFiltered(Map<String, ? extends Comparable<?>> criteria, Pageable pageable) {
-        List<ProductDto> result = repository.get(new GetSpecification<>(criteria), pageable).stream()
+        List<ProductDto> result = repository.findAll(new GetSpecification<>(criteria), pageable).stream()
                 .map(mapper::toDto).toList();
         return new SliceImpl<>(result, pageable, result.iterator().hasNext());
     }
@@ -106,7 +106,7 @@ public class ProductService implements CrudService<ProductDto, String> {
      */
     @Override
     public Collection<ProductDto> findAll() {
-        return repository.get(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+        return repository.findAll(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
                 .map(mapper::toDto).toList();
     }
 

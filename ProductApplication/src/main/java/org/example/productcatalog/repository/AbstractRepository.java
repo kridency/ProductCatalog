@@ -2,6 +2,7 @@ package org.example.productcatalog.repository;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -19,6 +20,12 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractRepository<T> {
     protected EntityManager entityManager;
+    protected Class<T> entityClass;
+
+    public AbstractRepository(EntityManager entityManager, Class<T> entityClass) {
+        this.entityManager = entityManager;
+        this.entityClass = entityClass;
+    }
 
     public T add(T entity) {
         entityManager.persist(entity);
@@ -38,18 +45,31 @@ public abstract class AbstractRepository<T> {
         return entity;
     }
 
-    abstract public Page<T> get(@Nullable Specification<T> spec, @Nullable Pageable pageable);
-
-    abstract public Optional<T> getById(long id);
-
-    abstract public Optional<T> getByKey(String key);
-
-    protected Page<T> findAll(@Nullable Specification<T> spec, @Nullable Pageable pageable, Class<T> dtoClass) {
+    protected Optional<T> getByKey(String key, String value) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        final CriteriaQuery<T> query = cb.createQuery(dtoClass);
+        final CriteriaQuery<T> query = cb.createQuery(entityClass);
 
-        Root<T> root = query.from(dtoClass);
+        Root<T> root = query.from(entityClass);
+        query.select(root).where(cb.equal(root.get(key), value));
+
+        try {
+            return Optional.of(entityManager.createQuery(query).getSingleResult());
+        } catch(NoResultException __) {
+            return Optional.empty();
+        }
+    }
+
+    public synchronized Optional<T> getById(long id) {
+        return Optional.of(entityManager.find(entityClass, id));
+    }
+
+    public Page<T> findAll(@Nullable Specification<T> spec, @Nullable Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        final CriteriaQuery<T> query = cb.createQuery(entityClass);
+
+        Root<T> root = query.from(entityClass);
 
         Optional.ofNullable(spec).map(x -> x.toPredicate(root, query, cb)).ifPresent(query::where);
 

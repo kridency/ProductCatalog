@@ -84,7 +84,7 @@ public class UserService implements CrudService<UserDto, String> {
      */
     @Override
     public Slice<UserDto> findFiltered(Map<String, ? extends Comparable<?>> criteria, Pageable pageable) {
-        List<UserDto> result = repository.get(new GetSpecification<>(criteria), pageable).stream()
+        List<UserDto> result = repository.findAll(new GetSpecification<>(criteria), pageable).stream()
                 .map(mapper::toDto).toList();
         return new SliceImpl<>(result, pageable, result.iterator().hasNext());
     }
@@ -97,7 +97,7 @@ public class UserService implements CrudService<UserDto, String> {
      */
     @Override
     public Collection<UserDto> findAll() {
-        return repository.get(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
+        return repository.findAll(new GetSpecification<>(Map.of()), PageRequest.of(0, 20)).stream()
                 .map(mapper::toDto).toList();
     }
 

@@ -2,10 +2,9 @@ package org.example.productcatalog.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.HttpHeaders;
-import org.example.productcatalog.entity.User;
 import org.example.productcatalog.exception.ApplicationException;
 import org.example.productcatalog.mapper.UserMapper;
-import org.example.productcatalog.repository.AbstractRepository;
+import org.example.productcatalog.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -53,7 +52,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(AbstractRepository<User> userRepository, UserMapper userMapper) {
+    public UserDetailsService userDetailsService(UserRepository userRepository, UserMapper userMapper) {
         return username -> userRepository.getByKey(username).map(userMapper::toDto)
                 .orElseThrow(() -> new ApplicationException("User not found"));
     }
