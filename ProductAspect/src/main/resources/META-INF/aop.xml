@@ -5,6 +5,6 @@
     </aspects>
 
     <weaver options="-warn:none -Xlint:ignore -Xlint:cantFindType=ignore -Xset:overWeaving=false">
-        <dump within="org.example.productcatalog..*" />
+        <include within="org.example.productcatalog..*" />
     </weaver>
 </aspectj>

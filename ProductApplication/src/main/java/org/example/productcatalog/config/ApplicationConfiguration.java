@@ -5,13 +5,14 @@ import liquibase.integration.spring.SpringLiquibase;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.hibernate.SpringBeanContainer;
@@ -21,13 +22,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Properties;
 
 @Configuration
-@ConfigurationPropertiesScan
+//@ConfigurationPropertiesScan
 @ComponentScan(basePackages = {"org.example.productcatalog"})
 @EnableSpringConfigured
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -35,7 +37,7 @@ import java.util.Properties;
 @EnableJpaRepositories(
         basePackages = "org.example.productcatalog.repository",
         entityManagerFactoryRef = "entityManager")
-@EnableAutoConfiguration
+@EnableWebMvc
 @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
 @PropertySources(
         value = {
@@ -43,14 +45,14 @@ import java.util.Properties;
         }
 )
 public class ApplicationConfiguration {
-    @Value("${spring.datasource.url}")
-    private String dataUrl;
-
     @Value("${app.datasource.data-schema}")
     private String dataSchema;
 
     @Value("${app.datasource.liquibase-schema}")
     private String liquibaseSchema;
+
+    @Value("${spring.datasource.url}")
+    private String dataUrl;
 
     @Value("${spring.datasource.username}")
     private String username;
@@ -70,6 +72,18 @@ public class ApplicationConfiguration {
     }
 
     @Bean
+    public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(new ClassPathResource("schema.sql"));
+
+        DataSourceInitializer initializer = new DataSourceInitializer();
+        initializer.setDataSource(dataSource);
+        initializer.setDatabasePopulator(populator);
+        return initializer;
+    }
+
+    @Bean
+    @DependsOn("dataSourceInitializer")
     public LocalContainerEntityManagerFactoryBean entityManager(ConfigurableListableBeanFactory beanFactory){
         final LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setPackagesToScan("org.example.productcatalog");
@@ -77,6 +91,9 @@ public class ApplicationConfiguration {
         entityManager.setJpaProperties(new Properties() {
             {
                 put ("hibernate.resource.beans.container", new SpringBeanContainer(beanFactory));
+                put ("hibernate.default_schema", dataSchema);
+                put ("hibernate.hbm2ddl.create_namespaces", "true");
+                put ("hibernate.hbm2ddl.auto", "update");
             }
         });
 
