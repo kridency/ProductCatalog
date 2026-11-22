@@ -16,14 +16,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
-            <version>${aspectj.version}</version>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>${spring-data.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.aspectj</groupId>
-            <artifactId>aspectjtools</artifactId>
+            <artifactId>aspectjrt</artifactId>
             <version>${aspectj.version}</version>
         </dependency>
 
@@ -34,9 +34,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-instrument</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

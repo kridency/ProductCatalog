@@ -1,6 +1,6 @@
 package org.example.productcatalog.web.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -86,7 +86,7 @@ public class UserController {
                 .map(list -> {
                     try {
                         return objectMapper.writeValueAsString(list);
-                    } catch (JsonProcessingException e) {
+                    } catch (JacksonException e) {
                         return e.getMessage();
                     }
                 }).orElse(USER_NOT_FOUND), "");
