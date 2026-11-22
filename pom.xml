@@ -22,7 +22,6 @@
         <start-class>org.example.productcatalog.ProductApplication</start-class>
         <maven.compiler.parameters>true</maven.compiler.parameters>
 
-        <spring-boot.version>4.0.3</spring-boot.version>
         <spring.version>7.0.8</spring.version>
         <spring-data.version>4.0.0</spring-data.version>
         <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>

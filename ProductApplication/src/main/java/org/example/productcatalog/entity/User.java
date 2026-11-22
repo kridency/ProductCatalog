@@ -10,13 +10,12 @@ import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "`user`")
+@Table(name = "`user`", uniqueConstraints = { @UniqueConstraint(name = "uc_user", columnNames = { "email" }) })
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
     @SequenceGenerator(sequenceName = "id_sequence", allocationSize = 1)
     private Long id;
-    @Column(name = "email", unique = true)
     private String email;
     @Convert(converter = PasswordConverter.class)
     private String password;
