@@ -1,6 +1,6 @@
 package org.example.productcatalog.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import tools.jackson.core.type.TypeReference;
 import org.example.productcatalog.AbstractTest;
 import org.example.productcatalog.dto.MessageDto;
 import org.example.productcatalog.dto.ProductDto;

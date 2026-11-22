@@ -3,7 +3,7 @@ FROM tomcat:10-jdk21
 
 ARG RUN_PROFILE=docker
 
-ARG SPRING_VERSION=7.0.3
+ARG SPRING_VERSION=7.0.8
 
 ARG POSTGRES_DATASOURCE_URL='jdbc:postgresql://postgres-container:5432/product_db?currentSchema=custom&createDatabaseIfNotExist=true'
 
