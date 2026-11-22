@@ -12,9 +12,7 @@ import org.springframework.stereotype.Repository;
 public class UserRepository extends AbstractRepository<User> {
 
     @Inject
-    public UserRepository(EntityManager entityManager) {
-        super(entityManager, User.class);
-    }
+    public UserRepository(EntityManager entityManager) { super(entityManager, User.class); }
 
     public Optional<User> getByKey(String email) { return getByKey("email", email); }
 }

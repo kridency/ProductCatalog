@@ -20,8 +20,7 @@ public class AspectModuleConfiguration implements LoadTimeWeavingConfigurer {
     private final InstrumentationLoadTimeWeaver loadTimeWeaver;
 
     public AspectModuleConfiguration(ApplicationContext applicationContext) {
-        this.loadTimeWeaver =
-                new InstrumentationLoadTimeWeaver(applicationContext.getClassLoader());
+        this.loadTimeWeaver = new InstrumentationLoadTimeWeaver(applicationContext.getClassLoader());
     }
 
     @Override
